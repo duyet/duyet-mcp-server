@@ -33,7 +33,7 @@ jest.mock("../database", () => ({
 // Mock MCP server
 const createMockServer = () =>
 	({
-		tool: jest.fn(),
+		registerTool: jest.fn(),
 	}) as any;
 
 beforeEach(() => {
@@ -54,7 +54,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 				.mockResolvedValueOnce([{ count: 10 }]); // total count
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") {
 					toolHandler = handler;
 				}
@@ -83,7 +83,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			const mockEnv = { DB: {} as D1Database };
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") {
 					toolHandler = handler;
 				}
@@ -100,7 +100,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			const mockEnv = { DB: {} as D1Database };
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") {
 					toolHandler = handler;
 				}
@@ -119,7 +119,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			mockDb.execute.mockRejectedValue(new Error("Database error"));
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") {
 					toolHandler = handler;
 				}
@@ -148,7 +148,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_contacts") {
 					toolHandler = handler;
 				}
@@ -177,7 +177,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			mockDb.execute.mockResolvedValue([]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_contacts") {
 					toolHandler = handler;
 				}
@@ -202,7 +202,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			mockDb.execute.mockRejectedValue(new Error("Database error"));
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_contacts") {
 					toolHandler = handler;
 				}
@@ -223,7 +223,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			mockDb.execute.mockResolvedValue({});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact") {
 					toolHandler = handler;
 				}
@@ -247,7 +247,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			mockDb.execute.mockResolvedValue({});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact") {
 					toolHandler = handler;
 				}
@@ -271,7 +271,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			(global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_latest_blog_post") {
 					toolHandler = handler;
 				}
@@ -292,7 +292,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_latest_blog_post") {
 					toolHandler = handler;
 				}
@@ -314,7 +314,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_latest_blog_post") {
 					toolHandler = handler;
 				}
@@ -334,7 +334,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			(global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_github_activity") {
 					toolHandler = handler;
 				}
@@ -357,7 +357,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_github_activity") {
 					toolHandler = handler;
 				}
@@ -379,7 +379,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_github_activity") {
 					toolHandler = handler;
 				}
@@ -400,7 +400,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_github_activity") {
 					toolHandler = handler;
 				}
@@ -428,7 +428,7 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_github_activity") {
 					toolHandler = handler;
 				}

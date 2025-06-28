@@ -5,13 +5,18 @@ import { z } from "zod";
  * Register the get_cv MCP tool
  */
 export function registerGetCVTool(server: McpServer) {
-	server.tool(
+	server.registerTool(
 		"get_cv",
 		{
-			format: z
-				.enum(["summary", "detailed", "json"])
-				.default("summary")
-				.describe("Format of CV data to return"),
+			title: "Get CV",
+			description:
+				"Retrieve Duyet's CV (curriculum vitae) in different formats - summary, detailed, or JSON format",
+			inputSchema: {
+				format: z
+					.enum(["summary", "detailed", "json"])
+					.default("summary")
+					.describe("Format of CV data to return"),
+			},
 		},
 		async ({ format = "summary" }) => {
 			try {

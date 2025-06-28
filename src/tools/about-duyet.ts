@@ -26,16 +26,25 @@ export function getAboutDuyetContent(yearsOfExperience: number): string {
  * Register the about_duyet MCP tool
  */
 export function registerAboutDuyetTool(server: McpServer) {
-	server.tool("about_duyet", {}, async () => {
-		const yearsOfExperience = calculateYearsOfExperience();
+	server.registerTool(
+		"about_duyet",
+		{
+			title: "About Duyet",
+			description:
+				"Get basic information about Duyet, a Senior Data Engineer with extensive experience in data engineering, cloud technologies, and distributed systems",
+			inputSchema: {},
+		},
+		async () => {
+			const yearsOfExperience = calculateYearsOfExperience();
 
-		return {
-			content: [
-				{
-					type: "text",
-					text: getAboutDuyetContent(yearsOfExperience),
-				},
-			],
-		};
-	});
+			return {
+				content: [
+					{
+						type: "text",
+						text: getAboutDuyetContent(yearsOfExperience),
+					},
+				],
+			};
+		},
+	);
 }

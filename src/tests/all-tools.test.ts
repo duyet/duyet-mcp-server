@@ -8,7 +8,7 @@ import { registerAllTools } from "../tools/index";
 
 // Mock the McpServer
 const mockServer = {
-	tool: jest.fn(),
+	registerTool: jest.fn(),
 } as unknown as McpServer;
 
 // Mock environment
@@ -24,7 +24,7 @@ describe("Tool Registration Tests", () => {
 	describe("About Duyet Tool", () => {
 		test("should register about-duyet tool", () => {
 			registerAboutDuyetTool(mockServer);
-			expect(mockServer.tool).toHaveBeenCalledWith(
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"about_duyet",
 				expect.any(Object),
 				expect.any(Function),
@@ -33,7 +33,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle about-duyet tool execution", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "about_duyet") {
 					toolHandler = handler;
 				}
@@ -53,7 +53,7 @@ describe("Tool Registration Tests", () => {
 	describe("Get CV Tool", () => {
 		test("should register get-cv tool", () => {
 			registerGetCVTool(mockServer);
-			expect(mockServer.tool).toHaveBeenCalledWith(
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"get_cv",
 				expect.any(Object),
 				expect.any(Function),
@@ -62,7 +62,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle CV tool with summary format", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "get_cv") {
 					toolHandler = handler;
 				}
@@ -77,7 +77,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle CV tool with detailed format", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "get_cv") {
 					toolHandler = handler;
 				}
@@ -90,7 +90,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle CV tool with json format", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "get_cv") {
 					toolHandler = handler;
 				}
@@ -106,7 +106,7 @@ describe("Tool Registration Tests", () => {
 	describe("GitHub Activity Tool", () => {
 		test("should register github-activity tool", () => {
 			registerGitHubActivityTool(mockServer);
-			expect(mockServer.tool).toHaveBeenCalledWith(
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"get_github_activity",
 				expect.any(Object),
 				expect.any(Function),
@@ -115,7 +115,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle github activity tool execution", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "get_github_activity") {
 					toolHandler = handler;
 				}
@@ -128,7 +128,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle github activity with details", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "get_github_activity") {
 					toolHandler = handler;
 				}
@@ -143,7 +143,7 @@ describe("Tool Registration Tests", () => {
 	describe("Hire Me Tool", () => {
 		test("should register hire-me tool", () => {
 			registerHireMeTool(mockServer);
-			expect(mockServer.tool).toHaveBeenCalledWith(
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"hire_me",
 				expect.any(Object),
 				expect.any(Function),
@@ -152,7 +152,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle hire-me tool with all parameters", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "hire_me") {
 					toolHandler = handler;
 				}
@@ -171,7 +171,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle hire-me tool with minimal parameters", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "hire_me") {
 					toolHandler = handler;
 				}
@@ -186,7 +186,7 @@ describe("Tool Registration Tests", () => {
 	describe("Say Hi Tool", () => {
 		test("should register say-hi tool", () => {
 			registerSayHiTool(mockServer);
-			expect(mockServer.tool).toHaveBeenCalledWith(
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"say_hi",
 				expect.any(Object),
 				expect.any(Function),
@@ -195,7 +195,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle say-hi tool without message", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "say_hi") {
 					toolHandler = handler;
 				}
@@ -209,7 +209,7 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle say-hi tool with custom message", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
 				if (name === "say_hi") {
 					toolHandler = handler;
 				}
@@ -226,7 +226,7 @@ describe("Tool Registration Tests", () => {
 		test("should register all tools", () => {
 			registerAllTools(mockServer, mockEnv);
 			// Should have called tool registration for all 9 tools
-			expect(mockServer.tool).toHaveBeenCalledTimes(9);
+			expect(mockServer.registerTool).toHaveBeenCalledTimes(9);
 		});
 	});
 });

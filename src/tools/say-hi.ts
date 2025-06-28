@@ -5,13 +5,18 @@ import { z } from "zod";
  * Register the say-hi MCP tool for greeting Duyet
  */
 export function registerSayHiTool(server: McpServer) {
-	server.tool(
+	server.registerTool(
 		"say_hi",
 		{
-			message: z
-				.string()
-				.optional()
-				.describe("Optional personal message to include with the greeting"),
+			title: "Say Hi",
+			description:
+				"Send a friendly greeting to Duyet with an optional personal message. Get contact information and connection links",
+			inputSchema: {
+				message: z
+					.string()
+					.optional()
+					.describe("Optional personal message to include with the greeting"),
+			},
 		},
 		async ({ message }) => {
 			const greeting = message ? `Hi Duyet! ${message}` : "Hi Duyet! 👋";

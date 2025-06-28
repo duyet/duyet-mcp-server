@@ -28,7 +28,7 @@ jest.mock("../database", () => ({
 	getDb: jest.fn(() => mockDb),
 }));
 
-const createMockServer = () => ({ tool: jest.fn() }) as any;
+const createMockServer = () => ({ registerTool: jest.fn() }) as any;
 
 beforeEach(() => {
 	jest.clearAllMocks();
@@ -51,7 +51,7 @@ describe("Coverage Boost Tests", () => {
 				.mockResolvedValueOnce([{ count: 10 }]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") toolHandler = handler;
 			});
 
@@ -73,7 +73,7 @@ describe("Coverage Boost Tests", () => {
 			]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") toolHandler = handler;
 			});
 
@@ -94,7 +94,7 @@ describe("Coverage Boost Tests", () => {
 			]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") toolHandler = handler;
 			});
 
@@ -114,7 +114,7 @@ describe("Coverage Boost Tests", () => {
 			]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") toolHandler = handler;
 			});
 
@@ -134,7 +134,7 @@ describe("Coverage Boost Tests", () => {
 			]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") toolHandler = handler;
 			});
 
@@ -153,7 +153,7 @@ describe("Coverage Boost Tests", () => {
 			const mockEnv = { DB: {} as D1Database };
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "contact_analytics") toolHandler = handler;
 			});
 
@@ -186,7 +186,7 @@ describe("Coverage Boost Tests", () => {
 			]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_contacts") toolHandler = handler;
 			});
 
@@ -211,7 +211,7 @@ describe("Coverage Boost Tests", () => {
 			]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_contacts") toolHandler = handler;
 			});
 
@@ -236,7 +236,7 @@ describe("Coverage Boost Tests", () => {
 			]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_contacts") toolHandler = handler;
 			});
 
@@ -261,7 +261,7 @@ describe("Coverage Boost Tests", () => {
 			]);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_contacts") toolHandler = handler;
 			});
 
@@ -289,7 +289,7 @@ describe("Coverage Boost Tests", () => {
 			);
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_contacts") toolHandler = handler;
 			});
 
@@ -326,7 +326,7 @@ describe("Coverage Boost Tests", () => {
 			});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_github_activity") toolHandler = handler;
 			});
 
@@ -354,7 +354,7 @@ describe("Coverage Boost Tests", () => {
 			});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_github_activity") toolHandler = handler;
 			});
 
@@ -387,7 +387,7 @@ describe("Coverage Boost Tests", () => {
 			});
 
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
 				if (name === "get_github_activity") toolHandler = handler;
 			});
 

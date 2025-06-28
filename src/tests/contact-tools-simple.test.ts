@@ -28,6 +28,7 @@ jest.mock("../database", () => ({
 // Mock MCP server
 const createMockServer = () => ({
 	tool: jest.fn(),
+	registerTool: jest.fn(),
 });
 
 beforeEach(() => {
@@ -46,7 +47,7 @@ describe("Contact Tools Registration", () => {
 
 			registerContactTool(mockServer as any, mockEnv as Env);
 
-			expect(mockServer.tool).toHaveBeenCalledWith(
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"contact",
 				expect.any(Object),
 				expect.any(Function),
@@ -63,7 +64,7 @@ describe("Contact Tools Registration", () => {
 
 			registerGetContactsTool(mockServer as any, mockEnv as Env);
 
-			expect(mockServer.tool).toHaveBeenCalledWith(
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"get_contacts",
 				expect.any(Object),
 				expect.any(Function),
@@ -80,7 +81,7 @@ describe("Contact Tools Registration", () => {
 
 			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
 
-			expect(mockServer.tool).toHaveBeenCalledWith(
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"contact_analytics",
 				expect.any(Object),
 				expect.any(Function),

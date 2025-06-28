@@ -68,19 +68,24 @@ interface GitHubEvent {
  * Register the get_github_activity MCP tool
  */
 export function registerGitHubActivityTool(server: McpServer) {
-	server.tool(
+	server.registerTool(
 		"get_github_activity",
 		{
-			limit: z
-				.number()
-				.min(1)
-				.max(20)
-				.default(5)
-				.describe("Number of recent activities to fetch (1-20)"),
-			include_details: z
-				.boolean()
-				.default(false)
-				.describe("Include detailed information about activities"),
+			title: "Get GitHub Activity",
+			description:
+				"Retrieve Duyet's recent GitHub activity including commits, issues, pull requests, releases, and other public events. View up to 20 recent activities with optional detailed information",
+			inputSchema: {
+				limit: z
+					.number()
+					.min(1)
+					.max(20)
+					.default(5)
+					.describe("Number of recent activities to fetch (1-20)"),
+				include_details: z
+					.boolean()
+					.default(false)
+					.describe("Include detailed information about activities"),
+			},
 		},
 		async ({ limit = 5, include_details = false }) => {
 			try {

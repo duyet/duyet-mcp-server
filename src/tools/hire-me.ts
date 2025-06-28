@@ -5,18 +5,23 @@ import { z } from "zod";
  * Register the hire_me MCP tool
  */
 export function registerHireMeTool(server: McpServer) {
-	server.tool(
+	server.registerTool(
 		"hire_me",
 		{
-			role_type: z
-				.enum(["full_time", "contract", "consulting", "part_time"])
-				.optional()
-				.describe("Type of engagement you're interested in"),
-			tech_stack: z.string().optional().describe("Technologies/tools your project uses"),
-			company_size: z
-				.enum(["startup", "scale_up", "enterprise", "agency"])
-				.optional()
-				.describe("Company size/type"),
+			title: "Hire Me",
+			description:
+				"Get information about hiring Duyet for various roles - full-time, contract, consulting, or part-time positions. Includes expertise, experience, and next steps",
+			inputSchema: {
+				role_type: z
+					.enum(["full_time", "contract", "consulting", "part_time"])
+					.optional()
+					.describe("Type of engagement you're interested in"),
+				tech_stack: z.string().optional().describe("Technologies/tools your project uses"),
+				company_size: z
+					.enum(["startup", "scale_up", "enterprise", "agency"])
+					.optional()
+					.describe("Company size/type"),
+			},
 		},
 		async ({ role_type, tech_stack, company_size }) => {
 			const currentYear = new Date().getFullYear();

@@ -10,22 +10,27 @@ import { contacts } from "../database/schema";
 export function registerContactTool(server: McpServer, env: Env) {
 	const db = getDb(env.DB);
 
-	server.tool(
+	server.registerTool(
 		"contact",
 		{
-			message: z
-				.string()
-				.min(10)
-				.max(500)
-				.describe("Message to send to Duyet (10-500 characters)"),
-			contact_email: z
-				.string()
-				.email()
-				.optional()
-				.describe("Optional: Your email for response"),
-			purpose: z
-				.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"])
-				.describe("Purpose of your message"),
+			title: "Contact Duyet",
+			description:
+				"Send a message to Duyet for collaboration, job opportunities, consulting, or general inquiries. Messages are saved with a reference ID for follow-up",
+			inputSchema: {
+				message: z
+					.string()
+					.min(10)
+					.max(500)
+					.describe("Message to send to Duyet (10-500 characters)"),
+				contact_email: z
+					.string()
+					.email()
+					.optional()
+					.describe("Optional: Your email for response"),
+				purpose: z
+					.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"])
+					.describe("Purpose of your message"),
+			},
 		},
 		async ({ message, contact_email, purpose }) => {
 			// Extract metadata - simplified for MCP context

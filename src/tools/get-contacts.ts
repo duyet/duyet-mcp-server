@@ -11,28 +11,36 @@ import { contacts } from "../database/schema";
 export function registerGetContactsTool(server: McpServer, env: Env) {
 	const db = getDb(env.DB);
 
-	server.tool(
+	server.registerTool(
 		"get_contacts",
 		{
-			purpose: z
-				.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"])
-				.optional()
-				.describe("Filter by purpose of contact"),
-			date_from: z.string().optional().describe("Start date filter (YYYY-MM-DD format)"),
-			date_to: z.string().optional().describe("End date filter (YYYY-MM-DD format)"),
-			contact_email: z.string().email().optional().describe("Filter by contact email"),
-			reference_id: z.string().optional().describe("Get specific contact by reference ID"),
-			limit: z
-				.number()
-				.min(1)
-				.max(100)
-				.default(20)
-				.describe("Maximum number of contacts to return (1-100)"),
-			offset: z
-				.number()
-				.min(0)
-				.default(0)
-				.describe("Number of contacts to skip for pagination"),
+			title: "Get Contacts",
+			description:
+				"Retrieve and search contact submissions with filtering options by purpose, date range, email, or reference ID. Supports pagination for large result sets",
+			inputSchema: {
+				purpose: z
+					.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"])
+					.optional()
+					.describe("Filter by purpose of contact"),
+				date_from: z.string().optional().describe("Start date filter (YYYY-MM-DD format)"),
+				date_to: z.string().optional().describe("End date filter (YYYY-MM-DD format)"),
+				contact_email: z.string().email().optional().describe("Filter by contact email"),
+				reference_id: z
+					.string()
+					.optional()
+					.describe("Get specific contact by reference ID"),
+				limit: z
+					.number()
+					.min(1)
+					.max(100)
+					.default(20)
+					.describe("Maximum number of contacts to return (1-100)"),
+				offset: z
+					.number()
+					.min(0)
+					.default(0)
+					.describe("Number of contacts to skip for pagination"),
+			},
 		},
 		async ({
 			purpose,

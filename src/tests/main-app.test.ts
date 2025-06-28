@@ -5,6 +5,7 @@ jest.mock("agents/mcp", () => ({
 	McpAgent: class MockMcpAgent {
 		server = {
 			tool: jest.fn(),
+			registerTool: jest.fn(),
 		};
 		env = {};
 		async init() {}

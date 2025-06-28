@@ -137,15 +137,20 @@ export function formatBlogPostsForMCP(posts: BlogPost[]): string {
  * Register the get_latest_blog_post MCP tool
  */
 export function registerGetLatestBlogPostTool(server: McpServer) {
-	server.tool(
+	server.registerTool(
 		"get_latest_blog_post",
 		{
-			limit: z
-				.number()
-				.min(1)
-				.max(10)
-				.default(1)
-				.describe("Number of blog posts to fetch, default is 1"),
+			title: "Get Latest Blog Post",
+			description:
+				"Fetch the latest blog posts from Duyet's technical blog at blog.duyet.net. Get up to 10 recent posts with titles, links, descriptions, and publication dates",
+			inputSchema: {
+				limit: z
+					.number()
+					.min(1)
+					.max(10)
+					.default(1)
+					.describe("Number of blog posts to fetch, default is 1"),
+			},
 		},
 		async ({ limit = 1 }) => {
 			try {

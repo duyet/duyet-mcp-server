@@ -37,12 +37,12 @@ jest.mock("../database/index", () => ({
 import { registerGetContactsTool } from "../tools/get-contacts";
 
 describe("Get Contacts Tool - Comprehensive Coverage", () => {
-	let mockServer: { tool: jest.Mock };
+	let mockServer: { registerTool: jest.Mock };
 	let mockEnv: Env;
 
 	beforeEach(() => {
 		mockServer = {
-			tool: jest.fn(),
+			registerTool: jest.fn(),
 		};
 		mockEnv = { DB: {} as any } as Env;
 		jest.clearAllMocks();
@@ -51,11 +51,11 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 	describe("Registration", () => {
 		test("should register get_contacts tool", () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			
-			expect(mockServer.tool).toHaveBeenCalledWith(
+
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"get_contacts",
 				expect.any(Object),
-				expect.any(Function)
+				expect.any(Function),
 			);
 		});
 	});
@@ -63,7 +63,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 	describe("Reference ID Query", () => {
 		test("should handle specific contact by reference ID", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContact = {
 				referenceId: "REF123",
@@ -92,7 +92,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle reference ID not found", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
 			mockDb.from.mockReturnValueOnce(mockDb);
@@ -107,7 +107,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle contact with no email", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContact = {
 				referenceId: "REF456",
@@ -137,7 +137,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 	describe("Filtered Queries", () => {
 		test("should handle purpose filter", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContacts = [
 				{
@@ -165,7 +165,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle email filter", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContacts = [
 				{
@@ -191,7 +191,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle date_from filter", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContacts = [
 				{
@@ -217,7 +217,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle date_to filter", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContacts = [
 				{
@@ -243,7 +243,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle invalid date_from format", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
 			mockDb.from.mockReturnValueOnce(mockDb);
@@ -259,7 +259,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle invalid date_to format", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
 			mockDb.from.mockReturnValueOnce(mockDb);
@@ -275,7 +275,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle multiple filters combined", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContacts = [
 				{
@@ -297,7 +297,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 				purpose: "job_opportunity",
 				contact_email: "multi@example.com",
 				date_from: "2024-01-15",
-				date_to: "2024-01-25"
+				date_to: "2024-01-25",
 			});
 
 			expect(result.content[0].text).toContain("purpose: job_opportunity");
@@ -310,7 +310,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 	describe("Pagination", () => {
 		test("should handle custom limit and offset", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContacts = Array.from({ length: 5 }, (_, i) => ({
 				referenceId: `REF${i + 11}`,
@@ -336,7 +336,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle when limit equals results (has more data)", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContacts = Array.from({ length: 10 }, (_, i) => ({
 				referenceId: `REF${i + 1}`,
@@ -360,7 +360,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle when limit exceeds results (no more data)", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const mockContacts = Array.from({ length: 3 }, (_, i) => ({
 				referenceId: `REF${i + 1}`,
@@ -386,7 +386,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 	describe("No Results Handling", () => {
 		test("should handle no contacts found with filters", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
 			mockDb.from.mockReturnValueOnce(mockDb);
@@ -394,9 +394,9 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 			mockDb.limit.mockReturnValueOnce(mockDb);
 			mockDb.offset.mockResolvedValueOnce([]);
 
-			const result = await handler({ 
+			const result = await handler({
 				purpose: "job_opportunity",
-				date_from: "2024-01-01"
+				date_from: "2024-01-01",
 			});
 
 			expect(result.content[0].text).toContain("No Contacts Found");
@@ -407,7 +407,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should handle no contacts found without filters", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
 			mockDb.from.mockReturnValueOnce(mockDb);
@@ -425,7 +425,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 	describe("Message Truncation", () => {
 		test("should truncate long messages", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const longMessage = "A".repeat(150); // 150 characters
 			const mockContacts = [
@@ -452,7 +452,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 
 		test("should not truncate short messages", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const shortMessage = "Short message";
 			const mockContacts = [
@@ -481,7 +481,7 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 	describe("Error Handling", () => {
 		test("should handle database errors gracefully", async () => {
 			registerGetContactsTool(mockServer as any, mockEnv);
-			const [, , handler] = mockServer.tool.mock.calls[0];
+			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			// Mock database error
 			mockDb.select.mockImplementation(() => {
@@ -494,4 +494,4 @@ describe("Get Contacts Tool - Comprehensive Coverage", () => {
 			expect(result.content[0].text).toContain("Please try again later");
 		});
 	});
-}); 
+});
