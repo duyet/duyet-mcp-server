@@ -2,6 +2,7 @@ import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Hono } from "hono";
 import { registerAllTools } from "./tools/index";
+import { registerAllResources } from "./resources/index";
 
 export class DuyetMCP extends McpAgent {
 	server = new McpServer({
@@ -10,14 +11,15 @@ export class DuyetMCP extends McpAgent {
 	});
 
 	async init() {
-		// Register all MCP tools - env should be available through this.env
+		// Register all MCP tools and resources - env should be available through this.env
 		registerAllTools(this.server, this.env as Env);
+		registerAllResources(this.server, this.env as Env);
 	}
 }
 
 const app = new Hono<{ Bindings: Env }>();
 
-const HOME_PAGE_CONTENT = `Duyet MCP Server. See https://github.com/duyet/duyet-mcp-server for more details.
+const LLMS_TXT = `Duyet MCP Server. See https://github.com/duyet/duyet-mcp-server for more details.
 
 Usage: Update your AI assistant configuration to point to the URL of Duyet MCP server
 
@@ -36,26 +38,42 @@ Usage: Update your AI assistant configuration to point to the URL of Duyet MCP s
 \`\`\`
   `;
 
-app.get("/", (c) => c.text(HOME_PAGE_CONTENT));
+app.get("/", (c) => c.redirect("/llms.txt"));
+app.get("/llms.txt", (c) => c.text(LLMS_TXT));
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
 
 // Create MCP routes with environment handling
 app.all("/sse/*", async (c) => {
-	const mcpApp = DuyetMCP.serveSSE("/sse");
-	return mcpApp.fetch(c.req.raw, c.env, c.executionCtx);
+	try {
+		const mcpApp = DuyetMCP.serveSSE("/sse");
+		return mcpApp.fetch(c.req.raw, c.env, c.executionCtx);
+	} catch (error) {
+		console.error("SSE Error:", error);
+		return c.text("Internal Server Error", 500);
+	}
 });
 
 app.all("/mcp*", async (c) => {
-	const mcpApp = DuyetMCP.serve("/mcp");
-	return mcpApp.fetch(c.req.raw, c.env, c.executionCtx);
+	try {
+		const mcpApp = DuyetMCP.serve("/mcp");
+		return mcpApp.fetch(c.req.raw, c.env, c.executionCtx);
+	} catch (error) {
+		console.error("MCP Error:", error);
+		return c.text("Internal Server Error", 500);
+	}
 });
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext) {
-		if (request.headers.get("Upgrade") === "websocket") {
-			const mcpApp = DuyetMCP.serve("/mcp");
-			return mcpApp.fetch(request, env, ctx);
+		try {
+			if (request.headers.get("Upgrade") === "websocket") {
+				const mcpApp = DuyetMCP.serve("/mcp");
+				return mcpApp.fetch(request, env, ctx);
+			}
+			return app.fetch(request, env, ctx);
+		} catch (error) {
+			console.error("Application Error:", error);
+			return new Response("Internal Server Error", { status: 500 });
 		}
-		return app.fetch(request, env, ctx);
 	},
 };

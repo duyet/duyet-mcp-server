@@ -6,6 +6,9 @@ import { registerHireMeTool } from "../tools/hire-me";
 import { registerSayHiTool } from "../tools/say-hi";
 import { registerAllTools } from "../tools/index";
 
+// Mock fetch globally
+global.fetch = jest.fn();
+
 // Mock the McpServer
 const mockServer = {
 	registerTool: jest.fn(),
@@ -19,6 +22,12 @@ const mockEnv = {
 describe("Tool Registration Tests", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
+		// Mock fetch responses
+		(global.fetch as jest.Mock).mockResolvedValue({
+			ok: true,
+			status: 200,
+			text: async () => "<title>Duyet - Senior Data Engineer</title><body>CV content</body>",
+		});
 	});
 
 	describe("About Duyet Tool", () => {
@@ -70,9 +79,8 @@ describe("Tool Registration Tests", () => {
 
 			registerGetCVTool(mockServer);
 			const result = await toolHandler({ format: "summary" });
-			expect(result.content[0].text).toContain(
-				"Sr. Data Engineer with 8+ years of experience",
-			);
+			expect(result.content[0].text).toContain("Duyet - Senior Data Engineer");
+			expect(result.content[0].text).toContain("Sr. Data Engineer with");
 		});
 
 		test("should handle CV tool with detailed format", async () => {
@@ -86,6 +94,7 @@ describe("Tool Registration Tests", () => {
 			registerGetCVTool(mockServer);
 			const result = await toolHandler({ format: "detailed" });
 			expect(result.content[0].text).toContain("Key Highlights");
+			expect(result.content[0].text).toContain("Duyet - Senior Data Engineer");
 		});
 
 		test("should handle CV tool with json format", async () => {
@@ -94,6 +103,20 @@ describe("Tool Registration Tests", () => {
 				if (name === "get_cv") {
 					toolHandler = handler;
 				}
+			});
+
+			// Mock JSON CV response
+			(global.fetch as jest.Mock).mockImplementation((url: string) => {
+				if (url.includes("cv.json")) {
+					return Promise.resolve({
+						ok: true,
+						text: async () => '{"name": "Duyet", "title": "Senior Data Engineer"}',
+					});
+				}
+				return Promise.resolve({
+					ok: true,
+					text: async () => "<title>Duyet - Senior Data Engineer</title>",
+				});
 			});
 
 			registerGetCVTool(mockServer);

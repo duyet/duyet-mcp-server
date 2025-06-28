@@ -4,9 +4,9 @@
 [![codecov](https://codecov.io/gh/duyet/duyet-mcp-server/branch/master/graph/badge.svg)](https://codecov.io/gh/duyet/duyet-mcp-server)
 [![Security](https://github.com/duyet/duyet-mcp-server/workflows/Security%20and%20Dependencies/badge.svg)](https://github.com/duyet/duyet-mcp-server/actions)
 
-An experimental MCP (Model Context Protocol) server that helps AI assistants connect to and retrieve information about duyet. This server provides access to information primarily available at [https://duyet.net](https://duyet.net), making it available directly to your AI assistant.
+An experimental [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that helps AI assistants connect to and retrieve information about duyet. This server provides access to information primarily available at [https://duyet.net](https://duyet.net), making it available directly to your AI assistant.
 
-Update your Claude/Cursor/etc configuration to point to the URL of Duyet MCP server
+Usage: Update your Claude/Cursor/etc MCP server configuration:
 
 ```json
 {
@@ -35,7 +35,7 @@ Endpoints:
 
 ## About This Project
 
-This is a **study, demo, and experimental project** designed to explore MCP capabilities. The project serves as a learning exercise in building remote MCP servers and is mostly written by LLM as well, showcasing AI-assisted development.
+This is a **study, demo, and experimental project** designed to explore MCP capabilities. The project serves as a learning exercise in building remote MCP servers and is mostly written by LLM as well.
 
 **Purpose**: Enable AI assistants to access and retrieve information about duyet's work, projects, and content that would otherwise require manual web browsing.
 
@@ -59,7 +59,7 @@ npm run deploy
 
 To add your own [tools](https://developers.cloudflare.com/agents/model-context-protocol/tools/) to the MCP server, define each tool inside the `init()` method of `src/index.ts` using `this.server.tool(...)`. 
 
-## Connect to Cloudflare AI Playground
+### Connect to Cloudflare AI Playground
 
 You can test your MCP server using the Cloudflare AI Playground:
 
@@ -67,7 +67,7 @@ You can test your MCP server using the Cloudflare AI Playground:
 2. Enter your deployed MCP server URL (`duyet-mcp-server.<your-account>.workers.dev/sse` or `duyet-mcp-server.<your-account>.workers.dev/mcp`)
 3. You can now use the duyet information tools directly from the playground!
 
-## Connect Claude Desktop to Your MCP Server
+### Connect Claude Desktop to Your MCP Server
 
 You can connect to your remote MCP server from Claude Desktop using the [mcp-remote proxy](https://www.npmjs.com/package/mcp-remote). 
 
@@ -82,7 +82,7 @@ Update with this configuration:
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://mcp.duyet.net/sse"
+        "https://duyet-mcp-server.<your-account>.workers.dev/sse"
       ]
     }
   }

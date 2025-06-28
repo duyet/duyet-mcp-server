@@ -56,6 +56,16 @@ describe("DuyetMCP Main Application", () => {
 			const request = new Request("http://localhost/");
 
 			const response = await app.fetch(request, mockEnv, mockCtx);
+
+			expect(response.status).toBe(302);
+			expect(response.headers.get("Location")).toBe("/llms.txt");
+		});
+
+		test("should handle llms.txt path correctly", async () => {
+			const { default: app } = require("../index");
+			const request = new Request("http://localhost/llms.txt");
+
+			const response = await app.fetch(request, mockEnv, mockCtx);
 			const text = await response.text();
 
 			expect(response.status).toBe(200);
@@ -115,10 +125,9 @@ describe("DuyetMCP Main Application", () => {
 			const request = new Request("http://localhost/");
 
 			const response = await app.fetch(request, mockEnv, mockCtx);
-			const text = await response.text();
 
-			expect(response.status).toBe(200);
-			expect(text).toContain("Duyet MCP Server");
+			expect(response.status).toBe(302);
+			expect(response.headers.get("Location")).toBe("/llms.txt");
 		});
 	});
 
