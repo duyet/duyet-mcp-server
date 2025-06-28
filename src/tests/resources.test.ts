@@ -45,8 +45,8 @@ describe("Resource Registration Coverage Tests", () => {
 
 	test("should register all resources and call them", () => {
 		registerAllResources(mockServer, mockEnv);
-		// Should have called resource registration for all 6 resources
-		expect(mockServer.registerResource).toHaveBeenCalledTimes(6);
+		// Should have called resource registration for all 4 resources
+		expect(mockServer.registerResource).toHaveBeenCalledTimes(4);
 
 		// Verify all resource types were registered
 		const registeredNames = (mockServer.registerResource as jest.Mock).mock.calls.map(
@@ -58,8 +58,6 @@ describe("Resource Registration Coverage Tests", () => {
 				"cv",
 				"blog-posts",
 				"github-activity",
-				"hire-me",
-				"contacts",
 			]),
 		);
 	});

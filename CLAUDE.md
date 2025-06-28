@@ -6,6 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Cloudflare Workers-based MCP (Model Context Protocol) server that provides AI assistants with access to information about Duyet's work, projects, and blog content. The server is built using Hono framework and the MCP SDK, deployed as a Cloudflare Worker with Durable Objects.
 
+With Duyet MCP server, you can:
+- Say hello to Duyet
+- Get Duyet's CV, his skills, and his experience
+- Get Duyet's latest blog posts
+- Get Duyet's GitHub activity
+- Get Duyet's contact information
+- Send a message to Duyet (hiring, get in touch, etc.)
+
+## Important documents:
+
+- Read @./docs/mcp.md
+- Read @./docs/mcp-typescript-sdk.md
+
 ## Development Commands
 
 - `npm run dev` - Start local development server with hot reloading
@@ -36,15 +49,32 @@ This is a Cloudflare Workers-based MCP (Model Context Protocol) server that prov
 ### MCP Tools Architecture
 
 **Centralized Tool Registry** (`src/tools/index.ts`): All tools are registered through `registerAllTools()` function, organized by category:
-- **Core Information Tools**: `about-duyet`, `get-cv`
-- **Content Tools**: `get-latest-blog-post`, `github-activity`
-- **Interaction Tools**: `contact`, `hire-me`, `say-hi`
-- **Management Tools**: `get-contacts`, `contact-analytics`
+- **Core Information Tools**: `get-cv`
+- **Content Tools**: `github-activity`
+- **Interaction Tools**: `send-message`, `hire-me`, `say-hi`
+- **Management Tools**: `contact-analytics`
 
 **Tool Implementation Pattern**: Each tool is in its own file with a `register[ToolName]Tool()` function that:
 - Uses Zod schemas for parameter validation
 - Implements proper error handling with sanitized error messages
 - Returns structured MCP responses with `content` arrays
+
+### MCP Resources Architecture
+
+**Centralized Resource Registry** (`src/resources/index.ts`): All resources are registered through `registerAllResources()` function:
+- **Core Information Resources**: `about-duyet`, `cv`
+- **Content Resources**: `blog-posts`, `github-activity`
+
+**Resource Implementation Pattern**: Each resource provides read-only data access via URI patterns:
+- `duyet://about` - Profile information (converted from about_duyet tool)
+- `duyet://blog/posts/{limit}` - Blog posts (converted from get_latest_blog_post tool)
+- `duyet://cv/{format}` - CV with format parameters
+- `duyet://github-activity` - GitHub activity data
+
+**Key Changes**: 
+- Removed `hire_me` and `contact` resources for privacy/security
+- Converted `about_duyet` and `get_latest_blog_post` from tools to resources
+- Resources enable automatic discovery in Claude Chat for natural conversations
 
 ### Database Architecture
 
@@ -91,8 +121,12 @@ This is a Cloudflare Workers-based MCP (Model Context Protocol) server that prov
 1. Create tool file in `/src/tools/[tool-name].ts`:
 ```typescript
 export function register[ToolName]Tool(server: McpServer, env?: Env) {
-  server.tool("tool_name", {
-    parameter: z.type().describe("description")
+  server.registerTool("tool_name", {
+    title: "Tool Title",
+    description: "Tool description for AI assistants",
+    inputSchema: {
+      parameter: z.type().describe("description")
+    }
   }, async ({ parameter }) => {
     try {
       // Tool implementation
@@ -114,6 +148,8 @@ export function register[ToolName]Tool(server: McpServer, env?: Env) {
    - Add to `registerAllTools()` function
    - Add to exports object
 
+**Example**: The `send_message` tool (renamed from `contact`) demonstrates this pattern with database integration and proper error handling.
+
 ### Database Operations
 
 **Always use Drizzle ORM** - never raw SQL:
@@ -127,12 +163,26 @@ await db.run(`SELECT * FROM contacts WHERE id = ${userId}`);
 
 **Error Handling**: Always sanitize database errors before returning to users.
 
+### MCP Resources
+
+Resources are also supported alongside tools. Add them in `/src/resources/` and register via `registerAllResources()`:
+```typescript
+export function register[ResourceName]Resource(server: McpServer, env?: Env) {
+  server.registerResource("duyet://resource-uri", "Resource description", () => ({
+    contents: [{ type: "text", text: "resource content" }]
+  }));
+}
+```
+
 ### HTTP Endpoints
 
 Use Hono's routing pattern:
 ```typescript
 app.get("/endpoint", (c) => c.text("response"));
-app.mount("/path", DuyetMCP.serve("/path").fetch, { replaceRequest: false });
+app.all("/sse/*", async (c) => {
+  const mcpApp = DuyetMCP.serveSSE("/sse");
+  return mcpApp.fetch(c.req.raw, c.env, c.executionCtx);
+});
 ```
 
 ## Connection Endpoints

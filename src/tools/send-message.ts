@@ -5,15 +5,15 @@ import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
 
 /**
- * Register the contact MCP tool with D1 database integration
+ * Register the send_message MCP tool with D1 database integration
  */
-export function registerContactTool(server: McpServer, env: Env) {
+export function registerSendMessageTool(server: McpServer, env: Env) {
 	const db = getDb(env.DB);
 
 	server.registerTool(
-		"contact",
+		"send_message",
 		{
-			title: "Contact Duyet",
+			title: "Send Message to Duyet",
 			description:
 				"Send a message to Duyet for collaboration, job opportunities, consulting, or general inquiries. Messages are saved with a reference ID for follow-up",
 			inputSchema: {
@@ -65,7 +65,7 @@ export function registerContactTool(server: McpServer, env: Env) {
 				content: [
 					{
 						type: "text",
-						text: `Contact Message Saved Successfully
+						text: `Message Sent Successfully
 
 Reference ID: ${referenceId}
 Message: ${message}
@@ -79,7 +79,7 @@ Email: me@duyet.net
 LinkedIn: https://linkedin.com/in/duyet
 GitHub: https://github.com/duyet
 
-Your submission has been recorded for follow-up.
+Your message has been recorded for follow-up.
 
 ${purpose === "job_opportunity" ? "\nFor Job Opportunities: Please include details about the role, company, and tech stack. Remote positions preferred." : ""}
 ${purpose === "consulting" ? "\nFor Consulting: Please provide project scope, timeline, and technical requirements." : ""}`,

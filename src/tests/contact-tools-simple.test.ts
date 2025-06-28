@@ -2,8 +2,7 @@
  * Simplified Contact tools integration tests
  */
 
-import { registerContactTool } from "../tools/contact";
-import { registerGetContactsTool } from "../tools/get-contacts";
+import { registerSendMessageTool } from "../tools/send-message";
 import { registerContactAnalyticsTool } from "../tools/contact-analytics";
 
 // Mock database operations with proper promise handling
@@ -38,34 +37,19 @@ beforeEach(() => {
 });
 
 describe("Contact Tools Registration", () => {
-	describe("Contact Tool", () => {
-		test("should register contact tool successfully", () => {
+	describe("Send Message Tool", () => {
+		test("should register send_message tool successfully", () => {
 			const mockServer = createMockServer();
 			const mockEnv = {
 				DB: {} as D1Database,
-			};
+				MCP_OBJECT: {} as DurableObjectNamespace,
+				ANALYTICS: {} as AnalyticsEngineDataset
+			} as unknown as Env;
 
-			registerContactTool(mockServer as any, mockEnv as Env);
-
-			expect(mockServer.registerTool).toHaveBeenCalledWith(
-				"contact",
-				expect.any(Object),
-				expect.any(Function),
-			);
-		});
-	});
-
-	describe("Get Contacts Tool", () => {
-		test("should register get contacts tool successfully", () => {
-			const mockServer = createMockServer();
-			const mockEnv = {
-				DB: {} as D1Database,
-			};
-
-			registerGetContactsTool(mockServer as any, mockEnv as Env);
+			registerSendMessageTool(mockServer as any, mockEnv);
 
 			expect(mockServer.registerTool).toHaveBeenCalledWith(
-				"get_contacts",
+				"send_message",
 				expect.any(Object),
 				expect.any(Function),
 			);
@@ -77,9 +61,11 @@ describe("Contact Tools Registration", () => {
 			const mockServer = createMockServer();
 			const mockEnv = {
 				DB: {} as D1Database,
-			};
+				MCP_OBJECT: {} as DurableObjectNamespace,
+				ANALYTICS: {} as AnalyticsEngineDataset
+			} as unknown as Env;
 
-			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			registerContactAnalyticsTool(mockServer as any, mockEnv);
 
 			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"contact_analytics",

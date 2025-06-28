@@ -1,6 +1,7 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Hono } from "hono";
+
 import { registerAllTools } from "./tools/index";
 import { registerAllResources } from "./resources/index";
 
@@ -42,26 +43,10 @@ app.get("/", (c) => c.redirect("/llms.txt"));
 app.get("/llms.txt", (c) => c.text(LLMS_TXT));
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
 
-// Create MCP routes with environment handling
-app.all("/sse/*", async (c) => {
-	try {
-		const mcpApp = DuyetMCP.serveSSE("/sse");
-		return mcpApp.fetch(c.req.raw, c.env, c.executionCtx);
-	} catch (error) {
-		console.error("SSE Error:", error);
-		return c.text("Internal Server Error", 500);
-	}
-});
 
-app.all("/mcp*", async (c) => {
-	try {
-		const mcpApp = DuyetMCP.serve("/mcp");
-		return mcpApp.fetch(c.req.raw, c.env, c.executionCtx);
-	} catch (error) {
-		console.error("MCP Error:", error);
-		return c.text("Internal Server Error", 500);
-	}
-});
+app.mount('/sse', DuyetMCP.serveSSE('/sse').fetch, { replaceRequest: false })
+app.mount('/mcp', DuyetMCP.serve('/mcp').fetch, { replaceRequest: false })
+
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext) {

@@ -7,7 +7,7 @@ import {
 	parseRSSContent,
 	formatBlogPostsForMCP,
 	type BlogPost,
-} from "../tools/get-latest-blog-post";
+} from "../resources/blog-posts";
 
 describe("RSS Parser Utilities", () => {
 	const mockRSSXML = `<?xml version="1.0" encoding="UTF-8"?>

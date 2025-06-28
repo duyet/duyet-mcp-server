@@ -84,25 +84,25 @@ describe("DuyetMCP Main Application", () => {
 		});
 
 		test("should handle SSE routes", async () => {
-			const { DuyetMCP } = require("../index");
 			const { default: app } = require("../index");
 			const request = new Request("http://localhost/sse/test");
 
 			const response = await app.fetch(request, mockEnv, mockCtx);
 
-			expect(DuyetMCP.serveSSE).toHaveBeenCalledWith("/sse");
 			expect(response).toBeDefined();
+			expect(response.status).toBe(200);
+			expect(await response.text()).toBe("SSE response");
 		});
 
 		test("should handle MCP routes", async () => {
-			const { DuyetMCP } = require("../index");
 			const { default: app } = require("../index");
 			const request = new Request("http://localhost/mcp/test");
 
 			const response = await app.fetch(request, mockEnv, mockCtx);
 
-			expect(DuyetMCP.serve).toHaveBeenCalledWith("/mcp");
 			expect(response).toBeDefined();
+			expect(response.status).toBe(200);
+			expect(await response.text()).toBe("MCP response");
 		});
 	});
 
@@ -132,36 +132,16 @@ describe("DuyetMCP Main Application", () => {
 	});
 
 	describe("Error Handling", () => {
-		test("should handle SSE route errors gracefully", async () => {
-			const { DuyetMCP } = require("../index");
+		test("should handle general application errors gracefully", async () => {
 			const { default: app } = require("../index");
 
-			// Mock fetch to throw an error
-			DuyetMCP.serveSSE.mockReturnValue({
-				fetch: jest.fn().mockRejectedValue(new Error("SSE Error")),
-			});
+			// Create a request that would cause an error in the application
+			const request = new Request("http://localhost/invalid-path");
 
-			const request = new Request("http://localhost/sse/test");
-
-			// Should return error response, not throw
 			const response = await app.fetch(request, mockEnv, mockCtx);
-			expect(response.status).toBe(500);
-		});
-
-		test("should handle MCP route errors gracefully", async () => {
-			const { DuyetMCP } = require("../index");
-			const { default: app } = require("../index");
-
-			// Mock fetch to throw an error
-			DuyetMCP.serve.mockReturnValue({
-				fetch: jest.fn().mockRejectedValue(new Error("MCP Error")),
-			});
-
-			const request = new Request("http://localhost/mcp/test");
-
-			// Should return error response, not throw
-			const response = await app.fetch(request, mockEnv, mockCtx);
-			expect(response.status).toBe(500);
+			
+			// Should return 404 for invalid paths, not throw
+			expect(response.status).toBe(404);
 		});
 	});
 });

@@ -1,9 +1,9 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerAboutDuyetTool } from "../tools/about-duyet";
 import { registerGetCVTool } from "../tools/get-cv";
-import { registerGitHubActivityTool } from "../tools/github-activity";
 import { registerHireMeTool } from "../tools/hire-me";
 import { registerSayHiTool } from "../tools/say-hi";
+import { registerSendMessageTool } from "../tools/send-message";
+import { registerContactAnalyticsTool } from "../tools/contact-analytics";
 import { registerAllTools } from "../tools/index";
 
 // Mock fetch globally
@@ -30,32 +30,14 @@ describe("Tool Registration Tests", () => {
 		});
 	});
 
-	describe("About Duyet Tool", () => {
-		test("should register about-duyet tool", () => {
-			registerAboutDuyetTool(mockServer);
+	describe("Send Message Tool", () => {
+		test("should register send_message tool", () => {
+			registerSendMessageTool(mockServer, mockEnv);
 			expect(mockServer.registerTool).toHaveBeenCalledWith(
-				"about_duyet",
+				"send_message",
 				expect.any(Object),
 				expect.any(Function),
 			);
-		});
-
-		test("should handle about-duyet tool execution", async () => {
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
-				if (name === "about_duyet") {
-					toolHandler = handler;
-				}
-			});
-
-			registerAboutDuyetTool(mockServer);
-			expect(toolHandler).toBeDefined();
-
-			const result = await toolHandler({});
-			expect(result.content).toBeDefined();
-			expect(result.content[0].type).toBe("text");
-			expect(result.content[0].text).toContain("Duyet");
-			expect(result.content[0].text).toContain("experience");
 		});
 	});
 
@@ -126,42 +108,6 @@ describe("Tool Registration Tests", () => {
 		});
 	});
 
-	describe("GitHub Activity Tool", () => {
-		test("should register github-activity tool", () => {
-			registerGitHubActivityTool(mockServer);
-			expect(mockServer.registerTool).toHaveBeenCalledWith(
-				"get_github_activity",
-				expect.any(Object),
-				expect.any(Function),
-			);
-		});
-
-		test("should handle github activity tool execution", async () => {
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
-				if (name === "get_github_activity") {
-					toolHandler = handler;
-				}
-			});
-
-			registerGitHubActivityTool(mockServer);
-			const result = await toolHandler({ limit: 5, include_details: false });
-			expect(result.content[0].text).toContain("GitHub");
-		});
-
-		test("should handle github activity with details", async () => {
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
-				if (name === "get_github_activity") {
-					toolHandler = handler;
-				}
-			});
-
-			registerGitHubActivityTool(mockServer);
-			const result = await toolHandler({ limit: 3, include_details: true });
-			expect(result.content[0].text).toContain("GitHub");
-		});
-	});
 
 	describe("Hire Me Tool", () => {
 		test("should register hire-me tool", () => {
@@ -245,11 +191,22 @@ describe("Tool Registration Tests", () => {
 		});
 	});
 
+	describe("Contact Analytics Tool", () => {
+		test("should register contact-analytics tool", () => {
+			registerContactAnalyticsTool(mockServer, mockEnv);
+			expect(mockServer.registerTool).toHaveBeenCalledWith(
+				"contact_analytics",
+				expect.any(Object),
+				expect.any(Function),
+			);
+		});
+	});
+
 	describe("Tool Registry", () => {
 		test("should register all tools", () => {
 			registerAllTools(mockServer, mockEnv);
-			// Should have called tool registration for all 9 tools
-			expect(mockServer.registerTool).toHaveBeenCalledTimes(9);
+			// Should have called tool registration for all 5 tools
+			expect(mockServer.registerTool).toHaveBeenCalledTimes(5);
 		});
 	});
 });

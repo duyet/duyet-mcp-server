@@ -3,8 +3,7 @@
  */
 
 import { registerContactAnalyticsTool } from "../tools/contact-analytics";
-import { registerGetContactsTool } from "../tools/get-contacts";
-import { registerGitHubActivityTool } from "../tools/github-activity";
+import { registerGitHubActivityResource } from "../resources/github-activity";
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -28,7 +27,10 @@ jest.mock("../database", () => ({
 	getDb: jest.fn(() => mockDb),
 }));
 
-const createMockServer = () => ({ registerTool: jest.fn() }) as any;
+const createMockServer = () => ({ 
+	registerTool: jest.fn(),
+	registerResource: jest.fn() 
+}) as any;
 
 beforeEach(() => {
 	jest.clearAllMocks();
@@ -40,7 +42,11 @@ describe("Coverage Boost Tests", () => {
 	describe("Contact Analytics - All Branch Coverage", () => {
 		test("should handle summary report with data", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
+			const mockEnv = { 
+				DB: {} as D1Database,
+				MCP_OBJECT: {} as DurableObjectNamespace,
+				ANALYTICS: {} as AnalyticsEngineDataset
+			} as unknown as Env;
 
 			// Mock multiple return values for different queries
 			mockDb.execute
@@ -63,7 +69,11 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle purpose_breakdown report", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
+			const mockEnv = { 
+				DB: {} as D1Database,
+				MCP_OBJECT: {} as DurableObjectNamespace,
+				ANALYTICS: {} as AnalyticsEngineDataset
+			} as unknown as Env;
 
 			mockDb.execute.mockResolvedValueOnce([
 				{ purpose: "collaboration", count: 8 },
@@ -85,7 +95,11 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle daily_trends report", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
+			const mockEnv = { 
+				DB: {} as D1Database,
+				MCP_OBJECT: {} as DurableObjectNamespace,
+				ANALYTICS: {} as AnalyticsEngineDataset
+			} as unknown as Env;
 
 			mockDb.execute.mockResolvedValueOnce([
 				{ date: "2024-01-01", daily_total: 3 },
@@ -106,7 +120,11 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle recent_activity report", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
+			const mockEnv = { 
+				DB: {} as D1Database,
+				MCP_OBJECT: {} as DurableObjectNamespace,
+				ANALYTICS: {} as AnalyticsEngineDataset
+			} as unknown as Env;
 
 			mockDb.execute.mockResolvedValueOnce([
 				{ purpose: "collaboration", total: 3, last_submission: "1704067200" },
@@ -126,7 +144,11 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle custom_period with valid dates", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
+			const mockEnv = { 
+				DB: {} as D1Database,
+				MCP_OBJECT: {} as DurableObjectNamespace,
+				ANALYTICS: {} as AnalyticsEngineDataset
+			} as unknown as Env;
 
 			mockDb.execute.mockResolvedValueOnce([
 				{ purpose: "collaboration", count: 4 },
@@ -150,7 +172,11 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle custom_period with invalid dates", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
+			const mockEnv = { 
+				DB: {} as D1Database,
+				MCP_OBJECT: {} as DurableObjectNamespace,
+				ANALYTICS: {} as AnalyticsEngineDataset
+			} as unknown as Env;
 
 			let toolHandler: any;
 			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
@@ -168,138 +194,6 @@ describe("Coverage Boost Tests", () => {
 		});
 	});
 
-	describe("Get Contacts - All Path Coverage", () => {
-		test("should handle reference_id query", async () => {
-			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
-
-			mockDb.execute.mockResolvedValueOnce([
-				{
-					referenceId: "test-ref-123",
-					message: "Test message",
-					contactEmail: "test@example.com",
-					purpose: "collaboration",
-					createdAt: Date.now(),
-					ipAddress: "127.0.0.1",
-					userAgent: "Test Agent",
-				},
-			]);
-
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
-				if (name === "get_contacts") toolHandler = handler;
-			});
-
-			registerGetContactsTool(mockServer as any, mockEnv as Env);
-			const result = await toolHandler({ reference_id: "test-ref-123" });
-
-			expect(result.content[0].text).toBeDefined();
-		});
-
-		test("should handle contact_email filter", async () => {
-			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
-
-			mockDb.execute.mockResolvedValueOnce([
-				{
-					referenceId: "test-ref-456",
-					message: "Email filtered message",
-					contactEmail: "filter@example.com",
-					purpose: "job_opportunity",
-					createdAt: Date.now(),
-				},
-			]);
-
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
-				if (name === "get_contacts") toolHandler = handler;
-			});
-
-			registerGetContactsTool(mockServer as any, mockEnv as Env);
-			const result = await toolHandler({ contact_email: "filter@example.com" });
-
-			expect(result.content[0].text).toBeDefined();
-		});
-
-		test("should handle purpose filter", async () => {
-			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
-
-			mockDb.execute.mockResolvedValueOnce([
-				{
-					referenceId: "test-ref-789",
-					message: "Purpose filtered message",
-					contactEmail: "purpose@example.com",
-					purpose: "consulting",
-					createdAt: Date.now(),
-				},
-			]);
-
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
-				if (name === "get_contacts") toolHandler = handler;
-			});
-
-			registerGetContactsTool(mockServer as any, mockEnv as Env);
-			const result = await toolHandler({ purpose: "consulting" });
-
-			expect(result.content[0].text).toBeDefined();
-		});
-
-		test("should handle date range filters", async () => {
-			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
-
-			mockDb.execute.mockResolvedValueOnce([
-				{
-					referenceId: "test-ref-date",
-					message: "Date filtered message",
-					contactEmail: "date@example.com",
-					purpose: "general_inquiry",
-					createdAt: new Date("2024-01-15").getTime(),
-				},
-			]);
-
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
-				if (name === "get_contacts") toolHandler = handler;
-			});
-
-			registerGetContactsTool(mockServer as any, mockEnv as Env);
-			const result = await toolHandler({
-				date_from: "2024-01-01",
-				date_to: "2024-01-31",
-			});
-
-			expect(result.content[0].text).toBeDefined();
-		});
-
-		test("should handle pagination with limit and offset", async () => {
-			const mockServer = createMockServer();
-			const mockEnv = { DB: {} as D1Database };
-
-			mockDb.execute.mockResolvedValueOnce(
-				Array.from({ length: 5 }, (_, i) => ({
-					referenceId: `test-ref-${i}`,
-					message: `Message ${i}`,
-					contactEmail: `user${i}@example.com`,
-					purpose: "collaboration",
-					createdAt: Date.now() - i * 1000000,
-				})),
-			);
-
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
-				if (name === "get_contacts") toolHandler = handler;
-			});
-
-			registerGetContactsTool(mockServer as any, mockEnv as Env);
-			const result = await toolHandler({ limit: 5, offset: 10 });
-
-			expect(result.content[0].text).toBeDefined();
-			// Just check that it returns some text
-		});
-	});
 
 	describe("GitHub Activity - Success Paths", () => {
 		test("should handle successful GitHub response with commits", async () => {
@@ -325,17 +219,24 @@ describe("Coverage Boost Tests", () => {
 				],
 			});
 
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
-				if (name === "get_github_activity") toolHandler = handler;
-			});
+			let resourceHandler: any;
+			(mockServer.registerResource as jest.Mock).mockImplementation(
+				(name, _template, _metadata, handler) => {
+					if (name === "github-activity") {
+						resourceHandler = handler;
+					}
+				},
+			);
 
-			registerGitHubActivityTool(mockServer);
-			const result = await toolHandler({ limit: 10, include_details: true });
+			registerGitHubActivityResource(mockServer);
+			const result = await resourceHandler(
+				new URL("duyet://github/activity/10/true"),
+				{ limit: "10", include_details: "true" },
+			);
 
-			expect(result.content[0].text).toContain("Recent GitHub Activity");
-			expect(result.content[0].text).toContain("Pushed 2 commits");
-			expect(result.content[0].text).toContain("Add new feature");
+			expect(result.contents[0].text).toContain("Recent GitHub Activity");
+			expect(result.contents[0].text).toContain("Pushed 2 commits");
+			expect(result.contents[0].text).toContain("Add new feature");
 		});
 
 		test("should handle GitHub response without details", async () => {
@@ -353,16 +254,23 @@ describe("Coverage Boost Tests", () => {
 				],
 			});
 
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
-				if (name === "get_github_activity") toolHandler = handler;
-			});
+			let resourceHandler: any;
+			(mockServer.registerResource as jest.Mock).mockImplementation(
+				(name, _template, _metadata, handler) => {
+					if (name === "github-activity") {
+						resourceHandler = handler;
+					}
+				},
+			);
 
-			registerGitHubActivityTool(mockServer);
-			const result = await toolHandler({ limit: 5, include_details: false });
+			registerGitHubActivityResource(mockServer);
+			const result = await resourceHandler(
+				new URL("duyet://github/activity/5/false"),
+				{ limit: "5", include_details: "false" },
+			);
 
-			expect(result.content[0].text).toContain("Recent GitHub Activity");
-			expect(result.content[0].text).toContain("Created branch");
+			expect(result.contents[0].text).toContain("Recent GitHub Activity");
+			expect(result.contents[0].text).toContain("Created branch");
 		});
 
 		test("should handle different event types", async () => {
@@ -386,17 +294,24 @@ describe("Coverage Boost Tests", () => {
 				],
 			});
 
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _schema, handler) => {
-				if (name === "get_github_activity") toolHandler = handler;
-			});
+			let resourceHandler: any;
+			(mockServer.registerResource as jest.Mock).mockImplementation(
+				(name, _template, _metadata, handler) => {
+					if (name === "github-activity") {
+						resourceHandler = handler;
+					}
+				},
+			);
 
-			registerGitHubActivityTool(mockServer);
-			const result = await toolHandler({ limit: 2, include_details: true });
+			registerGitHubActivityResource(mockServer);
+			const result = await resourceHandler(
+				new URL("duyet://github/activity/2/true"),
+				{ limit: "2", include_details: "true" },
+			);
 
-			expect(result.content[0].text).toContain("Recent GitHub Activity");
-			expect(result.content[0].text).toContain("Starred repository");
-			expect(result.content[0].text).toContain("Forked repository");
+			expect(result.contents[0].text).toContain("Recent GitHub Activity");
+			expect(result.contents[0].text).toContain("Starred repository");
+			expect(result.contents[0].text).toContain("Forked repository");
 		});
 	});
 });

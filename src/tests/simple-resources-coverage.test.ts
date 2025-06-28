@@ -44,7 +44,7 @@ describe("Resource Coverage Tests", () => {
 		const {
 			calculateYearsOfExperience,
 			getAboutDuyetContent,
-		} = require("../tools/about-duyet");
+		} = require("../resources/about-duyet");
 
 		const years = calculateYearsOfExperience();
 		expect(years).toBeGreaterThan(0);
