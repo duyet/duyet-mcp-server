@@ -15,12 +15,16 @@ Update your Claude/Cursor/etc configuration to point to the URL of Duyet MCP ser
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://duyet-mcp-server.duyet.workers.dev/sse"
+        "https://mcp.duyet.net/sse"
       ]
     }
   }
 }
 ```
+
+Endpoints:
+- https://mcp.duyet.net/sse
+- https://mcp.duyet.net/mcp
 
 
 ## About This Project
@@ -29,13 +33,14 @@ This is a **study, demo, and experimental project** designed to explore MCP capa
 
 **Purpose**: Enable AI assistants to access and retrieve information about duyet's work, projects, and content that would otherwise require manual web browsing.
 
-## Get Started
+## Deploy to Cloudflare Workers
 
 [![Deploy to Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/duyet/duyet-mcp-server)
-
 This will deploy your MCP server to a URL like: `duyet-mcp-server.<your-account>.workers.dev/sse`
 
+
 Alternatively, you can clone and deploy using the command line:
+
 ```bash
 git clone https://github.com/duyet/duyet-mcp-server
 cd duyet-mcp-server
@@ -70,23 +75,40 @@ Update with this configuration:
       "command": "npx",
       "args": [
         "mcp-remote",
-        "http://localhost:8787/sse"  // or duyet-mcp-server.your-account.workers.dev/sse
+        "https://mcp.duyet.net/sse"
       ]
     }
   }
 }
 ```
 
-Restart Claude and you should see the duyet information tools become available.
+You should see the duyet-mcp information tools become available.
 
-## What This MCP Provides
+# Available Tools
 
-Once connected, your AI assistant will have access to tools that can retrieve information about duyet's:
-- Projects and work
-- Blog posts and articles
-- Technical expertise and experience
-- And other content available on duyet.net
+### Contact Tools
+- `contact`: Submit a contact form
+- `get_contacts`: Retrieve contact submissions with filtering
+- `contact_analytics`: Generate analytics reports on contacts
 
-## Experimental Nature
+### Personal Information
+- `about_duyet`: Get personal information about duyet
+- `get_cv`: Retrieve CV/resume information
+- `hire_me`: Information about hiring duyet
 
-⚠️ **Note**: This is an experimental project built for learning and demonstration purposes. The functionality may change as we explore different MCP patterns and capabilities.
+### Content Tools
+- `get_latest_blog_post`: Fetch recent blog posts
+- `get_github_activity`: View GitHub contributions and activity
+- `say_hi`: Simple greeting tool
+
+## Architecture
+
+- **Framework**: Hono.js running on Cloudflare Workers
+- **Database**: Cloudflare D1 with Drizzle ORM
+- **Testing**: Jest with comprehensive test coverage
+- **Linting**: Biome for code quality
+- **Type Safety**: TypeScript with strict configuration
+
+## License
+
+MIT License - see LICENSE file for details.
