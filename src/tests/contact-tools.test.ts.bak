@@ -1,0 +1,419 @@
+/**
+ * Contact tools integration tests
+ */
+
+import { registerContactTool } from '../tools/contact';
+import { registerGetContactsTool } from '../tools/get-contacts';
+import { registerContactAnalyticsTool } from '../tools/contact-analytics';
+
+// Mock database operations
+const mockDbOperations = {
+	select: jest.fn().mockReturnThis(),
+	from: jest.fn().mockReturnThis(),
+	where: jest.fn().mockReturnThis(),
+	insert: jest.fn().mockReturnThis(),
+	values: jest.fn().mockReturnThis(),
+	returning: jest.fn().mockReturnThis(),
+	groupBy: jest.fn().mockReturnThis(),
+	orderBy: jest.fn().mockReturnThis(),
+	limit: jest.fn().mockReturnThis(),
+	offset: jest.fn().mockReturnThis(),
+	execute: jest.fn().mockResolvedValue([]),
+};
+
+jest.mock("../database", () => ({
+	getDb: jest.fn(() => mockDbOperations),
+}));
+
+// Mock MCP server
+const createMockServer = () => ({
+	tool: jest.fn(),
+});
+
+beforeEach(() => {
+	jest.clearAllMocks();
+});
+
+describe("Contact Tools", () => {
+	describe("Contact Tool", () => {
+		test("should register contact tool successfully", () => {
+			const mockServer = createMockServer();
+			const mockEnv = {
+				DB: {} as D1Database,
+			};
+
+			registerContactTool(mockServer as any, mockEnv as Env);
+			
+			expect(mockServer.tool).toHaveBeenCalledWith(
+				"contact",
+				expect.any(Object),
+				expect.any(Function)
+			);
+		});
+	});
+
+	describe("Get Contacts Tool", () => {
+		test("should register get contacts tool successfully", () => {
+			const mockServer = createMockServer();
+			const mockEnv = {
+				DB: {} as D1Database,
+			};
+
+			registerGetContactsTool(mockServer as any, mockEnv as Env);
+			
+			expect(mockServer.tool).toHaveBeenCalledWith(
+				"get_contacts",
+				expect.any(Object),
+				expect.any(Function)
+			);
+		});
+	});
+
+	describe("Contact Analytics Tool", () => {
+		test("should register contact analytics tool successfully", () => {
+			const mockServer = createMockServer();
+			const mockEnv = {
+				DB: {} as D1Database,
+			};
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			
+			expect(mockServer.tool).toHaveBeenCalledWith(
+				"contact_analytics",
+				expect.any(Object),
+				expect.any(Function)
+			);
+		});
+
+		test("should handle summary analytics", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			// Mock successful database responses
+			mockDbOperations.select.mockResolvedValueOnce([
+				{ purpose: "collaboration", count: 5 },
+				{ purpose: "job_opportunity", count: 3 }
+			]).mockResolvedValueOnce([{ count: 4 }]);
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact_analytics") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({ report_type: "summary" });
+			
+			expect(result.content[0].text).toContain("Contact Analytics Summary");
+		});
+
+		test("should handle purpose breakdown analytics", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.select.mockResolvedValueOnce([
+				{ purpose: "collaboration", count: 5 },
+				{ purpose: "job_opportunity", count: 3 }
+			]);
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact_analytics") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({ report_type: "purpose_breakdown" });
+			
+			expect(result.content[0].text).toContain("Contact Purpose Breakdown");
+		});
+
+		test("should handle daily trends analytics", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.select.mockResolvedValueOnce([
+				{ date: "2024-01-01", daily_total: 2 },
+				{ date: "2024-01-02", daily_total: 3 }
+			]);
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact_analytics") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({ report_type: "daily_trends" });
+			
+			expect(result.content[0].text).toContain("Daily Contact Trends");
+		});
+
+		test("should handle recent activity analytics", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.select.mockResolvedValueOnce([
+				{ purpose: "collaboration", total: 2, last_submission: "1704067200" }
+			]);
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact_analytics") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({ report_type: "recent_activity" });
+			
+			expect(result.content[0].text).toContain("Recent Activity");
+		});
+
+		test("should handle custom period analytics", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.select.mockResolvedValueOnce([
+				{ purpose: "collaboration", count: 2 }
+			]);
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact_analytics") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({
+				report_type: "custom_period",
+				date_from: "2024-01-01",
+				date_to: "2024-01-31"
+			});
+			
+			expect(result.content[0].text).toContain("Custom Period Analytics");
+		});
+
+		test("should handle custom period without dates", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact_analytics") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({ report_type: "custom_period" });
+			
+			expect(result.content[0].text).toContain("Missing Date Range");
+		});
+
+		test("should handle invalid date format", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact_analytics") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({
+				report_type: "custom_period",
+				date_from: "invalid-date",
+				date_to: "2024-01-31"
+			});
+			
+			expect(result.content[0].text).toContain("Invalid date format");
+		});
+
+		test("should handle invalid report type", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact_analytics") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({ report_type: "invalid_type" });
+			
+			expect(result.content[0].text).toContain("Invalid Report Type");
+		});
+
+		test("should handle database errors", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.select.mockRejectedValueOnce(new Error("Database error"));
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact_analytics") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({ report_type: "summary" });
+			
+			expect(result.content[0].text).toContain("Unexpected Error");
+		});
+	});
+
+	describe("Contact Tool Functionality", () => {
+		test("should handle contact submission successfully", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.execute.mockResolvedValueOnce({});
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({
+				message: "Hello, this is a test message",
+				contact_email: "test@example.com",
+				purpose: "collaboration"
+			});
+			
+			expect(result.content[0].text).toContain("Contact Message Saved Successfully");
+		});
+
+		test("should handle contact submission database error", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.execute.mockRejectedValueOnce(new Error("Database error"));
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "contact") {
+					toolHandler = handler;
+				}
+			});
+
+			registerContactTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({
+				message: "Hello, this is a test message",
+				purpose: "collaboration"
+			});
+			
+			expect(result.content[0].text).toContain("could not be saved");
+		});
+	});
+
+	describe("Get Contacts Tool Functionality", () => {
+		test("should handle get contacts with reference ID", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.select.mockResolvedValueOnce([{
+				referenceId: "test-id",
+				message: "Test message",
+				contactEmail: "test@example.com",
+				purpose: "collaboration",
+				createdAt: Date.now(),
+				ipAddress: "127.0.0.1",
+				userAgent: "Test Agent"
+			}]);
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "get_contacts") {
+					toolHandler = handler;
+				}
+			});
+
+			registerGetContactsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({ reference_id: "test-id" });
+			
+			expect(result.content[0].text).toContain("Contact Details");
+		});
+
+		test("should handle get contacts with no results", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.select.mockResolvedValueOnce([]);
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "get_contacts") {
+					toolHandler = handler;
+				}
+			});
+
+			registerGetContactsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({});
+			
+			expect(result.content[0].text).toContain("No Contacts Found");
+		});
+
+		test("should handle get contacts with filters", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.select.mockResolvedValueOnce([{
+				referenceId: "test-id",
+				message: "Test message",
+				contactEmail: "test@example.com",
+				purpose: "collaboration",
+				createdAt: Date.now()
+			}]);
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "get_contacts") {
+					toolHandler = handler;
+				}
+			});
+
+			registerGetContactsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({
+				purpose: "collaboration",
+				date_from: "2024-01-01",
+				date_to: "2024-01-31",
+				limit: 10
+			});
+			
+			expect(result.content[0].text).toContain("Contact Submissions");
+		});
+
+		test("should handle database error in get contacts", async () => {
+			const mockServer = createMockServer();
+			const mockEnv = { DB: {} as D1Database };
+			
+			mockDbOperations.select.mockRejectedValueOnce(new Error("Database error"));
+
+			let toolHandler: any;
+			(mockServer.tool as jest.Mock).mockImplementation((name, schema, handler) => {
+				if (name === "get_contacts") {
+					toolHandler = handler;
+				}
+			});
+
+			registerGetContactsTool(mockServer as any, mockEnv as Env);
+			const result = await toolHandler({});
+			
+			expect(result.content[0].text).toContain("Unexpected Error");
+		});
+	});
+});
