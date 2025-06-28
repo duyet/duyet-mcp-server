@@ -6,7 +6,7 @@
 
 An experimental [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that helps AI assistants connect to and retrieve information about duyet. This server provides access to information primarily available at [https://duyet.net](https://duyet.net), making it available directly to your AI assistant.
 
-Usage: Update your Claude/Cursor/etc MCP server configuration:
+Usage: Update MCP server configuration in your AI assistant:
 
 ```json
 {
@@ -20,6 +20,12 @@ Usage: Update your Claude/Cursor/etc MCP server configuration:
     }
   }
 }
+```
+
+If you are using Claude Code:
+
+```bash
+claude mcp add --transport http duyet https://mcp.duyet.net/mcp
 ```
 
 Endpoints:
@@ -91,22 +97,39 @@ Update with this configuration:
 
 You should see the duyet-mcp information tools become available.
 
-# Available Tools
+# Available Resources and Tools
 
-### Contact Tools
-- `contact`: Submit a contact form
-- `get_contacts`: Retrieve contact submissions with filtering
-- `contact_analytics`: Generate analytics reports on contacts
+This MCP server exposes both **Resources** (read-only data access via URIs) and **Tools** (interactive functions with parameters).
 
-### Personal Information
-- `about_duyet`: Get personal information about duyet
-- `get_cv`: Retrieve CV/resume information
-- `hire_me`: Information about hiring duyet
+## Resources
+Resources provide read-only access to information through URI-based requests.
 
-### Content Tools
-- `get_latest_blog_post`: Fetch recent blog posts
-- `get_github_activity`: View GitHub contributions and activity
-- `say_hi`: Simple greeting tool
+### Core Information Resources
+- **`duyet://about`** - Basic information about Duyet with dynamically calculated years of experience
+- **`duyet://cv/{format}`** - CV/resume with format parameters:
+  - `duyet://cv/summary` - Brief CV overview
+  - `duyet://cv/detailed` - Comprehensive CV information  
+  - `duyet://cv/json` - Structured CV data (when available)
+
+### Content Resources
+- **Blog Posts Resource** - Latest blog post information from RSS feed
+- **GitHub Activity Resource** - Recent GitHub contributions and activity
+- **Hire Me Resource** - Professional hiring information with role matching
+- **Contacts Resource** - Contact submission data (database-backed)
+
+## Tools
+Tools provide interactive functionality with input parameters and dynamic responses.
+
+- **`about_duyet`** - Get basic information about Duyet, a Senior Data Engineer with extensive experience in data engineering, cloud technologies, and distributed systems
+- **`get_cv`** - Retrieve Duyet's CV (curriculum vitae) in different formats - summary, detailed, or JSON format
+- **`get_latest_blog_post`** - Fetch the latest blog posts from Duyet's technical blog at blog.duyet.net. Get up to 10 recent posts with titles, links, descriptions, and publication dates
+- **`get_github_activity`** - Retrieve Duyet's recent GitHub activity including commits, issues, pull requests, releases, and other public events. View up to 20 recent activities with optional detailed information
+- **`contact`** - Send a message to Duyet for collaboration, job opportunities, consulting, or general inquiries. Messages are saved with a reference ID for follow-up
+- **`hire_me`** - Get information about hiring Duyet for various roles - full-time, contract, consulting, or part-time positions. Includes expertise, experience, and next steps
+- **`say_hi`** - Send a friendly greeting to Duyet with an optional personal message. Get contact information and connection links
+- **`get_contacts`** - Retrieve and search contact submissions with filtering options by purpose, date range, email, or reference ID. Supports pagination for large result sets
+- **`contact_analytics`** - Generate analytics reports on contact submissions including summary statistics, purpose breakdown, daily trends, and recent activity patterns
+
 
 ## Architecture
 
