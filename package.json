@@ -56,7 +56,23 @@
 		"collectCoverageFrom": [
 			"src/**/*.ts",
 			"!src/**/*.d.ts",
-			"!src/tests/**/*"
-		]
+			"!src/tests/**/*",
+			"!src/**/*.test.ts",
+			"!src/**/*.spec.ts"
+		],
+		"coverageReporters": [
+			"text",
+			"lcov",
+			"html",
+			"json-summary"
+		],
+		"coverageThreshold": {
+			"global": {
+				"branches": 15,
+				"functions": 18,
+				"lines": 20,
+				"statements": 20
+			}
+		}
 	}
 }
