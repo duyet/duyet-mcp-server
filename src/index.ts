@@ -36,7 +36,6 @@ Usage: Update your AI assistant configuration to point to the URL of Duyet MCP s
 \`\`\`
   `;
 
-
 app.get("/", (c) => c.text(HOME_PAGE_CONTENT));
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
 

@@ -14,6 +14,7 @@
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
+		"pre-commit": "npm run type-check && npm run test && npm run lint",
 		"all": "npm run lint && npm run format && npm run type-check && npm run test:coverage && npm run deploy"
 	},
 	"dependencies": {

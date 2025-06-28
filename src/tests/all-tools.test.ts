@@ -1,4 +1,4 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerAboutDuyetTool } from "../tools/about-duyet";
 import { registerGetCVTool } from "../tools/get-cv";
 import { registerGitHubActivityTool } from "../tools/github-activity";
@@ -33,13 +33,11 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle about-duyet tool execution", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "about_duyet") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "about_duyet") {
+					toolHandler = handler;
+				}
+			});
 
 			registerAboutDuyetTool(mockServer);
 			expect(toolHandler).toBeDefined();
@@ -64,28 +62,26 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle CV tool with summary format", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "get_cv") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "get_cv") {
+					toolHandler = handler;
+				}
+			});
 
 			registerGetCVTool(mockServer);
 			const result = await toolHandler({ format: "summary" });
-			expect(result.content[0].text).toContain("Sr. Data Engineer with 8+ years of experience");
+			expect(result.content[0].text).toContain(
+				"Sr. Data Engineer with 8+ years of experience",
+			);
 		});
 
 		test("should handle CV tool with detailed format", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "get_cv") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "get_cv") {
+					toolHandler = handler;
+				}
+			});
 
 			registerGetCVTool(mockServer);
 			const result = await toolHandler({ format: "detailed" });
@@ -94,13 +90,11 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle CV tool with json format", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "get_cv") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "get_cv") {
+					toolHandler = handler;
+				}
+			});
 
 			registerGetCVTool(mockServer);
 			const result = await toolHandler({ format: "json" });
@@ -121,13 +115,11 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle github activity tool execution", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "get_github_activity") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "get_github_activity") {
+					toolHandler = handler;
+				}
+			});
 
 			registerGitHubActivityTool(mockServer);
 			const result = await toolHandler({ limit: 5, include_details: false });
@@ -136,13 +128,11 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle github activity with details", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "get_github_activity") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "get_github_activity") {
+					toolHandler = handler;
+				}
+			});
 
 			registerGitHubActivityTool(mockServer);
 			const result = await toolHandler({ limit: 3, include_details: true });
@@ -162,13 +152,11 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle hire-me tool with all parameters", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "hire_me") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "hire_me") {
+					toolHandler = handler;
+				}
+			});
 
 			registerHireMeTool(mockServer);
 			const result = await toolHandler({
@@ -183,13 +171,11 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle hire-me tool with minimal parameters", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "hire_me") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "hire_me") {
+					toolHandler = handler;
+				}
+			});
 
 			registerHireMeTool(mockServer);
 			const result = await toolHandler({});
@@ -209,13 +195,11 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle say-hi tool without message", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "say_hi") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "say_hi") {
+					toolHandler = handler;
+				}
+			});
 
 			registerSayHiTool(mockServer);
 			const result = await toolHandler({});
@@ -225,13 +209,11 @@ describe("Tool Registration Tests", () => {
 
 		test("should handle say-hi tool with custom message", async () => {
 			let toolHandler: any;
-			(mockServer.tool as jest.Mock).mockImplementation(
-				(name, schema, handler) => {
-					if (name === "say_hi") {
-						toolHandler = handler;
-					}
-				},
-			);
+			(mockServer.tool as jest.Mock).mockImplementation((name, _schema, handler) => {
+				if (name === "say_hi") {
+					toolHandler = handler;
+				}
+			});
 
 			registerSayHiTool(mockServer);
 			const result = await toolHandler({ message: "How are you today?" });

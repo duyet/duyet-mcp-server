@@ -47,8 +47,10 @@ export function registerContactAnalyticsTool(server: McpServer, env: Env) {
 							.groupBy(contacts.purpose);
 
 						const total = purposeBreakdown.reduce((sum, item) => sum + item.count, 0);
-						const thirtyDaysAgo = Math.floor((Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000);
-						
+						const thirtyDaysAgo = Math.floor(
+							(Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000,
+						);
+
 						const recentCount = await db
 							.select({ count: count(contacts.id) })
 							.from(contacts)
@@ -118,8 +120,12 @@ ${breakdown}`,
 								daily_total: count(contacts.id),
 							})
 							.from(contacts)
-							.groupBy(sql`strftime('%Y-%m-%d', datetime(${contacts.createdAt}, 'unixepoch'))`)
-							.orderBy(sql`strftime('%Y-%m-%d', datetime(${contacts.createdAt}, 'unixepoch')) DESC`)
+							.groupBy(
+								sql`strftime('%Y-%m-%d', datetime(${contacts.createdAt}, 'unixepoch'))`,
+							)
+							.orderBy(
+								sql`strftime('%Y-%m-%d', datetime(${contacts.createdAt}, 'unixepoch')) DESC`,
+							)
 							.limit(30);
 
 						const chart = result
@@ -129,10 +135,7 @@ ${breakdown}`,
 							})
 							.join("\n");
 
-						const totalRecent = result.reduce(
-							(sum, item) => sum + item.daily_total,
-							0,
-						);
+						const totalRecent = result.reduce((sum, item) => sum + item.daily_total, 0);
 						const avgDaily = (totalRecent / result.length).toFixed(1);
 						const maxValue = Math.max(...result.map((item) => item.daily_total));
 
@@ -155,7 +158,9 @@ Statistics
 					}
 
 					case "recent_activity": {
-						const sevenDaysAgo = Math.floor((Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000);
+						const sevenDaysAgo = Math.floor(
+							(Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000,
+						);
 						const result = await db
 							.select({
 								purpose: contacts.purpose,
@@ -170,7 +175,9 @@ Statistics
 
 						const activity = result
 							.map((item) => {
-								const lastDate = new Date(item.last_submission!).toLocaleDateString();
+								const lastDate = new Date(
+									item.last_submission!,
+								).toLocaleDateString();
 
 								return `${item.purpose.replace("_", " ")}
 - Submissions: ${item.total}
@@ -212,7 +219,7 @@ Example: date_from: "2024-01-01", date_to: "2024-01-31"`,
 
 						const startDate = new Date(date_from);
 						const endDate = new Date(date_to);
-						
+
 						if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
 							return {
 								content: [
@@ -231,12 +238,12 @@ Example: date_from: "2024-01-01", date_to: "2024-01-31"`,
 							})
 							.from(contacts)
 							.where(
-								sql`${contacts.createdAt} >= ${Math.floor(startDate.getTime() / 1000)} AND ${contacts.createdAt} <= ${Math.floor(endDate.getTime() / 1000)}`
+								sql`${contacts.createdAt} >= ${Math.floor(startDate.getTime() / 1000)} AND ${contacts.createdAt} <= ${Math.floor(endDate.getTime() / 1000)}`,
 							)
 							.groupBy(contacts.purpose);
 
 						const total = result.reduce((sum, item) => sum + item.count, 0);
-						
+
 						const breakdown = result
 							.map((item) => `${item.purpose.replace("_", " ")}: ${item.count}`)
 							.join("\n");

@@ -2,9 +2,9 @@
  * Simplified Contact tools integration tests
  */
 
-import { registerContactTool } from '../tools/contact';
-import { registerGetContactsTool } from '../tools/get-contacts';
-import { registerContactAnalyticsTool } from '../tools/contact-analytics';
+import { registerContactTool } from "../tools/contact";
+import { registerGetContactsTool } from "../tools/get-contacts";
+import { registerContactAnalyticsTool } from "../tools/contact-analytics";
 
 // Mock database operations with proper promise handling
 const mockDbOperations = {
@@ -45,11 +45,11 @@ describe("Contact Tools Registration", () => {
 			};
 
 			registerContactTool(mockServer as any, mockEnv as Env);
-			
+
 			expect(mockServer.tool).toHaveBeenCalledWith(
 				"contact",
 				expect.any(Object),
-				expect.any(Function)
+				expect.any(Function),
 			);
 		});
 	});
@@ -62,11 +62,11 @@ describe("Contact Tools Registration", () => {
 			};
 
 			registerGetContactsTool(mockServer as any, mockEnv as Env);
-			
+
 			expect(mockServer.tool).toHaveBeenCalledWith(
 				"get_contacts",
 				expect.any(Object),
-				expect.any(Function)
+				expect.any(Function),
 			);
 		});
 	});
@@ -79,11 +79,11 @@ describe("Contact Tools Registration", () => {
 			};
 
 			registerContactAnalyticsTool(mockServer as any, mockEnv as Env);
-			
+
 			expect(mockServer.tool).toHaveBeenCalledWith(
 				"contact_analytics",
 				expect.any(Object),
-				expect.any(Function)
+				expect.any(Function),
 			);
 		});
 	});

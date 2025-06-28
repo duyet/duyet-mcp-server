@@ -19,10 +19,7 @@ export interface ParsedRSSFeed {
 /**
  * Extract field content from RSS item element, handling CDATA and parsing quirks
  */
-export function extractFieldFromElement(
-	element: Element,
-	tagName: string,
-): string | null {
+export function extractFieldFromElement(element: Element, tagName: string): string | null {
 	const elements = getElementsByTagName(tagName, element);
 	if (elements.length === 0) return null;
 
@@ -73,8 +70,7 @@ export function extractBlogPostFromItem(item: Element): BlogPost {
 		link: extractFieldFromElement(item, "link"),
 		description: extractFieldFromElement(item, "description"),
 		pubDate:
-			extractFieldFromElement(item, "pubDate") ||
-			extractFieldFromElement(item, "pubdate"),
+			extractFieldFromElement(item, "pubDate") || extractFieldFromElement(item, "pubdate"),
 	};
 }
 
@@ -98,9 +94,7 @@ export function parseRSSContent(xml: string, limit = 1): ParsedRSSFeed {
 
 		// Remove null values to clean up the output
 		const cleanedPost = Object.fromEntries(
-			Object.entries(blogPost).filter(
-				([_, value]) => value !== null && value !== undefined,
-			),
+			Object.entries(blogPost).filter(([_, value]) => value !== null && value !== undefined),
 		) as BlogPost;
 
 		posts.push(cleanedPost);
@@ -115,15 +109,10 @@ export function parseRSSContent(xml: string, limit = 1): ParsedRSSFeed {
 /**
  * Fetch and parse RSS feed from URL
  */
-export async function fetchAndParseRSS(
-	url: string,
-	limit = 1,
-): Promise<ParsedRSSFeed> {
+export async function fetchAndParseRSS(url: string, limit = 1): Promise<ParsedRSSFeed> {
 	const response = await fetch(url);
 	if (!response.ok) {
-		throw new Error(
-			`Failed to fetch RSS feed: ${response.status} ${response.statusText}`,
-		);
+		throw new Error(`Failed to fetch RSS feed: ${response.status} ${response.statusText}`);
 	}
 
 	const xml = await response.text();
@@ -160,10 +149,7 @@ export function registerGetLatestBlogPostTool(server: McpServer) {
 		},
 		async ({ limit = 1 }) => {
 			try {
-				const result = await fetchAndParseRSS(
-					"https://blog.duyet.net/rss.xml",
-					limit,
-				);
+				const result = await fetchAndParseRSS("https://blog.duyet.net/rss.xml", limit);
 
 				if (result.posts.length === 0) {
 					return {

@@ -15,31 +15,13 @@ export function registerGetContactsTool(server: McpServer, env: Env) {
 		"get_contacts",
 		{
 			purpose: z
-				.enum([
-					"collaboration",
-					"job_opportunity",
-					"consulting",
-					"general_inquiry",
-				])
+				.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"])
 				.optional()
 				.describe("Filter by purpose of contact"),
-			date_from: z
-				.string()
-				.optional()
-				.describe("Start date filter (YYYY-MM-DD format)"),
-			date_to: z
-				.string()
-				.optional()
-				.describe("End date filter (YYYY-MM-DD format)"),
-			contact_email: z
-				.string()
-				.email()
-				.optional()
-				.describe("Filter by contact email"),
-			reference_id: z
-				.string()
-				.optional()
-				.describe("Get specific contact by reference ID"),
+			date_from: z.string().optional().describe("Start date filter (YYYY-MM-DD format)"),
+			date_to: z.string().optional().describe("End date filter (YYYY-MM-DD format)"),
+			contact_email: z.string().email().optional().describe("Filter by contact email"),
+			reference_id: z.string().optional().describe("Get specific contact by reference ID"),
 			limit: z
 				.number()
 				.min(1)
@@ -108,7 +90,7 @@ User Agent: ${contact.userAgent || "N/A"}`,
 				const filters = [];
 				if (purpose) filters.push(eq(contacts.purpose, purpose));
 				if (contact_email) filters.push(eq(contacts.contactEmail, contact_email));
-				
+
 				// Add date filters
 				if (date_from) {
 					const fromDate = new Date(date_from);
@@ -133,7 +115,12 @@ User Agent: ${contact.userAgent || "N/A"}`,
 					.offset(offset);
 
 				if (results.length === 0) {
-					const filterText = Object.entries({ purpose, date_from, date_to, contact_email })
+					const filterText = Object.entries({
+						purpose,
+						date_from,
+						date_to,
+						contact_email,
+					})
 						.filter(([_, value]) => value !== undefined && value !== null)
 						.map(([key, value]) => `${key}: ${value}`)
 						.join(", ");
@@ -155,7 +142,9 @@ Try adjusting your search criteria or check for different date ranges.`,
 				// Format contacts for display
 				const contactList = results
 					.map((contact, index) => {
-						const timestamp = new Date(contact.createdAt || Date.now()).toLocaleString();
+						const timestamp = new Date(
+							contact.createdAt || Date.now(),
+						).toLocaleString();
 
 						return `${offset + index + 1}. ${contact.purpose.replace("_", " ")}
 ID: ${contact.referenceId}

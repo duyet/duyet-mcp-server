@@ -14,16 +14,14 @@ export function registerSayHiTool(server: McpServer) {
 				.describe("Optional personal message to include with the greeting"),
 		},
 		async ({ message }) => {
-			const greeting = message 
-				? `Hi Duyet! ${message}` 
-				: "Hi Duyet! 👋";
+			const greeting = message ? `Hi Duyet! ${message}` : "Hi Duyet! 👋";
 
 			const responses = [
 				"Thanks for saying hi! Hope you're having a great day! 😊",
 				"Hello there! Great to hear from you! 🌟",
 				"Hi! Always nice to get a friendly greeting! ✨",
 				"Hey! Thanks for reaching out. Hope all is well! 🚀",
-				"Hello! Appreciate you taking the time to say hi! 💫"
+				"Hello! Appreciate you taking the time to say hi! 💫",
 			];
 
 			const randomResponse = responses[Math.floor(Math.random() * responses.length)];

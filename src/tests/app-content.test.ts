@@ -1,8 +1,5 @@
 // Jest globals are available without import in Jest environment
-import {
-	calculateYearsOfExperience,
-	getAboutDuyetContent,
-} from "../tools/about-duyet";
+import { calculateYearsOfExperience, getAboutDuyetContent } from "../tools/about-duyet";
 
 describe("App Content Utilities", () => {
 	describe("calculateYearsOfExperience", () => {
@@ -27,9 +24,7 @@ describe("App Content Utilities", () => {
 			const years = 5;
 			const content = getAboutDuyetContent(years);
 
-			expect(content).toContain(
-				`Data Engineer with ${years} years of experience`,
-			);
+			expect(content).toContain(`Data Engineer with ${years} years of experience`);
 			expect(content).toContain("https://blog.duyet.net");
 			expect(content).toContain("https://duyet.net/cv");
 			expect(content).toContain("https://github.com/duyet");

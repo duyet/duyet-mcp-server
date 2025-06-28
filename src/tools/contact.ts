@@ -24,12 +24,7 @@ export function registerContactTool(server: McpServer, env: Env) {
 				.optional()
 				.describe("Optional: Your email for response"),
 			purpose: z
-				.enum([
-					"collaboration",
-					"job_opportunity",
-					"consulting",
-					"general_inquiry",
-				])
+				.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"])
 				.describe("Purpose of your message"),
 		},
 		async ({ message, contact_email, purpose }) => {

@@ -12,10 +12,7 @@ export function registerHireMeTool(server: McpServer) {
 				.enum(["full_time", "contract", "consulting", "part_time"])
 				.optional()
 				.describe("Type of engagement you're interested in"),
-			tech_stack: z
-				.string()
-				.optional()
-				.describe("Technologies/tools your project uses"),
+			tech_stack: z.string().optional().describe("Technologies/tools your project uses"),
 			company_size: z
 				.enum(["startup", "scale_up", "enterprise", "agency"])
 				.optional()
@@ -87,8 +84,7 @@ export function registerHireMeTool(server: McpServer) {
 						"Excellent fit! I have strong experience scaling data systems and building robust infrastructure.",
 					enterprise:
 						"Open to the right opportunity, especially roles involving modernization and innovation.",
-					agency:
-						"Interested in project-based work and bringing data expertise to diverse client challenges.",
+					agency: "Interested in project-based work and bringing data expertise to diverse client challenges.",
 				};
 				companySizeInfo = `\n${sizePreferences[company_size]}\n`;
 			}
