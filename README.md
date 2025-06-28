@@ -26,6 +26,12 @@ Endpoints:
 - https://mcp.duyet.net/sse
 - https://mcp.duyet.net/mcp
 
+![](./.github/screenshots/screenshot-1.png)
+![](./.github/screenshots/screenshot-2.png)
+![](./.github/screenshots/screenshot-3.png)
+![](./.github/screenshots/screenshot-4.png)
+![](./.github/screenshots/screenshot-5.png)
+![](./.github/screenshots/screenshot-6.png)
 
 ## About This Project
 
