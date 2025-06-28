@@ -42,6 +42,7 @@ This is a **study, demo, and experimental project** designed to explore MCP capa
 ## Deploy to Cloudflare Workers
 
 [![Deploy to Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/duyet/duyet-mcp-server)
+
 This will deploy your MCP server to a URL like: `duyet-mcp-server.<your-account>.workers.dev/sse`
 
 

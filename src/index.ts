@@ -28,7 +28,7 @@ Usage: Update your AI assistant configuration to point to the URL of Duyet MCP s
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://duyet-mcp-server.duyet.workers.dev/sse"
+        "https://mcp.duyet.net/sse"
       ]
     }
   }
