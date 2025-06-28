@@ -1,25 +1,62 @@
 {
-	"name": "remote-mcp-server-authless",
-	"version": "0.0.0",
+	"name": "duyet-mcp-server",
+	"version": "0.1.0",
 	"private": true,
 	"scripts": {
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
 		"format": "biome format --write",
+		"lint": "biome lint",
 		"lint:fix": "biome lint --fix",
 		"start": "wrangler dev",
 		"cf-typegen": "wrangler types",
-		"type-check": "tsc --noEmit"
+		"type-check": "tsc --noEmit",
+		"test": "jest",
+		"test:watch": "jest --watch",
+		"test:coverage": "jest --coverage",
+		"all": "npm run lint && npm run format && npm run type-check && npm run test:coverage && npm run deploy"
 	},
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.13.0",
 		"agents": "^0.0.95",
+		"domutils": "^3.2.2",
+		"drizzle-orm": "^0.44.2",
+		"hono": "^4.8.3",
+		"htmlparser2": "^10.0.0",
 		"zod": "^3.25.67"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.0.4",
+		"@biomejs/biome": "^2.0.6",
+		"@types/jest": "^29.5.12",
 		"@types/node": "^24.0.4",
+		"dotenv": "^17.0.0",
+		"drizzle-kit": "^0.31.4",
+		"jest": "^29.7.0",
+		"ts-jest": "^29.1.2",
 		"typescript": "^5.8.3",
 		"wrangler": "^4.22.0"
+	},
+	"type": "module",
+	"jest": {
+		"preset": "ts-jest/presets/default-esm",
+		"extensionsToTreatAsEsm": [
+			".ts"
+		],
+		"moduleNameMapper": {
+			"^(\\.{1,2}/.*)\\.js$": "$1"
+		},
+		"testEnvironment": "node",
+		"roots": [
+			"<rootDir>/src"
+		],
+		"testMatch": [
+			"**/__tests__/**/*.ts",
+			"**/?(*.)+(spec|test).ts"
+		],
+		"collectCoverageFrom": [
+			"src/**/*.ts",
+			"!src/**/*.d.ts",
+			"!src/tests/**/*"
+		]
 	}
 }

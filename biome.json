@@ -1,15 +1,22 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.0.4/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+	"files": {
+		"ignoreUnknown": false,
+		"includes": [
+			"!node_modules",
+			"!dist",
+			"!./worker-configuration.d.ts",
+			"src/**"
+		]
+	},
 	"assist": {
 		"actions": {
 			"source": {
-				"useSortedKeys": "on"
+				"useSortedKeys": "on",
+				"organizeImports": "on"
 			}
 		},
 		"enabled": true
-	},
-	"files": {
-		"includes": ["!worker-configuration.d.ts"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -40,7 +47,6 @@
 			}
 		}
 	},
-	"root": false,
 	"vcs": {
 		"clientKind": "git",
 		"enabled": true,
