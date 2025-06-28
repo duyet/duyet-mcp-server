@@ -1,5 +1,9 @@
 # duyet-mcp-server
 
+[![CI/CD Pipeline](https://github.com/duyet/duyet-mcp-server/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/duyet/duyet-mcp-server/actions)
+[![codecov](https://codecov.io/gh/duyet/duyet-mcp-server/branch/master/graph/badge.svg)](https://codecov.io/gh/duyet/duyet-mcp-server)
+[![Security](https://github.com/duyet/duyet-mcp-server/workflows/Security%20and%20Dependencies/badge.svg)](https://github.com/duyet/duyet-mcp-server/actions)
+
 An experimental MCP (Model Context Protocol) server that helps AI assistants connect to and retrieve information about duyet. This server provides access to information primarily available at [https://duyet.net](https://duyet.net), making it available directly to your AI assistant.
 
 Update your Claude/Cursor/etc configuration to point to the URL of Duyet MCP server
