@@ -1,6 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerGitHubActivityResource } from "../resources/github-activity";
-import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerGitHubActivityTool } from "../tools/github-activity";
 
 // Mock Octokit
 const mockListPublicEventsForUser = jest.fn();
@@ -16,23 +15,25 @@ jest.mock("@octokit/rest", () => ({
 
 // Mock the McpServer
 const mockServer = {
-	registerResource: jest.fn(),
+	registerTool: jest.fn(),
 } as unknown as McpServer;
 
-describe("GitHub Activity Resource Enhanced Tests", () => {
+describe("GitHub Activity Tool Enhanced Tests", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});
 
-	test("should register github-activity resource with all parameters", () => {
-		registerGitHubActivityResource(mockServer);
-		expect(mockServer.registerResource).toHaveBeenCalledWith(
-			"github-activity",
-			expect.any(ResourceTemplate),
+	test("should register github-activity tool with all parameters", () => {
+		registerGitHubActivityTool(mockServer);
+		expect(mockServer.registerTool).toHaveBeenCalledWith(
+			"github_activity",
 			expect.objectContaining({
-				title: "Duyet's GitHub Activity",
-				description: expect.stringContaining("Recent GitHub activity"),
-				mimeType: "text/plain",
+				title: "GitHub Activity",
+				description: expect.stringContaining("Get Duyet's recent GitHub activity"),
+				inputSchema: expect.objectContaining({
+					limit: expect.any(Object),
+					include_details: expect.any(Object),
+				}),
 			}),
 			expect.any(Function),
 		);
@@ -52,23 +53,20 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/false"),
-			{ limit: "5", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: false });
 
-		expect(result.contents[0].text).toContain("Starred repository");
-		expect(result.contents[0].text).toContain("duyet/test-repo");
+		expect(result.content[0].text).toContain("Starred repository");
+		expect(result.content[0].text).toContain("duyet/test-repo");
 	});
 
 	test("should handle ForkEvent type", async () => {
@@ -85,23 +83,20 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/false"),
-			{ limit: "5", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: false });
 
-		expect(result.contents[0].text).toContain("Forked repository");
-		expect(result.contents[0].text).toContain("duyet/test-repo");
+		expect(result.content[0].text).toContain("Forked repository");
+		expect(result.content[0].text).toContain("duyet/test-repo");
 	});
 
 	test("should handle ReleaseEvent type", async () => {
@@ -125,23 +120,20 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/true"),
-			{ limit: "5", include_details: "true" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: true });
 
-		expect(result.contents[0].text).toContain("published release");
-		expect(result.contents[0].text).toContain("v1.0.0: Version 1.0.0");
+		expect(result.content[0].text).toContain("published release");
+		expect(result.content[0].text).toContain("v1.0.0: Version 1.0.0");
 	});
 
 	test("should handle ReleaseEvent without payload", async () => {
@@ -158,22 +150,19 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/false"),
-			{ limit: "5", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: false });
 
-		expect(result.contents[0].text).toContain("created release");
+		expect(result.content[0].text).toContain("created release");
 	});
 
 	test("should handle CreateEvent without ref", async () => {
@@ -190,22 +179,19 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/false"),
-			{ limit: "5", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: false });
 
-		expect(result.contents[0].text).toContain("Created repository");
+		expect(result.content[0].text).toContain("Created repository");
 	});
 
 	test("should handle PushEvent without commits", async () => {
@@ -222,22 +208,19 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/false"),
-			{ limit: "5", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: false });
 
-		expect(result.contents[0].text).toContain("Pushed 0 commit");
+		expect(result.content[0].text).toContain("Pushed 0 commit");
 	});
 
 	test("should handle missing payloads gracefully", async () => {
@@ -260,23 +243,20 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/false"),
-			{ limit: "5", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: false });
 
-		expect(result.contents[0].text).toContain("updated issue");
-		expect(result.contents[0].text).toContain("updated pull request");
+		expect(result.content[0].text).toContain("updated issue");
+		expect(result.content[0].text).toContain("updated pull request");
 	});
 
 	test("should handle GitHub API error", async () => {
@@ -284,26 +264,20 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			new Error("GitHub API error: 404")
 		);
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/false"),
-			{
-				limit: "5",
-				include_details: "false",
-			},
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: false });
 
-		expect(result.contents[0].text).toContain("Error fetching GitHub activity");
-		expect(result.contents[0].text).toContain("GitHub API error: 404");
+		expect(result.content[0].text).toContain("Error fetching GitHub activity");
+		expect(result.content[0].text).toContain("GitHub API error: 404");
 	});
 
 	test("should handle empty events array", async () => {
@@ -311,22 +285,19 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: [],
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/false"),
-			{ limit: "5", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: false });
 
-		expect(result.contents[0].text).toContain("No recent GitHub activity found");
+		expect(result.content[0].text).toContain("No recent GitHub activity found");
 	});
 
 	test("should limit results correctly", async () => {
@@ -341,20 +312,17 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const _result = await resourceHandler(
-			new URL("duyet://github/activity/25/false"),
-			{ limit: "25", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const _result = await toolHandler({ limit: 25, include_details: false });
 
 		// Should limit to 20 max
 		expect(mockListPublicEventsForUser).toHaveBeenCalledWith({
@@ -377,27 +345,24 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/invalid/false"),
-			{ limit: "invalid", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ include_details: false }); // Test default value
 
 		// Should default to 5
 		expect(mockListPublicEventsForUser).toHaveBeenCalledWith({
 			username: "duyet",
 			per_page: 5,
 		});
-		expect(result.contents[0].text).toContain("Recent GitHub Activity");
+		expect(result.content[0].text).toContain("Recent GitHub Activity");
 	});
 
 	test("should handle unknown event types", async () => {
@@ -414,21 +379,18 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			data: mockEvents,
 		});
 
-		let resourceHandler: any;
-		(mockServer.registerResource as jest.Mock).mockImplementation(
-			(name, _template, _metadata, handler) => {
-				if (name === "github-activity") {
-					resourceHandler = handler;
+		let toolHandler: any;
+		(mockServer.registerTool as jest.Mock).mockImplementation(
+			(name, _config, handler) => {
+				if (name === "github_activity") {
+					toolHandler = handler;
 				}
 			},
 		);
 
-		registerGitHubActivityResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://github/activity/5/false"),
-			{ limit: "5", include_details: "false" },
-		);
+		registerGitHubActivityTool(mockServer);
+		const result = await toolHandler({ limit: 5, include_details: false });
 
-		expect(result.contents[0].text).toContain("Unknown");
+		expect(result.content[0].text).toContain("Unknown");
 	});
 }); 

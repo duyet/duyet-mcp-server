@@ -1,10 +1,14 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
+import { getDb } from "../database/index";
+import { contacts } from "../database/schema";
+
 /**
- * Register the hire_me MCP tool
+ * Register the hire_me MCP tool with D1 database integration
  */
-export function registerHireMeTool(server: McpServer) {
+export function registerHireMeTool(server: McpServer, env: Env) {
+	const db = getDb(env.DB);
 	server.registerTool(
 		"hire_me",
 		{
@@ -21,9 +25,19 @@ export function registerHireMeTool(server: McpServer) {
 					.enum(["startup", "scale_up", "enterprise", "agency"])
 					.optional()
 					.describe("Company size/type"),
+				contact_email: z
+					.string()
+					.email()
+					.optional()
+					.describe("Optional: Your email for follow-up"),
+				additional_notes: z
+					.string()
+					.max(500)
+					.optional()
+					.describe("Optional: Additional notes or specific requirements (max 500 characters)"),
 			},
 		},
-		async ({ role_type, tech_stack, company_size }) => {
+		async ({ role_type, tech_stack, company_size, contact_email, additional_notes }) => {
 			const currentYear = new Date().getFullYear();
 			const experience = currentYear - 2017;
 
@@ -94,6 +108,42 @@ export function registerHireMeTool(server: McpServer) {
 				companySizeInfo = `\n${sizePreferences[company_size]}\n`;
 			}
 
+			// Save hire inquiry to database if any optional data is provided
+			let referenceId: string | undefined;
+			if (contact_email || additional_notes || role_type || tech_stack || company_size) {
+				referenceId = crypto.randomUUID();
+				const ip_address = "unknown";
+				const user_agent = "MCP Client";
+				
+				// Create a message from the provided information
+				const messageParts = [];
+				if (role_type) messageParts.push(`Role Type: ${role_type}`);
+				if (tech_stack) messageParts.push(`Tech Stack: ${tech_stack}`);
+				if (company_size) messageParts.push(`Company Size: ${company_size}`);
+				if (additional_notes) messageParts.push(`Notes: ${additional_notes}`);
+				
+				const message = messageParts.length > 0 
+					? `Hire Me Inquiry - ${messageParts.join(", ")}`
+					: "Hire Me Inquiry";
+
+				try {
+					await db.insert(contacts).values({
+						message,
+						contactEmail: contact_email,
+						purpose: "hire_me",
+						roleType: role_type,
+						techStack: tech_stack,
+						companySize: company_size,
+						ipAddress: ip_address,
+						userAgent: user_agent,
+						referenceId,
+					});
+				} catch (_e: any) {
+					// Continue execution even if DB save fails, but don't expose the reference ID
+					referenceId = undefined;
+				}
+			}
+
 			return {
 				content: [
 					{
@@ -141,7 +191,9 @@ Ideal Opportunities:
 - AI Agent Engineer
 - Remote-first companies with strong engineering culture
 
-Ready to discuss how I can help solve your data challenges.`,
+Ready to discuss how I can help solve your data challenges.
+
+${referenceId ? `\n---\nInquiry Reference ID: ${referenceId}\nYour hiring inquiry has been saved for follow-up.` : ""}`,
 					},
 				],
 			};

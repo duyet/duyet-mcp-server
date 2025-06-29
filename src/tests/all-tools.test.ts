@@ -4,10 +4,23 @@ import { registerHireMeTool } from "../tools/hire-me";
 import { registerSayHiTool } from "../tools/say-hi";
 import { registerSendMessageTool } from "../tools/send-message";
 import { registerGetAnalyticsTool } from "../tools/contact-analytics";
-import { registerAllTools } from "../tools/index";
 
 // Mock fetch globally
 global.fetch = jest.fn();
+
+// Mock Octokit for GitHub Activity tool
+const mockListPublicEventsForUser = jest.fn();
+jest.mock("@octokit/rest", () => ({
+	Octokit: jest.fn().mockImplementation(() => ({
+		rest: {
+			activity: {
+				listPublicEventsForUser: mockListPublicEventsForUser,
+			},
+		},
+	})),
+}));
+
+import { registerAllTools } from "../tools/index";
 
 // Mock the McpServer
 const mockServer = {
@@ -17,7 +30,9 @@ const mockServer = {
 // Mock environment
 const mockEnv = {
 	DB: {} as D1Database,
-} as Env;
+	MCP_OBJECT: {} as DurableObjectNamespace,
+	ANALYTICS: {} as AnalyticsEngineDataset
+} as unknown as Env;
 
 describe("Tool Registration Tests", () => {
 	beforeEach(() => {
@@ -111,7 +126,7 @@ describe("Tool Registration Tests", () => {
 
 	describe("Hire Me Tool", () => {
 		test("should register hire-me tool", () => {
-			registerHireMeTool(mockServer);
+			registerHireMeTool(mockServer, mockEnv);
 			expect(mockServer.registerTool).toHaveBeenCalledWith(
 				"hire_me",
 				expect.any(Object),
@@ -127,7 +142,7 @@ describe("Tool Registration Tests", () => {
 				}
 			});
 
-			registerHireMeTool(mockServer);
+			registerHireMeTool(mockServer, mockEnv);
 			const result = await toolHandler({
 				role_type: "full_time",
 				company_size: "startup",
@@ -146,7 +161,7 @@ describe("Tool Registration Tests", () => {
 				}
 			});
 
-			registerHireMeTool(mockServer);
+			registerHireMeTool(mockServer, mockEnv);
 			const result = await toolHandler({});
 			expect(result.content[0].text).toContain("Hire Duyet");
 		});
@@ -205,8 +220,8 @@ describe("Tool Registration Tests", () => {
 	describe("Tool Registry", () => {
 		test("should register all tools", () => {
 			registerAllTools(mockServer, mockEnv);
-			// Should have called tool registration for all 5 tools
-			expect(mockServer.registerTool).toHaveBeenCalledTimes(5);
+			// Should have called tool registration for all 6 tools
+			expect(mockServer.registerTool).toHaveBeenCalledTimes(6);
 		});
 	});
 });

@@ -3,6 +3,9 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 // Core information tools
 import { registerGetCVTool } from './get-cv'
 
+// Content tools
+import { registerGitHubActivityTool } from './github-activity'
+
 // Interaction tools
 import { registerSendMessageTool } from './send-message'
 import { registerHireMeTool } from './hire-me'
@@ -18,9 +21,12 @@ export function registerAllTools(server: McpServer, env: Env) {
   // Core information tools
   registerGetCVTool(server)
 
+  // Content tools
+  registerGitHubActivityTool(server)
+
   // Interaction tools
   registerSendMessageTool(server, env)
-  registerHireMeTool(server)
+  registerHireMeTool(server, env)
   registerSayHiTool(server)
 
   // Management tools
@@ -31,6 +37,8 @@ export function registerAllTools(server: McpServer, env: Env) {
 export {
   // Core information tools
   registerGetCVTool,
+  // Content tools
+  registerGitHubActivityTool,
   // Interaction tools
   registerSendMessageTool,
   registerHireMeTool,

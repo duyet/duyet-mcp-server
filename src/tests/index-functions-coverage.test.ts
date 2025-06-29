@@ -1,3 +1,15 @@
+// Mock Octokit for GitHub Activity tool
+const mockListPublicEventsForUser = jest.fn();
+jest.mock("@octokit/rest", () => ({
+	Octokit: jest.fn().mockImplementation(() => ({
+		rest: {
+			activity: {
+				listPublicEventsForUser: mockListPublicEventsForUser,
+			},
+		},
+	})),
+}));
+
 import { registerAllResources } from "../resources/index";
 import { registerAllTools } from "../tools/index";
 
@@ -14,12 +26,13 @@ jest.mock("../resources/blog-posts", () => ({
 	registerBlogPostsResource: jest.fn(),
 }));
 
-jest.mock("../resources/github-activity", () => ({
-	registerGitHubActivityResource: jest.fn(),
-}));
 
 jest.mock("../tools/get-cv", () => ({
 	registerGetCVTool: jest.fn(),
+}));
+
+jest.mock("../tools/github-activity", () => ({
+	registerGitHubActivityTool: jest.fn(),
 }));
 
 jest.mock("../tools/hire-me", () => ({
@@ -63,16 +76,13 @@ describe("Index Functions Coverage", () => {
 			const {
 				registerBlogPostsResource,
 			} = require("../resources/blog-posts");
-			const {
-				registerGitHubActivityResource,
-			} = require("../resources/github-activity");
 
 			registerAllResources(mockServer, mockEnv);
 
 			expect(registerAboutDuyetResource).toHaveBeenCalledWith(mockServer);
 			expect(registerCVResource).toHaveBeenCalledWith(mockServer);
 			expect(registerBlogPostsResource).toHaveBeenCalledWith(mockServer);
-			expect(registerGitHubActivityResource).toHaveBeenCalledWith(mockServer);
+			// GitHub activity is now a tool, not a resource
 		});
 	});
 
@@ -81,6 +91,9 @@ describe("Index Functions Coverage", () => {
 			const {
 				registerGetCVTool,
 			} = require("../tools/get-cv");
+			const {
+				registerGitHubActivityTool,
+			} = require("../tools/github-activity");
 			const {
 				registerHireMeTool,
 			} = require("../tools/hire-me");
@@ -97,7 +110,8 @@ describe("Index Functions Coverage", () => {
 			registerAllTools(mockServer, mockEnv);
 
 			expect(registerGetCVTool).toHaveBeenCalledWith(mockServer);
-			expect(registerHireMeTool).toHaveBeenCalledWith(mockServer);
+			expect(registerGitHubActivityTool).toHaveBeenCalledWith(mockServer);
+			expect(registerHireMeTool).toHaveBeenCalledWith(mockServer, mockEnv);
 			expect(registerSayHiTool).toHaveBeenCalledWith(mockServer);
 			expect(registerSendMessageTool).toHaveBeenCalledWith(mockServer, mockEnv);
 			expect(registerGetAnalyticsTool).toHaveBeenCalledWith(mockServer, mockEnv);
