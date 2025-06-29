@@ -5,22 +5,18 @@
 import { registerGetAnalyticsTool } from "../tools/contact-analytics";
 import { registerGitHubActivityResource } from "../resources/github-activity";
 
-// Mock the github-activity resource to avoid ESM import issues
-jest.mock("../resources/github-activity", () => ({
-	registerGitHubActivityResource: jest.fn((server) => {
-		// Simulate the resource registration behavior
-		const mockHandler = async (uri: URL, _params: any) => {
-			// Simulate basic GitHub activity response
-			return {
-				contents: [{
-					uri: uri.href,
-					text: "Recent GitHub Activity for Duyet:\n\nStarred repository in duyet/starred-repo (1/4/2024)\n\nForked repository in duyet/forked-repo (1/5/2024)\n\nGitHub Profile: https://github.com/duyet"
-				}]
-			};
-		};
-		
-		server.registerResource("github-activity", {}, {}, mockHandler);
-	}),
+// Don't mock the github-activity resource, use actual implementation
+
+// Mock Octokit
+const mockListPublicEventsForUser = jest.fn();
+jest.mock("@octokit/rest", () => ({
+	Octokit: jest.fn().mockImplementation(() => ({
+		rest: {
+			activity: {
+				listPublicEventsForUser: mockListPublicEventsForUser,
+			},
+		},
+	})),
 }));
 
 // Mock fetch
@@ -214,12 +210,15 @@ describe("Coverage Boost Tests", () => {
 
 
 	describe("GitHub Activity - Success Paths", () => {
+		beforeEach(() => {
+			mockListPublicEventsForUser.mockReset();
+		});
 		test("should handle successful GitHub response with commits", async () => {
 			const mockServer = createMockServer();
 
-			(global.fetch as jest.Mock).mockResolvedValueOnce({
-				ok: true,
-				json: async () => [
+			// Mock Octokit response
+			mockListPublicEventsForUser.mockResolvedValue({
+				data: [
 					{
 						type: "PushEvent",
 						created_at: "2024-01-01T12:00:00Z",
@@ -260,9 +259,9 @@ describe("Coverage Boost Tests", () => {
 		test("should handle GitHub response without details", async () => {
 			const mockServer = createMockServer();
 
-			(global.fetch as jest.Mock).mockResolvedValueOnce({
-				ok: true,
-				json: async () => [
+			// Mock Octokit response
+			mockListPublicEventsForUser.mockResolvedValue({
+				data: [
 					{
 						type: "CreateEvent",
 						created_at: "2024-01-03T16:00:00Z",
@@ -294,9 +293,9 @@ describe("Coverage Boost Tests", () => {
 		test("should handle different event types", async () => {
 			const mockServer = createMockServer();
 
-			(global.fetch as jest.Mock).mockResolvedValueOnce({
-				ok: true,
-				json: async () => [
+			// Mock Octokit response
+			mockListPublicEventsForUser.mockResolvedValue({
+				data: [
 					{
 						type: "WatchEvent",
 						created_at: "2024-01-04T18:00:00Z",
