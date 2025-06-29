@@ -16,7 +16,6 @@ With Duyet MCP server, you can:
 
 ## Important documents:
 
-- Read @./docs/mcp.md
 - Read @./docs/mcp-typescript-sdk.md
 
 ## Development Commands

@@ -1,5 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
+// Mock the github-activity resource to avoid ESM import issues
+jest.mock("../resources/github-activity", () => ({
+	registerGitHubActivityResource: jest.fn(),
+}));
+
 // Mock the agents/mcp module
 jest.mock("agents/mcp", () => ({
 	McpAgent: class MockMcpAgent {

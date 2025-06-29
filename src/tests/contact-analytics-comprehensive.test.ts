@@ -1,4 +1,4 @@
-import { registerContactAnalyticsTool } from "../tools/contact-analytics";
+import { registerGetAnalyticsTool } from "../tools/contact-analytics";
 
 // Mock database
 const mockDb = {
@@ -41,11 +41,11 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 	});
 
 	describe("Registration", () => {
-		test("should register contact_analytics tool", () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+		test("should register get_analytics tool", () => {
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 
 			expect(mockServer.registerTool).toHaveBeenCalledWith(
-				"contact_analytics",
+				"get_analytics",
 				expect.any(Object),
 				expect.any(Function),
 			);
@@ -54,7 +54,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 
 	describe("Summary Report Type", () => {
 		test("should handle summary with contacts", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			// Mock purpose breakdown query
@@ -79,7 +79,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 		});
 
 		test("should handle summary with no contacts", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			// Mock empty responses
@@ -100,7 +100,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 
 	describe("Purpose Breakdown Report Type", () => {
 		test("should handle purpose breakdown with data", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
@@ -122,7 +122,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 		});
 
 		test("should handle purpose breakdown with no data", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
@@ -137,7 +137,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 
 	describe("Daily Trends Report Type", () => {
 		test("should handle daily trends with data", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
@@ -160,7 +160,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 		});
 
 		test("should handle daily trends with no data", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
@@ -179,7 +179,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 
 	describe("Recent Activity Report Type", () => {
 		test("should handle recent activity with data", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
@@ -202,7 +202,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 		});
 
 		test("should handle recent activity with no data", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
@@ -220,7 +220,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 
 	describe("Custom Period Report Type", () => {
 		test("should handle custom period with valid dates and data", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			mockDb.select.mockReturnValueOnce(mockDb);
@@ -244,7 +244,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 		});
 
 		test("should handle custom period without date_from", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const result = await handler({
@@ -257,7 +257,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 		});
 
 		test("should handle custom period without date_to", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const result = await handler({
@@ -269,7 +269,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 		});
 
 		test("should handle custom period with invalid date format", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const result = await handler({
@@ -283,7 +283,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 		});
 
 		test("should handle custom period with invalid date_to format", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			const result = await handler({
@@ -298,7 +298,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 
 	describe("Default Report Type", () => {
 		test("should default to summary when no report_type specified", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			// Mock the database calls for summary
@@ -319,7 +319,7 @@ describe("Contact Analytics Tool - Comprehensive Coverage", () => {
 
 	describe("Error Handling", () => {
 		test("should handle database errors gracefully", async () => {
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 			const [, , handler] = mockServer.registerTool.mock.calls[0];
 
 			// Mock database error

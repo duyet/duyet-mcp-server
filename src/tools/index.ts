@@ -9,7 +9,7 @@ import { registerHireMeTool } from './hire-me'
 import { registerSayHiTool } from './say-hi'
 
 // Management tools
-import { registerContactAnalyticsTool } from './contact-analytics'
+import { registerGetAnalyticsTool } from './contact-analytics'
 
 /**
  * Register all MCP tools with the server
@@ -24,7 +24,7 @@ export function registerAllTools(server: McpServer, env: Env) {
   registerSayHiTool(server)
 
   // Management tools
-  registerContactAnalyticsTool(server, env)
+  registerGetAnalyticsTool(server, env)
 }
 
 // Export individual tool registration functions for selective use
@@ -36,5 +36,5 @@ export {
   registerHireMeTool,
   registerSayHiTool,
   // Management tools
-  registerContactAnalyticsTool,
+  registerGetAnalyticsTool,
 }

@@ -2,8 +2,17 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerGitHubActivityResource } from "../resources/github-activity";
 import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-// Mock fetch globally
-global.fetch = jest.fn();
+// Mock Octokit
+const mockListPublicEventsForUser = jest.fn();
+jest.mock("@octokit/rest", () => ({
+	Octokit: jest.fn().mockImplementation(() => ({
+		rest: {
+			activity: {
+				listPublicEventsForUser: mockListPublicEventsForUser,
+			},
+		},
+	})),
+}));
 
 // Mock the McpServer
 const mockServer = {
@@ -39,9 +48,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			},
 		];
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;
@@ -73,9 +81,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			},
 		];
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;
@@ -114,9 +121,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			},
 		];
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;
@@ -148,9 +154,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			},
 		];
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;
@@ -181,9 +186,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			},
 		];
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;
@@ -214,9 +218,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			},
 		];
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;
@@ -253,9 +256,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			},
 		];
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;
@@ -278,10 +280,9 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 	});
 
 	test("should handle GitHub API error", async () => {
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: false,
-			status: 404,
-		});
+		mockListPublicEventsForUser.mockRejectedValue(
+			new Error("GitHub API error: 404")
+		);
 
 		let resourceHandler: any;
 		(mockServer.registerResource as jest.Mock).mockImplementation(
@@ -306,9 +307,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 	});
 
 	test("should handle empty events array", async () => {
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => [],
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: [],
 		});
 
 		let resourceHandler: any;
@@ -337,9 +337,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			payload: { commits: [{ message: `Commit ${i}`, sha: `sha${i}` }] },
 		}));
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;
@@ -358,9 +357,10 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 		);
 
 		// Should limit to 20 max
-		expect(global.fetch).toHaveBeenCalledWith(
-			"https://api.github.com/users/duyet/events/public?per_page=20",
-		);
+		expect(mockListPublicEventsForUser).toHaveBeenCalledWith({
+			username: "duyet",
+			per_page: 20,
+		});
 	});
 
 	test("should handle invalid limit parameter", async () => {
@@ -373,9 +373,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			},
 		];
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;
@@ -394,9 +393,10 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 		);
 
 		// Should default to 5
-		expect(global.fetch).toHaveBeenCalledWith(
-			"https://api.github.com/users/duyet/events/public?per_page=5",
-		);
+		expect(mockListPublicEventsForUser).toHaveBeenCalledWith({
+			username: "duyet",
+			per_page: 5,
+		});
 		expect(result.contents[0].text).toContain("Recent GitHub Activity");
 	});
 
@@ -410,9 +410,8 @@ describe("GitHub Activity Resource Enhanced Tests", () => {
 			},
 		];
 
-		(global.fetch as jest.Mock).mockResolvedValue({
-			ok: true,
-			json: async () => mockEvents,
+		mockListPublicEventsForUser.mockResolvedValue({
+			data: mockEvents,
 		});
 
 		let resourceHandler: any;

@@ -3,7 +3,7 @@
  */
 
 import { registerSendMessageTool } from "../tools/send-message";
-import { registerContactAnalyticsTool } from "../tools/contact-analytics";
+import { registerGetAnalyticsTool } from "../tools/contact-analytics";
 
 // Mock database operations with proper promise handling
 const mockDbOperations = {
@@ -65,10 +65,10 @@ describe("Contact Tools Registration", () => {
 				ANALYTICS: {} as AnalyticsEngineDataset
 			} as unknown as Env;
 
-			registerContactAnalyticsTool(mockServer as any, mockEnv);
+			registerGetAnalyticsTool(mockServer as any, mockEnv);
 
 			expect(mockServer.registerTool).toHaveBeenCalledWith(
-				"contact_analytics",
+				"get_analytics",
 				expect.any(Object),
 				expect.any(Function),
 			);

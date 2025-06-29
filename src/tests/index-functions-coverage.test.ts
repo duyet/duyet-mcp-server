@@ -35,7 +35,7 @@ jest.mock("../tools/send-message", () => ({
 }));
 
 jest.mock("../tools/contact-analytics", () => ({
-	registerContactAnalyticsTool: jest.fn(),
+	registerGetAnalyticsTool: jest.fn(),
 }));
 
 const mockServer = {
@@ -91,7 +91,7 @@ describe("Index Functions Coverage", () => {
 				registerSendMessageTool,
 			} = require("../tools/send-message");
 			const {
-				registerContactAnalyticsTool,
+				registerGetAnalyticsTool,
 			} = require("../tools/contact-analytics");
 
 			registerAllTools(mockServer, mockEnv);
@@ -100,7 +100,7 @@ describe("Index Functions Coverage", () => {
 			expect(registerHireMeTool).toHaveBeenCalledWith(mockServer);
 			expect(registerSayHiTool).toHaveBeenCalledWith(mockServer);
 			expect(registerSendMessageTool).toHaveBeenCalledWith(mockServer, mockEnv);
-			expect(registerContactAnalyticsTool).toHaveBeenCalledWith(mockServer, mockEnv);
+			expect(registerGetAnalyticsTool).toHaveBeenCalledWith(mockServer, mockEnv);
 		});
 	});
 });

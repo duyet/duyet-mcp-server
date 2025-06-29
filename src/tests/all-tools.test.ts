@@ -3,7 +3,7 @@ import { registerGetCVTool } from "../tools/get-cv";
 import { registerHireMeTool } from "../tools/hire-me";
 import { registerSayHiTool } from "../tools/say-hi";
 import { registerSendMessageTool } from "../tools/send-message";
-import { registerContactAnalyticsTool } from "../tools/contact-analytics";
+import { registerGetAnalyticsTool } from "../tools/contact-analytics";
 import { registerAllTools } from "../tools/index";
 
 // Mock fetch globally
@@ -192,10 +192,10 @@ describe("Tool Registration Tests", () => {
 	});
 
 	describe("Contact Analytics Tool", () => {
-		test("should register contact-analytics tool", () => {
-			registerContactAnalyticsTool(mockServer, mockEnv);
+		test("should register get_analytics tool", () => {
+			registerGetAnalyticsTool(mockServer, mockEnv);
 			expect(mockServer.registerTool).toHaveBeenCalledWith(
-				"contact_analytics",
+				"get_analytics",
 				expect.any(Object),
 				expect.any(Function),
 			);

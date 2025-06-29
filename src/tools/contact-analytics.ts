@@ -9,13 +9,13 @@ import { contacts } from "../database/schema";
  * Register the contact-analytics MCP tool for insights and statistics
  * Analytics data is written to Cloudflare Analytics Engine and computed from D1 contacts
  */
-export function registerContactAnalyticsTool(server: McpServer, env: Env) {
+export function registerGetAnalyticsTool(server: McpServer, env: Env) {
 	const db = getDb(env.DB);
 
 	server.registerTool(
-		"contact_analytics",
+		"get_analytics",
 		{
-			title: "Contact Analytics",
+			title: "Get Analytics",
 			description:
 				"Generate analytics reports on contact submissions including summary statistics, purpose breakdown, daily trends, and recent activity patterns",
 			inputSchema: {

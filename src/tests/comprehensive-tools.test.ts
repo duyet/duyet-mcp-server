@@ -3,7 +3,7 @@
  */
 
 import { registerSendMessageTool } from "../tools/send-message";
-import { registerContactAnalyticsTool } from "../tools/contact-analytics";
+import { registerGetAnalyticsTool } from "../tools/contact-analytics";
 
 // Mock fetch for RSS and GitHub API
 global.fetch = jest.fn();
@@ -49,10 +49,10 @@ describe("Comprehensive Tool Coverage Tests", () => {
 				ANALYTICS: {} as AnalyticsEngineDataset
 			} as unknown as Env;
 
-			registerContactAnalyticsTool(mockServer, mockEnv);
+			registerGetAnalyticsTool(mockServer, mockEnv);
 
 			expect(mockServer.registerTool).toHaveBeenCalledWith(
-				"contact_analytics",
+				"get_analytics",
 				expect.any(Object),
 				expect.any(Function),
 			);

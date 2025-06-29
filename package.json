@@ -20,6 +20,7 @@
 	},
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.13.0",
+		"@octokit/rest": "^22.0.0",
 		"agents": "^0.0.99",
 		"domutils": "^3.2.2",
 		"drizzle-orm": "^0.44.2",
@@ -49,6 +50,9 @@
 		"moduleNameMapper": {
 			"^(\\.{1,2}/.*)\\.js$": "$1"
 		},
+		"transformIgnorePatterns": [
+			"node_modules/(?!(@octokit)/)"
+		],
 		"testEnvironment": "node",
 		"roots": [
 			"<rootDir>/src"

@@ -1,3 +1,8 @@
+// Mock the github-activity resource to avoid ESM import issues
+jest.mock("../resources/github-activity", () => ({
+	registerGitHubActivityResource: jest.fn(),
+}));
+
 import { DuyetMCP } from "../index";
 
 // Mock the agents library
