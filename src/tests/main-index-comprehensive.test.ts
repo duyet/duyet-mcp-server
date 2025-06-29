@@ -144,7 +144,7 @@ describe("DuyetMCP Main Application", () => {
 			const request = new Request("http://localhost/invalid-path");
 
 			const response = await app.fetch(request, mockEnv, mockCtx);
-			
+
 			// Should return 404 for invalid paths, not throw
 			expect(response.status).toBe(404);
 		});

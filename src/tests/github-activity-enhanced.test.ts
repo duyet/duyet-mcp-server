@@ -54,13 +54,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: false });
@@ -84,13 +82,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: false });
@@ -121,13 +117,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: true });
@@ -151,13 +145,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: false });
@@ -180,13 +172,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: false });
@@ -209,13 +199,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: false });
@@ -244,13 +232,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: false });
@@ -260,18 +246,14 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 	});
 
 	test("should handle GitHub API error", async () => {
-		mockListPublicEventsForUser.mockRejectedValue(
-			new Error("GitHub API error: 404")
-		);
+		mockListPublicEventsForUser.mockRejectedValue(new Error("GitHub API error: 404"));
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: false });
@@ -286,13 +268,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: false });
@@ -313,13 +293,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const _result = await toolHandler({ limit: 25, include_details: false });
@@ -346,13 +324,11 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ include_details: false }); // Test default value
@@ -380,17 +356,15 @@ describe("GitHub Activity Tool Enhanced Tests", () => {
 		});
 
 		let toolHandler: any;
-		(mockServer.registerTool as jest.Mock).mockImplementation(
-			(name, _config, handler) => {
-				if (name === "github_activity") {
-					toolHandler = handler;
-				}
-			},
-		);
+		(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
+			if (name === "github_activity") {
+				toolHandler = handler;
+			}
+		});
 
 		registerGitHubActivityTool(mockServer);
 		const result = await toolHandler({ limit: 5, include_details: false });
 
 		expect(result.content[0].text).toContain("Unknown");
 	});
-}); 
+});

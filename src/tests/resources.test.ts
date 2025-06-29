@@ -58,11 +58,7 @@ describe("Resource Registration Coverage Tests", () => {
 			(call) => call[0],
 		);
 		expect(registeredNames).toEqual(
-			expect.arrayContaining([
-				"about-duyet",
-				"cv",
-				"blog-posts",
-			]),
+			expect.arrayContaining(["about-duyet", "cv", "blog-posts"]),
 		);
 	});
 });

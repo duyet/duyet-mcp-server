@@ -34,7 +34,9 @@ export function registerHireMeTool(server: McpServer, env: Env) {
 					.string()
 					.max(500)
 					.optional()
-					.describe("Optional: Additional notes or specific requirements (max 500 characters)"),
+					.describe(
+						"Optional: Additional notes or specific requirements (max 500 characters)",
+					),
 			},
 		},
 		async ({ role_type, tech_stack, company_size, contact_email, additional_notes }) => {
@@ -114,17 +116,18 @@ export function registerHireMeTool(server: McpServer, env: Env) {
 				referenceId = crypto.randomUUID();
 				const ip_address = "unknown";
 				const user_agent = "MCP Client";
-				
+
 				// Create a message from the provided information
 				const messageParts = [];
 				if (role_type) messageParts.push(`Role Type: ${role_type}`);
 				if (tech_stack) messageParts.push(`Tech Stack: ${tech_stack}`);
 				if (company_size) messageParts.push(`Company Size: ${company_size}`);
 				if (additional_notes) messageParts.push(`Notes: ${additional_notes}`);
-				
-				const message = messageParts.length > 0 
-					? `Hire Me Inquiry - ${messageParts.join(", ")}`
-					: "Hire Me Inquiry";
+
+				const message =
+					messageParts.length > 0
+						? `Hire Me Inquiry - ${messageParts.join(", ")}`
+						: "Hire Me Inquiry";
 
 				try {
 					await db.insert(contacts).values({

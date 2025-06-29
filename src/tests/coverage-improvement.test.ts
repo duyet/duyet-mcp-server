@@ -20,10 +20,11 @@ jest.mock("@octokit/rest", () => ({
 global.fetch = jest.fn();
 
 // Mock server
-const createMockServer = () => ({
-	registerResource: jest.fn(),
-	registerTool: jest.fn(),
-}) as any;
+const createMockServer = () =>
+	({
+		registerResource: jest.fn(),
+		registerTool: jest.fn(),
+	}) as any;
 
 beforeEach(() => {
 	jest.clearAllMocks();
@@ -38,7 +39,7 @@ describe("Coverage Improvement Tests", () => {
 				const numbers = Array.from({ length: 20 }, (_, i) => String(i + 1));
 				return numbers.filter((n) => n.startsWith(value));
 			};
-			
+
 			expect(testLimitFunction("1")).toContain("1");
 			expect(testLimitFunction("10")).toContain("10");
 			expect(testLimitFunction("2")).toEqual(["2", "20"]);
@@ -50,7 +51,7 @@ describe("Coverage Improvement Tests", () => {
 			const testDetailsFunction = (value: string) => {
 				return ["true", "false"].filter((v) => v.startsWith(value));
 			};
-			
+
 			expect(testDetailsFunction("t")).toEqual(["true"]);
 			expect(testDetailsFunction("f")).toEqual(["false"]);
 			expect(testDetailsFunction("")).toEqual(["true", "false"]);
@@ -89,15 +90,17 @@ describe("Coverage Improvement Tests", () => {
 			});
 
 			let resourceHandler: any;
-			(mockServer.registerResource as jest.Mock).mockImplementation((name, _template, _metadata, handler) => {
-				if (name === "github-activity") resourceHandler = handler;
-			});
+			(mockServer.registerResource as jest.Mock).mockImplementation(
+				(name, _template, _metadata, handler) => {
+					if (name === "github-activity") resourceHandler = handler;
+				},
+			);
 
 			registerGitHubActivityResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://github/activity/10/true"),
-				{ limit: "10", include_details: "true" }
-			);
+			const result = await resourceHandler(new URL("duyet://github/activity/10/true"), {
+				limit: "10",
+				include_details: "true",
+			});
 
 			expect(result.contents[0].text).toContain("Recent GitHub Activity");
 			expect(result.contents[0].text).toContain("opened issue");
@@ -113,15 +116,17 @@ describe("Coverage Improvement Tests", () => {
 			mockListPublicEventsForUser.mockRejectedValue(new Error("GitHub API error: 404"));
 
 			let resourceHandler: any;
-			(mockServer.registerResource as jest.Mock).mockImplementation((name, _template, _metadata, handler) => {
-				if (name === "github-activity") resourceHandler = handler;
-			});
+			(mockServer.registerResource as jest.Mock).mockImplementation(
+				(name, _template, _metadata, handler) => {
+					if (name === "github-activity") resourceHandler = handler;
+				},
+			);
 
 			registerGitHubActivityResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://github/activity/5/false"),
-				{ limit: "5", include_details: "false" }
-			);
+			const result = await resourceHandler(new URL("duyet://github/activity/5/false"), {
+				limit: "5",
+				include_details: "false",
+			});
 
 			expect(result.contents[0].text).toContain("Error fetching GitHub activity");
 			expect(result.contents[0].text).toContain("https://github.com/duyet");
@@ -134,15 +139,17 @@ describe("Coverage Improvement Tests", () => {
 			mockListPublicEventsForUser.mockRejectedValue(new Error("Network error"));
 
 			let resourceHandler: any;
-			(mockServer.registerResource as jest.Mock).mockImplementation((name, _template, _metadata, handler) => {
-				if (name === "github-activity") resourceHandler = handler;
-			});
+			(mockServer.registerResource as jest.Mock).mockImplementation(
+				(name, _template, _metadata, handler) => {
+					if (name === "github-activity") resourceHandler = handler;
+				},
+			);
 
 			registerGitHubActivityResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://github/activity/3/true"),
-				{ limit: "3", include_details: "true" }
-			);
+			const result = await resourceHandler(new URL("duyet://github/activity/3/true"), {
+				limit: "3",
+				include_details: "true",
+			});
 
 			expect(result.contents[0].text).toContain("Error fetching GitHub activity");
 			expect(result.contents[0].text).toContain("Network error");
@@ -181,10 +188,10 @@ describe("Coverage Improvement Tests", () => {
 			);
 
 			registerGitHubActivityResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://github/activity/1/false"),
-				{ limit: "1", include_details: "false" },
-			);
+			const result = await resourceHandler(new URL("duyet://github/activity/1/false"), {
+				limit: "1",
+				include_details: "false",
+			});
 
 			expect(result.contents[0].text).toContain("reopened issue");
 			expect(result.contents[0].text).not.toContain("Test Issue");
@@ -218,10 +225,10 @@ describe("Coverage Improvement Tests", () => {
 			);
 
 			registerGitHubActivityResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://github/activity/1/false"),
-				{ limit: "1", include_details: "false" },
-			);
+			const result = await resourceHandler(new URL("duyet://github/activity/1/false"), {
+				limit: "1",
+				include_details: "false",
+			});
 
 			expect(result.contents[0].text).toContain("merged pull request");
 			expect(result.contents[0].text).not.toContain("Test PR");
@@ -252,7 +259,7 @@ describe("Coverage Improvement Tests", () => {
 </rss>`;
 
 			const result = parseRSSContent(malformedRSS, 5);
-			
+
 			// Should handle empty or missing fields gracefully
 			expect(result.totalFound).toBeGreaterThanOrEqual(0);
 		});
@@ -304,10 +311,9 @@ describe("Coverage Improvement Tests", () => {
 			);
 
 			registerCVResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://cv/summary"),
-				{ format: "summary" },
-			);
+			const result = await resourceHandler(new URL("duyet://cv/summary"), {
+				format: "summary",
+			});
 
 			expect(result.contents[0].text).toContain("Error");
 		});

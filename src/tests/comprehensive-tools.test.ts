@@ -43,10 +43,10 @@ describe("Comprehensive Tool Coverage Tests", () => {
 	describe("Contact Analytics Tool - Full Coverage", () => {
 		test("should register contact analytics tool", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { 
+			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			registerGetAnalyticsTool(mockServer, mockEnv);
@@ -62,16 +62,18 @@ describe("Comprehensive Tool Coverage Tests", () => {
 	describe("Send Message Tool - Full Coverage", () => {
 		test("should handle successful message submission", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { 
+			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			let toolHandler: any;
-			mockServer.registerTool.mockImplementation((_name: string, _config: any, handler: any) => {
-				toolHandler = handler;
-			});
+			mockServer.registerTool.mockImplementation(
+				(_name: string, _config: any, handler: any) => {
+					toolHandler = handler;
+				},
+			);
 
 			registerSendMessageTool(mockServer, mockEnv);
 
@@ -91,16 +93,18 @@ describe("Comprehensive Tool Coverage Tests", () => {
 
 		test("should handle database errors gracefully", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { 
+			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			let toolHandler: any;
-			mockServer.registerTool.mockImplementation((_name: string, _config: any, handler: any) => {
-				toolHandler = handler;
-			});
+			mockServer.registerTool.mockImplementation(
+				(_name: string, _config: any, handler: any) => {
+					toolHandler = handler;
+				},
+			);
 
 			registerSendMessageTool(mockServer, mockEnv);
 
@@ -116,5 +120,4 @@ describe("Comprehensive Tool Coverage Tests", () => {
 			expect(result.content[0].text).toContain("me@duyet.net");
 		});
 	});
-
 });

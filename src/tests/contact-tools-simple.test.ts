@@ -60,7 +60,7 @@ describe("Contact Tools Registration", () => {
 			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			registerSendMessageTool(mockServer as any, mockEnv);
@@ -79,7 +79,7 @@ describe("Contact Tools Registration", () => {
 			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			registerGetAnalyticsTool(mockServer as any, mockEnv);
@@ -98,7 +98,7 @@ describe("Contact Tools Registration", () => {
 			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			registerHireMeTool(mockServer as any, mockEnv);
@@ -115,15 +115,17 @@ describe("Contact Tools Registration", () => {
 			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			let toolHandler: any;
-			mockServer.registerTool.mockImplementation((name: string, _config: any, handler: any) => {
-				if (name === "hire_me") {
-					toolHandler = handler;
-				}
-			});
+			mockServer.registerTool.mockImplementation(
+				(name: string, _config: any, handler: any) => {
+					if (name === "hire_me") {
+						toolHandler = handler;
+					}
+				},
+			);
 
 			// Mock successful database insert
 			mockDbOperations.values.mockResolvedValue(undefined);
@@ -135,7 +137,7 @@ describe("Contact Tools Registration", () => {
 				tech_stack: "clickhouse, rust, python",
 				company_size: "startup",
 				contact_email: "test@example.com",
-				additional_notes: "Looking for senior role"
+				additional_notes: "Looking for senior role",
 			});
 
 			expect(result.content).toBeDefined();
@@ -149,7 +151,7 @@ describe("Contact Tools Registration", () => {
 					techStack: "clickhouse, rust, python",
 					companySize: "startup",
 					contactEmail: "test@example.com",
-				})
+				}),
 			);
 		});
 
@@ -158,15 +160,17 @@ describe("Contact Tools Registration", () => {
 			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			let toolHandler: any;
-			mockServer.registerTool.mockImplementation((name: string, _config: any, handler: any) => {
-				if (name === "hire_me") {
-					toolHandler = handler;
-				}
-			});
+			mockServer.registerTool.mockImplementation(
+				(name: string, _config: any, handler: any) => {
+					if (name === "hire_me") {
+						toolHandler = handler;
+					}
+				},
+			);
 
 			registerHireMeTool(mockServer as any, mockEnv);
 
@@ -183,15 +187,17 @@ describe("Contact Tools Registration", () => {
 			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			let toolHandler: any;
-			mockServer.registerTool.mockImplementation((name: string, _config: any, handler: any) => {
-				if (name === "hire_me") {
-					toolHandler = handler;
-				}
-			});
+			mockServer.registerTool.mockImplementation(
+				(name: string, _config: any, handler: any) => {
+					if (name === "hire_me") {
+						toolHandler = handler;
+					}
+				},
+			);
 
 			// Mock database error
 			mockDbOperations.values.mockRejectedValue(new Error("Database error"));
@@ -200,7 +206,7 @@ describe("Contact Tools Registration", () => {
 
 			const result = await toolHandler({
 				contact_email: "test@example.com",
-				additional_notes: "Test inquiry"
+				additional_notes: "Test inquiry",
 			});
 
 			expect(result.content).toBeDefined();

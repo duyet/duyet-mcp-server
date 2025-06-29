@@ -26,7 +26,6 @@ jest.mock("../resources/blog-posts", () => ({
 	registerBlogPostsResource: jest.fn(),
 }));
 
-
 jest.mock("../tools/get-cv", () => ({
 	registerGetCVTool: jest.fn(),
 }));
@@ -67,15 +66,9 @@ describe("Index Functions Coverage", () => {
 
 	describe("Resources Index", () => {
 		test("should call registerAllResources and invoke all resource registrations", () => {
-			const {
-				registerAboutDuyetResource,
-			} = require("../resources/about-duyet");
-			const {
-				registerCVResource,
-			} = require("../resources/cv");
-			const {
-				registerBlogPostsResource,
-			} = require("../resources/blog-posts");
+			const { registerAboutDuyetResource } = require("../resources/about-duyet");
+			const { registerCVResource } = require("../resources/cv");
+			const { registerBlogPostsResource } = require("../resources/blog-posts");
 
 			registerAllResources(mockServer, mockEnv);
 
@@ -88,24 +81,12 @@ describe("Index Functions Coverage", () => {
 
 	describe("Tools Index", () => {
 		test("should call registerAllTools and invoke all tool registrations", () => {
-			const {
-				registerGetCVTool,
-			} = require("../tools/get-cv");
-			const {
-				registerGitHubActivityTool,
-			} = require("../tools/github-activity");
-			const {
-				registerHireMeTool,
-			} = require("../tools/hire-me");
-			const {
-				registerSayHiTool,
-			} = require("../tools/say-hi");
-			const {
-				registerSendMessageTool,
-			} = require("../tools/send-message");
-			const {
-				registerGetAnalyticsTool,
-			} = require("../tools/contact-analytics");
+			const { registerGetCVTool } = require("../tools/get-cv");
+			const { registerGitHubActivityTool } = require("../tools/github-activity");
+			const { registerHireMeTool } = require("../tools/hire-me");
+			const { registerSayHiTool } = require("../tools/say-hi");
+			const { registerSendMessageTool } = require("../tools/send-message");
+			const { registerGetAnalyticsTool } = require("../tools/contact-analytics");
 
 			registerAllTools(mockServer, mockEnv);
 

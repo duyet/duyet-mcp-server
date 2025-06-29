@@ -10,9 +10,10 @@ import {
 
 global.fetch = jest.fn();
 
-const createMockServer = () => ({
-	registerResource: jest.fn(),
-}) as any;
+const createMockServer = () =>
+	({
+		registerResource: jest.fn(),
+	}) as any;
 
 beforeEach(() => {
 	jest.clearAllMocks();
@@ -85,7 +86,7 @@ describe("Blog Posts Advanced Coverage", () => {
 
 			const result = parseRSSContent(rssWithEmptyTitles, 5);
 			expect(result.posts.length).toBeGreaterThan(0);
-			const validPost = result.posts.find(p => p.title === "Valid Title");
+			const validPost = result.posts.find((p) => p.title === "Valid Title");
 			expect(validPost).toBeDefined();
 		});
 	});
@@ -119,10 +120,7 @@ describe("Blog Posts Advanced Coverage", () => {
 			);
 
 			registerBlogPostsResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://blog/posts/1"),
-				{ limit: "1" },
-			);
+			const result = await resourceHandler(new URL("duyet://blog/posts/1"), { limit: "1" });
 
 			expect(result.contents[0].text).toContain("Test Post");
 		});
@@ -142,10 +140,7 @@ describe("Blog Posts Advanced Coverage", () => {
 			);
 
 			registerBlogPostsResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://blog/posts/5"),
-				{ limit: "5" },
-			);
+			const result = await resourceHandler(new URL("duyet://blog/posts/5"), { limit: "5" });
 
 			expect(result.contents[0].text).toContain("Error");
 		});
@@ -172,7 +167,7 @@ describe("Blog Posts Advanced Coverage", () => {
 
 			const doc = parseDocument(emptyElementXML);
 			const items = getElementsByTagName("item", doc);
-			
+
 			expect(extractFieldFromElement(items[0], "title")).toBeNull();
 			expect(extractFieldFromElement(items[0], "link")).toBeNull();
 		});
@@ -187,7 +182,7 @@ describe("Blog Posts Advanced Coverage", () => {
 
 			const doc = parseDocument(nestedXML);
 			const items = getElementsByTagName("item", doc);
-			
+
 			const title = extractFieldFromElement(items[0], "title");
 			// The extractFieldFromElement function may include the span tags based on implementation
 			expect(title).toContain("Nested Title");
@@ -202,7 +197,7 @@ describe("Blog Posts Advanced Coverage", () => {
 
 			const doc = parseDocument(emptyItemXML);
 			const items = getElementsByTagName("item", doc);
-			
+
 			const blogPost = extractBlogPostFromItem(items[0]);
 			expect(blogPost.title).toBeNull();
 			expect(blogPost.link).toBeNull();

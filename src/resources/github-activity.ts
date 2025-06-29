@@ -3,7 +3,8 @@ import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Octokit } from "@octokit/rest";
 import type { RestEndpointMethodTypes } from "@octokit/rest";
 
-type GitHubEvent = RestEndpointMethodTypes["activity"]["listPublicEventsForUser"]["response"]["data"][0];
+type GitHubEvent =
+	RestEndpointMethodTypes["activity"]["listPublicEventsForUser"]["response"]["data"][0];
 
 /**
  * Register the GitHub activity resource with limit and details parameters
@@ -41,7 +42,7 @@ export function registerGitHubActivityResource(server: McpServer) {
 				const includeDetails = include_details === "true";
 
 				const octokit = new Octokit();
-				
+
 				const { data: events } = await octokit.rest.activity.listPublicEventsForUser({
 					username: "duyet",
 					per_page: limitNum,
@@ -142,12 +143,12 @@ GitHub Profile: https://github.com/duyet`;
 				};
 			} catch (error) {
 				console.error("GitHub API error:", error);
-				
+
 				let errorMessage = "Unknown error";
 				if (error instanceof Error) {
 					errorMessage = error.message;
 				}
-				
+
 				const errorContent = `Error fetching GitHub activity: ${errorMessage}
 
 GitHub Profile: https://github.com/duyet`;

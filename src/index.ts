@@ -43,10 +43,8 @@ app.get("/", (c) => c.redirect("/llms.txt"));
 app.get("/llms.txt", (c) => c.text(LLMS_TXT));
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
 
-
-app.mount('/sse', DuyetMCP.serveSSE('/sse').fetch, { replaceRequest: false })
-app.mount('/mcp', DuyetMCP.serve('/mcp').fetch, { replaceRequest: false })
-
+app.mount("/sse", DuyetMCP.serveSSE("/sse").fetch, { replaceRequest: false });
+app.mount("/mcp", DuyetMCP.serve("/mcp").fetch, { replaceRequest: false });
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext) {

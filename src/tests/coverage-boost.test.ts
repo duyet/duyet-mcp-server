@@ -41,10 +41,11 @@ jest.mock("../database", () => ({
 	getDb: jest.fn(() => mockDb),
 }));
 
-const createMockServer = () => ({ 
-	registerTool: jest.fn(),
-	registerResource: jest.fn() 
-}) as any;
+const createMockServer = () =>
+	({
+		registerTool: jest.fn(),
+		registerResource: jest.fn(),
+	}) as any;
 
 beforeEach(() => {
 	jest.clearAllMocks();
@@ -56,10 +57,10 @@ describe("Coverage Boost Tests", () => {
 	describe("Contact Analytics - All Branch Coverage", () => {
 		test("should handle summary report with data", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { 
+			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			// Mock multiple return values for different queries
@@ -83,10 +84,10 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle purpose_breakdown report", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { 
+			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			mockDb.execute.mockResolvedValueOnce([
@@ -109,10 +110,10 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle daily_trends report", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { 
+			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			mockDb.execute.mockResolvedValueOnce([
@@ -134,10 +135,10 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle recent_activity report", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { 
+			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			mockDb.execute.mockResolvedValueOnce([
@@ -158,10 +159,10 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle custom_period with valid dates", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { 
+			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			mockDb.execute.mockResolvedValueOnce([
@@ -186,10 +187,10 @@ describe("Coverage Boost Tests", () => {
 
 		test("should handle custom_period with invalid dates", async () => {
 			const mockServer = createMockServer();
-			const mockEnv = { 
+			const mockEnv = {
 				DB: {} as D1Database,
 				MCP_OBJECT: {} as DurableObjectNamespace,
-				ANALYTICS: {} as AnalyticsEngineDataset
+				ANALYTICS: {} as AnalyticsEngineDataset,
 			} as unknown as Env;
 
 			let toolHandler: any;
@@ -207,7 +208,6 @@ describe("Coverage Boost Tests", () => {
 			expect(result.content[0].text).toContain("Invalid date format");
 		});
 	});
-
 
 	describe("GitHub Activity - Success Paths", () => {
 		beforeEach(() => {
@@ -246,10 +246,10 @@ describe("Coverage Boost Tests", () => {
 			);
 
 			registerGitHubActivityResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://github/activity/10/true"),
-				{ limit: "10", include_details: "true" },
-			);
+			const result = await resourceHandler(new URL("duyet://github/activity/10/true"), {
+				limit: "10",
+				include_details: "true",
+			});
 
 			expect(result.contents[0].text).toContain("Recent GitHub Activity");
 			expect(result.contents[0].text).toContain("Pushed 2 commits");
@@ -281,10 +281,10 @@ describe("Coverage Boost Tests", () => {
 			);
 
 			registerGitHubActivityResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://github/activity/5/false"),
-				{ limit: "5", include_details: "false" },
-			);
+			const result = await resourceHandler(new URL("duyet://github/activity/5/false"), {
+				limit: "5",
+				include_details: "false",
+			});
 
 			expect(result.contents[0].text).toContain("Recent GitHub Activity");
 			expect(result.contents[0].text).toContain("Created branch");
@@ -321,10 +321,10 @@ describe("Coverage Boost Tests", () => {
 			);
 
 			registerGitHubActivityResource(mockServer);
-			const result = await resourceHandler(
-				new URL("duyet://github/activity/2/true"),
-				{ limit: "2", include_details: "true" },
-			);
+			const result = await resourceHandler(new URL("duyet://github/activity/2/true"), {
+				limit: "2",
+				include_details: "true",
+			});
 
 			expect(result.contents[0].text).toContain("Recent GitHub Activity");
 			expect(result.contents[0].text).toContain("Starred repository");

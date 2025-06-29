@@ -3,7 +3,8 @@ import { z } from "zod";
 import { Octokit } from "@octokit/rest";
 import type { RestEndpointMethodTypes } from "@octokit/rest";
 
-type GitHubEvent = RestEndpointMethodTypes["activity"]["listPublicEventsForUser"]["response"]["data"][0];
+type GitHubEvent =
+	RestEndpointMethodTypes["activity"]["listPublicEventsForUser"]["response"]["data"][0];
 
 /**
  * Register the GitHub activity tool
@@ -35,7 +36,7 @@ export function registerGitHubActivityTool(server: McpServer) {
 				const limitNum = Math.min(Math.max(limit, 1), 20);
 
 				const octokit = new Octokit();
-				
+
 				const { data: events } = await octokit.rest.activity.listPublicEventsForUser({
 					username: "duyet",
 					per_page: limitNum,
@@ -136,12 +137,12 @@ GitHub Profile: https://github.com/duyet`;
 				};
 			} catch (error) {
 				console.error("GitHub API error:", error);
-				
+
 				let errorMessage = "Unknown error";
 				if (error instanceof Error) {
 					errorMessage = error.message;
 				}
-				
+
 				const errorContent = `Error fetching GitHub activity: ${errorMessage}
 
 GitHub Profile: https://github.com/duyet`;

@@ -56,10 +56,7 @@ describe("CV Resource Enhanced Tests", () => {
 		);
 
 		registerCVResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://cv/json"),
-			{ format: "json" },
-		);
+		const result = await resourceHandler(new URL("duyet://cv/json"), { format: "json" });
 
 		expect(result.contents[0].text).toContain("CV Data (JSON format)");
 		expect(result.contents[0].text).toContain("name");
@@ -93,10 +90,7 @@ describe("CV Resource Enhanced Tests", () => {
 		);
 
 		registerCVResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://cv/json"),
-			{ format: "json" },
-		);
+		const result = await resourceHandler(new URL("duyet://cv/json"), { format: "json" });
 
 		// Should fallback to summary format
 		expect(result.contents[0].text).toContain("Duyet - Senior Data Engineer");
@@ -127,10 +121,7 @@ describe("CV Resource Enhanced Tests", () => {
 		);
 
 		registerCVResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://cv/json"),
-			{ format: "json" },
-		);
+		const result = await resourceHandler(new URL("duyet://cv/json"), { format: "json" });
 
 		// Should fallback to summary format
 		expect(result.contents[0].text).toContain("Duyet - Senior Data Engineer");
@@ -153,10 +144,7 @@ describe("CV Resource Enhanced Tests", () => {
 		);
 
 		registerCVResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://cv/summary"),
-			{ format: "summary" },
-		);
+		const result = await resourceHandler(new URL("duyet://cv/summary"), { format: "summary" });
 
 		expect(result.contents[0].text).toContain("Error fetching CV");
 		expect(result.contents[0].text).toContain("Failed to fetch CV: 500");
@@ -176,10 +164,7 @@ describe("CV Resource Enhanced Tests", () => {
 		);
 
 		registerCVResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://cv/summary"),
-			{ format: "summary" },
-		);
+		const result = await resourceHandler(new URL("duyet://cv/summary"), { format: "summary" });
 
 		expect(result.contents[0].text).toContain("Error fetching CV");
 		expect(result.contents[0].text).toContain("Network timeout");
@@ -199,10 +184,7 @@ describe("CV Resource Enhanced Tests", () => {
 		);
 
 		registerCVResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://cv/summary"),
-			{ format: "summary" },
-		);
+		const result = await resourceHandler(new URL("duyet://cv/summary"), { format: "summary" });
 
 		expect(result.contents[0].text).toContain("Error fetching CV");
 		expect(result.contents[0].text).toContain("Unknown error");
@@ -225,10 +207,7 @@ describe("CV Resource Enhanced Tests", () => {
 		);
 
 		registerCVResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://cv/summary"),
-			{ format: "summary" },
-		);
+		const result = await resourceHandler(new URL("duyet://cv/summary"), { format: "summary" });
 
 		expect(result.contents[0].text).toContain("Duyet's CV");
 		expect(result.contents[0].text).toContain("CV Link: https://duyet.net/cv");
@@ -250,10 +229,9 @@ describe("CV Resource Enhanced Tests", () => {
 		);
 
 		registerCVResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://cv/detailed"),
-			{ format: "detailed" },
-		);
+		const result = await resourceHandler(new URL("duyet://cv/detailed"), {
+			format: "detailed",
+		});
 
 		expect(result.contents[0].text).toContain("Duyet - Senior Data Engineer");
 		expect(result.contents[0].text).toContain("Full CV available at: https://duyet.net/cv");
@@ -306,20 +284,17 @@ describe("CV Resource Enhanced Tests", () => {
 		);
 
 		registerCVResource(mockServer);
-		const result = await resourceHandler(
-			new URL("duyet://cv/summary"),
-			{ format: "summary" },
-		);
+		const result = await resourceHandler(new URL("duyet://cv/summary"), { format: "summary" });
 
 		expect(result.contents[0].text).toContain("Custom CV Title - Duyet");
 	});
 
 	test("should verify resource registration parameters", () => {
 		registerCVResource(mockServer);
-		
+
 		const registerCall = (mockServer.registerResource as jest.Mock).mock.calls[0];
 		const [name, template, metadata, handler] = registerCall;
-		
+
 		expect(name).toBe("cv");
 		expect(template).toBeDefined();
 		expect(metadata.title).toBe("Duyet's CV");
@@ -327,4 +302,4 @@ describe("CV Resource Enhanced Tests", () => {
 		expect(metadata.mimeType).toBe("text/plain");
 		expect(typeof handler).toBe("function");
 	});
-}); 
+});

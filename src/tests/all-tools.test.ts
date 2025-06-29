@@ -31,7 +31,7 @@ const mockServer = {
 const mockEnv = {
 	DB: {} as D1Database,
 	MCP_OBJECT: {} as DurableObjectNamespace,
-	ANALYTICS: {} as AnalyticsEngineDataset
+	ANALYTICS: {} as AnalyticsEngineDataset,
 } as unknown as Env;
 
 describe("Tool Registration Tests", () => {
@@ -122,7 +122,6 @@ describe("Tool Registration Tests", () => {
 			expect(result.content[0].text).toContain("title");
 		});
 	});
-
 
 	describe("Hire Me Tool", () => {
 		test("should register hire-me tool", () => {
@@ -220,8 +219,8 @@ describe("Tool Registration Tests", () => {
 	describe("Tool Registry", () => {
 		test("should register all tools", () => {
 			registerAllTools(mockServer, mockEnv);
-			// Should have called tool registration for all 6 tools
-			expect(mockServer.registerTool).toHaveBeenCalledTimes(6);
+			// Should have called tool registration for all 8 tools
+			expect(mockServer.registerTool).toHaveBeenCalledTimes(8);
 		});
 	});
 });
