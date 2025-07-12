@@ -1,11 +1,13 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 // Core information tools
+import { registerGetAboutDuyetTool } from "./get-about-duyet";
 import { registerGetCVTool } from "./get-cv";
 
 // Content tools
 import { registerGitHubActivityTool } from "./github-activity";
-import { registerListBlogPostTool, registerGetBlogPostContentTool } from "./blog-posts";
+import { registerGetGitHubActivityTool } from "./get-github-activity";
+import { registerGetBlogPostsTool, registerListBlogPostTool, registerGetBlogPostContentTool } from "./blog-posts";
 
 // Interaction tools
 import { registerSendMessageTool } from "./send-message";
@@ -19,12 +21,15 @@ import { registerGetAnalyticsTool } from "./contact-analytics";
  * Register all MCP tools with the server
  */
 export function registerAllTools(server: McpServer, env: Env) {
-	// Core information tools
+	// Core information tools (matching resources for compatibility)
+	registerGetAboutDuyetTool(server);
 	registerGetCVTool(server);
 
 	// Content tools
 	registerGitHubActivityTool(server);
-	registerListBlogPostTool(server);
+	registerGetGitHubActivityTool(server);
+	registerGetBlogPostsTool(server);
+	registerListBlogPostTool(server); // Legacy alias for compatibility
 	registerGetBlogPostContentTool(server);
 
 	// Interaction tools
@@ -39,9 +44,12 @@ export function registerAllTools(server: McpServer, env: Env) {
 // Export individual tool registration functions for selective use
 export {
 	// Core information tools
+	registerGetAboutDuyetTool,
 	registerGetCVTool,
 	// Content tools
 	registerGitHubActivityTool,
+	registerGetGitHubActivityTool,
+	registerGetBlogPostsTool,
 	registerListBlogPostTool,
 	registerGetBlogPostContentTool,
 	// Interaction tools

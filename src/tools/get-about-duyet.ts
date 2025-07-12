@@ -2,26 +2,25 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { getAboutDuyetData } from "../core/about.js";
 
 /**
- * Register the about-duyet resource
+ * Register the get_about_duyet MCP tool for compatibility with clients that don't support resources
  */
-export function registerAboutDuyetResource(server: McpServer) {
-	server.registerResource(
-		"about-duyet",
-		"duyet://about",
+export function registerGetAboutDuyetTool(server: McpServer) {
+	server.registerTool(
+		"get_about_duyet",
 		{
-			title: "About Duyet",
+			title: "Get About Duyet",
 			description:
-				"Basic information about Duyet, a Senior Data Engineer with extensive experience in data engineering, cloud technologies, and distributed systems",
-			mimeType: "text/plain",
+				"Get basic information about Duyet, a Senior Data Engineer with extensive experience in data engineering, cloud technologies, and distributed systems",
+			inputSchema: {},
 		},
-		async (uri: URL) => {
+		async () => {
 			try {
 				const data = getAboutDuyetData();
 
 				return {
-					contents: [
+					content: [
 						{
-							uri: uri.href,
+							type: "text",
 							text: data.content,
 						},
 					],
@@ -29,9 +28,9 @@ export function registerAboutDuyetResource(server: McpServer) {
 			} catch (error) {
 				const errorMessage = error instanceof Error ? error.message : "Unknown error";
 				return {
-					contents: [
+					content: [
 						{
-							uri: uri.href,
+							type: "text",
 							text: `Error loading about information: ${errorMessage}`,
 						},
 					],

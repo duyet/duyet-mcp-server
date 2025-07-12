@@ -1,6 +1,6 @@
 // Don't mock the github-activity resource, use actual implementation
 
-import { parseRSSContent, formatBlogPostsForMCP } from "../resources/blog-posts";
+import { parseRSSContent, formatBlogPostsForMCP } from "../core/blog";
 import { registerCVResource } from "../resources/cv";
 import { registerGitHubActivityResource } from "../resources/github-activity";
 

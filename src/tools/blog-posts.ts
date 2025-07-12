@@ -1,15 +1,15 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { fetchAndParseRSS } from "../resources/blog-posts.js";
+import { getBlogPostsData, formatBlogPostsForTool } from "../core/blog.js";
 
 /**
- * Register the list blog posts tool
+ * Register the get blog posts tool (replaces list_blog_posts)
  */
-export function registerListBlogPostTool(server: McpServer) {
+export function registerGetBlogPostsTool(server: McpServer) {
 	server.registerTool(
-		"list_blog_posts",
+		"get_blog_posts",
 		{
-			title: "List Blog Posts",
+			title: "Get Blog Posts",
 			description: "Get a list of blog posts from blog.duyet.net in JSON format",
 			inputSchema: {
 				limit: z
@@ -22,25 +22,19 @@ export function registerListBlogPostTool(server: McpServer) {
 		},
 		async ({ limit = 5 }) => {
 			try {
-				const result = await fetchAndParseRSS("https://blog.duyet.net/rss.xml", limit);
+				const data = await getBlogPostsData(limit);
+				const formattedContent = formatBlogPostsForTool(data);
 
 				return {
 					content: [
 						{
 							type: "text",
-							text: JSON.stringify(
-								{
-									posts: result.posts,
-									totalFound: result.totalFound,
-									retrieved: result.posts.length,
-								},
-								null,
-								2,
-							),
+							text: formattedContent,
 						},
 					],
 				};
 			} catch (error) {
+				const errorMessage = error instanceof Error ? error.message : "Unknown error";
 				return {
 					content: [
 						{
@@ -48,8 +42,60 @@ export function registerListBlogPostTool(server: McpServer) {
 							text: JSON.stringify(
 								{
 									error: "Failed to fetch blog posts",
-									message:
-										error instanceof Error ? error.message : "Unknown error",
+									message: errorMessage,
+								},
+								null,
+								2,
+							),
+						},
+					],
+				};
+			}
+		},
+	);
+}
+
+/**
+ * Register the list blog posts tool (legacy alias for compatibility)
+ */
+export function registerListBlogPostTool(server: McpServer) {
+	server.registerTool(
+		"list_blog_posts",
+		{
+			title: "List Blog Posts",
+			description: "Get a list of blog posts from blog.duyet.net in JSON format (legacy alias for get_blog_posts)",
+			inputSchema: {
+				limit: z
+					.number()
+					.min(1)
+					.max(20)
+					.default(5)
+					.describe("Number of blog posts to retrieve (1-20, default: 5)"),
+			},
+		},
+		async ({ limit = 5 }) => {
+			try {
+				const data = await getBlogPostsData(limit);
+				const formattedContent = formatBlogPostsForTool(data);
+
+				return {
+					content: [
+						{
+							type: "text",
+							text: formattedContent,
+						},
+					],
+				};
+			} catch (error) {
+				const errorMessage = error instanceof Error ? error.message : "Unknown error";
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify(
+								{
+									error: "Failed to fetch blog posts",
+									message: errorMessage,
 								},
 								null,
 								2,

@@ -5,8 +5,8 @@ import {
 	extractBlogPostFromItem,
 	parseRSSContent,
 	formatBlogPostsForMCP,
-	registerBlogPostsResource,
-} from "../resources/blog-posts";
+} from "../core/blog";
+import { registerBlogPostsResource } from "../resources/blog-posts";
 
 global.fetch = jest.fn();
 
