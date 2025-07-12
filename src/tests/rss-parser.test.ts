@@ -6,8 +6,8 @@ import {
 	extractBlogPostFromItem,
 	parseRSSContent,
 	formatBlogPostsForMCP,
-	type BlogPost,
-} from "../resources/blog-posts";
+} from "../core/blog";
+import type { BlogPostData } from "../core/types";
 
 describe("RSS Parser Utilities", () => {
 	const mockRSSXML = `<?xml version="1.0" encoding="UTF-8"?>
@@ -170,7 +170,7 @@ describe("RSS Parser Utilities", () => {
 
 	describe("formatBlogPostsForMCP", () => {
 		it("should format single post correctly", () => {
-			const posts: BlogPost[] = [
+			const posts: BlogPostData[] = [
 				{
 					title: "Test Post",
 					link: "https://example.com/test",
@@ -188,7 +188,7 @@ describe("RSS Parser Utilities", () => {
 		});
 
 		it("should format multiple posts correctly", () => {
-			const posts: BlogPost[] = [
+			const posts: BlogPostData[] = [
 				{
 					title: "First Post",
 					link: "https://example.com/first",

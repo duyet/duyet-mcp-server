@@ -40,11 +40,11 @@ describe("Resource Coverage Tests", () => {
 	});
 
 	test("should call utility functions", () => {
-		// Import and use utility functions from about-duyet
+		// Import and use utility functions from core about module
 		const {
 			calculateYearsOfExperience,
 			getAboutDuyetContent,
-		} = require("../resources/about-duyet");
+		} = require("../core/about");
 
 		const years = calculateYearsOfExperience();
 		expect(years).toBeGreaterThan(0);

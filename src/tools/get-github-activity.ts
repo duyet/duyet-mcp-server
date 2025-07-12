@@ -3,13 +3,13 @@ import { z } from "zod";
 import { getGitHubActivityData, formatGitHubActivityForDisplay } from "../core/github.js";
 
 /**
- * Register the GitHub activity tool
+ * Register the get_github_activity MCP tool for compatibility with clients that don't support resources
  */
-export function registerGitHubActivityTool(server: McpServer) {
+export function registerGetGitHubActivityTool(server: McpServer) {
 	server.registerTool(
-		"github_activity",
+		"get_github_activity",
 		{
-			title: "GitHub Activity",
+			title: "Get GitHub Activity",
 			description:
 				"Get Duyet's recent GitHub activity including commits, issues, pull requests, releases, and other public events",
 			inputSchema: {
