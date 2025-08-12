@@ -38,6 +38,7 @@ Endpoints:
 ![](./.github/screenshots/screenshot-4.png)
 ![](./.github/screenshots/screenshot-5.png)
 ![](./.github/screenshots/screenshot-6.png)
+![](./.github/screenshots/screenshot-7.png)
 
 ## About This Project
 
