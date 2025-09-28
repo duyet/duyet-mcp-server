@@ -41,10 +41,7 @@ describe("Resource Coverage Tests", () => {
 
 	test("should call utility functions", () => {
 		// Import and use utility functions from core about module
-		const {
-			calculateYearsOfExperience,
-			getAboutDuyetContent,
-		} = require("../core/about");
+		const { calculateYearsOfExperience, getAboutDuyetContent } = require("../core/about");
 
 		const years = calculateYearsOfExperience();
 		expect(years).toBeGreaterThan(0);

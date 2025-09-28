@@ -131,7 +131,10 @@ export function formatGitHubActivityForDisplay(data: GitHubActivityData): string
 	}
 
 	const activityList = data.activities
-		.map((activity) => `${activity.action} in ${activity.repository} (${activity.date})${activity.details || ""}`)
+		.map(
+			(activity) =>
+				`${activity.action} in ${activity.repository} (${activity.date})${activity.details || ""}`,
+		)
 		.join("\n\n");
 
 	return `Recent GitHub Activity for ${data.username}:

@@ -16,10 +16,10 @@ export type {
 } from "./types.js";
 
 // Export about functions
-export { 
-	getAboutDuyetData, 
-	calculateYearsOfExperience, 
-	getAboutDuyetContent 
+export {
+	getAboutDuyetData,
+	calculateYearsOfExperience,
+	getAboutDuyetContent,
 } from "./about.js";
 
 // Export CV functions

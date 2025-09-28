@@ -1,6 +1,4 @@
-import { DuyetMCP } from "../index";
-
-// Mock the agents/mcp module
+// Mock the agents/mcp module FIRST before any imports
 jest.mock("agents/mcp", () => ({
 	McpAgent: class MockMcpAgent {
 		server = {
@@ -22,6 +20,8 @@ jest.mock("agents/mcp", () => ({
 		}
 	},
 }));
+
+import { DuyetMCP } from "../index";
 
 // Mock the tools and resources registration
 jest.mock("../tools/index", () => ({
