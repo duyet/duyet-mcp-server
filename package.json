@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.13.0",
 		"@octokit/rest": "^22.0.0",
-		"agents": "^0.2.0",
+		"agents": "^0.0.99",
 		"domutils": "^3.2.2",
 		"drizzle-orm": "^0.44.2",
 		"hono": "^4.8.3",
@@ -43,16 +43,7 @@
 	},
 	"type": "module",
 	"jest": {
-		"preset": "ts-jest/presets/default-esm",
-		"extensionsToTreatAsEsm": [
-			".ts"
-		],
-		"moduleNameMapper": {
-			"^(\\.{1,2}/.*)\\.js$": "$1"
-		},
-		"transformIgnorePatterns": [
-			"node_modules/(?!(@octokit)/)"
-		],
+		"preset": "ts-jest",
 		"testEnvironment": "node",
 		"roots": [
 			"<rootDir>/src"
@@ -61,12 +52,17 @@
 			"**/__tests__/**/*.ts",
 			"**/?(*.)+(spec|test).ts"
 		],
+		"modulePathIgnorePatterns": [
+			"<rootDir>/src/index.ts",
+			"<rootDir>/worker-configuration.d.ts"
+		],
 		"collectCoverageFrom": [
 			"src/**/*.ts",
 			"!src/**/*.d.ts",
 			"!src/tests/**/*",
 			"!src/**/*.test.ts",
-			"!src/**/*.spec.ts"
+			"!src/**/*.spec.ts",
+			"!src/index.ts"
 		],
 		"coverageReporters": [
 			"text",
