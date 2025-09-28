@@ -2,6 +2,9 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getCVData, type CVFormat } from "../core/cv.js";
 
+// Define schema separately to avoid TypeScript inference issues with Zod version differences
+const formatSchema = z.enum(["summary", "detailed", "json"]).default("summary") as any;
+
 /**
  * Register the get_cv MCP tool
  */
@@ -13,10 +16,7 @@ export function registerGetCVTool(server: McpServer) {
 			description:
 				"Retrieve Duyet's CV (curriculum vitae) in different formats - summary, detailed, or JSON format",
 			inputSchema: {
-				format: z
-					.enum(["summary", "detailed", "json"])
-					.default("summary")
-					.describe("Format of CV data to return"),
+				format: formatSchema.describe("Format of CV data to return"),
 			},
 		},
 		async ({ format = "summary" }) => {

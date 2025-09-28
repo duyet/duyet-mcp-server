@@ -2,6 +2,11 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { count, sql, gte } from "drizzle-orm";
 
+// Define schemas separately to avoid TypeScript inference issues with Zod version differences
+const reportTypeSchema = z.enum(["summary", "purpose_breakdown", "daily_trends", "recent_activity", "custom_period"]).default("summary") as any;
+const dateFromSchema = z.string().optional() as any;
+const dateToSchema = z.string().optional() as any;
+
 import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
 
@@ -19,24 +24,9 @@ export function registerGetAnalyticsTool(server: McpServer, env: Env) {
 			description:
 				"Generate analytics reports on contact submissions including summary statistics, purpose breakdown, daily trends, and recent activity patterns",
 			inputSchema: {
-				report_type: z
-					.enum([
-						"summary",
-						"purpose_breakdown",
-						"daily_trends",
-						"recent_activity",
-						"custom_period",
-					])
-					.default("summary")
-					.describe("Type of analytics report to generate"),
-				date_from: z
-					.string()
-					.optional()
-					.describe("Start date for custom period (YYYY-MM-DD format)"),
-				date_to: z
-					.string()
-					.optional()
-					.describe("End date for custom period (YYYY-MM-DD format)"),
+				report_type: reportTypeSchema.describe("Type of analytics report to generate"),
+				date_from: dateFromSchema.describe("Start date for custom period (YYYY-MM-DD format)"),
+				date_to: dateToSchema.describe("End date for custom period (YYYY-MM-DD format)"),
 			},
 		},
 		async ({ report_type = "summary", date_from, date_to }) => {

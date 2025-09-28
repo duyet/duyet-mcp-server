@@ -1,6 +1,9 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
+// Define schema separately to avoid TypeScript inference issues with Zod version differences
+const messageSchema = z.string().optional() as any;
+
 /**
  * Register the say-hi MCP tool for greeting Duyet
  */
@@ -12,10 +15,7 @@ export function registerSayHiTool(server: McpServer) {
 			description:
 				"Send a friendly greeting to Duyet with an optional personal message. Get contact information and connection links",
 			inputSchema: {
-				message: z
-					.string()
-					.optional()
-					.describe("Optional personal message to include with the greeting"),
+				message: messageSchema.describe("Optional personal message to include with the greeting"),
 			},
 		},
 		async ({ message }) => {

@@ -2,6 +2,10 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getBlogPostsData, formatBlogPostsForTool } from "../core/blog.js";
 
+// Define schemas separately to help with TypeScript inference
+const limitSchema = z.number().min(1).max(20).optional().default(5) as any;
+const urlSchema = z.string().url() as any;
+
 /**
  * Register the get blog posts tool (replaces list_blog_posts)
  */
@@ -12,12 +16,7 @@ export function registerGetBlogPostsTool(server: McpServer) {
 			title: "Get Blog Posts",
 			description: "Get a list of blog posts from blog.duyet.net in JSON format",
 			inputSchema: {
-				limit: z
-					.number()
-					.min(1)
-					.max(20)
-					.default(5)
-					.describe("Number of blog posts to retrieve (1-20, default: 5)"),
+				limit: limitSchema.describe("Number of blog posts to retrieve (1-20, default: 5)"),
 			},
 		},
 		async ({ limit = 5 }) => {
@@ -65,12 +64,7 @@ export function registerListBlogPostTool(server: McpServer) {
 			title: "List Blog Posts",
 			description: "Get a list of blog posts from blog.duyet.net in JSON format (legacy alias for get_blog_posts)",
 			inputSchema: {
-				limit: z
-					.number()
-					.min(1)
-					.max(20)
-					.default(5)
-					.describe("Number of blog posts to retrieve (1-20, default: 5)"),
+				limit: limitSchema.describe("Number of blog posts to retrieve (1-20, default: 5)"),
 			},
 		},
 		async ({ limit = 5 }) => {
@@ -118,7 +112,7 @@ export function registerGetBlogPostContentTool(server: McpServer) {
 			title: "Get Blog Post Content",
 			description: "Get the full content of a specific blog post by URL",
 			inputSchema: {
-				url: z.string().url().describe("The URL of the blog post to retrieve content from"),
+				url: urlSchema.describe("The URL of the blog post to retrieve content from"),
 			},
 		},
 		async ({ url }) => {

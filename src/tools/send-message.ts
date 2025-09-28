@@ -4,6 +4,11 @@ import { z } from "zod";
 import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
 
+// Define schemas separately to avoid TypeScript inference issues with Zod version differences
+const messageSchema = z.string().min(10).max(500) as any;
+const contactEmailSchema = z.string().email().optional() as any;
+const purposeSchema = z.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"]) as any;
+
 /**
  * Register the send_message MCP tool with D1 database integration
  */
@@ -17,19 +22,9 @@ export function registerSendMessageTool(server: McpServer, env: Env) {
 			description:
 				"Send a message to Duyet for collaboration, job opportunities, consulting, or general inquiries. Messages are saved with a reference ID for follow-up",
 			inputSchema: {
-				message: z
-					.string()
-					.min(10)
-					.max(500)
-					.describe("Message to send to Duyet (10-500 characters)"),
-				contact_email: z
-					.string()
-					.email()
-					.optional()
-					.describe("Optional: Your email for response"),
-				purpose: z
-					.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"])
-					.describe("Purpose of your message"),
+				message: messageSchema.describe("Message to send to Duyet (10-500 characters)"),
+				contact_email: contactEmailSchema.describe("Optional: Your email for response"),
+				purpose: purposeSchema.describe("Purpose of your message"),
 			},
 		},
 		async ({ message, contact_email, purpose }) => {
