@@ -63,7 +63,8 @@ export function registerListBlogPostTool(server: McpServer) {
 		"list_blog_posts",
 		{
 			title: "List Blog Posts",
-			description: "Get a list of blog posts from blog.duyet.net in JSON format (legacy alias for get_blog_posts)",
+			description:
+				"Get a list of blog posts from blog.duyet.net in JSON format (legacy alias for get_blog_posts)",
 			inputSchema: {
 				limit: z
 					.number()

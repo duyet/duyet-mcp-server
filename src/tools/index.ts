@@ -7,7 +7,11 @@ import { registerGetCVTool } from "./get-cv";
 // Content tools
 import { registerGitHubActivityTool } from "./github-activity";
 import { registerGetGitHubActivityTool } from "./get-github-activity";
-import { registerGetBlogPostsTool, registerListBlogPostTool, registerGetBlogPostContentTool } from "./blog-posts";
+import {
+	registerGetBlogPostsTool,
+	registerListBlogPostTool,
+	registerGetBlogPostContentTool,
+} from "./blog-posts";
 
 // Interaction tools
 import { registerSendMessageTool } from "./send-message";

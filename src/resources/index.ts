@@ -19,9 +19,9 @@ export function registerAllResources(server: McpServer, _env: Env) {
 }
 
 // Export individual resource registration functions for selective use
-export { 
-	registerAboutDuyetResource, 
-	registerCVResource, 
+export {
+	registerAboutDuyetResource,
+	registerCVResource,
 	registerBlogPostsResource,
-	registerGitHubActivityResource 
+	registerGitHubActivityResource,
 };
