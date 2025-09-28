@@ -1,11 +1,4 @@
-// Mock the github-activity resource to avoid ESM import issues
-jest.mock("../resources/github-activity", () => ({
-	registerGitHubActivityResource: jest.fn(),
-}));
-
-import { DuyetMCP } from "../index";
-
-// Mock the agents library
+// Mock the agents library FIRST before any imports
 jest.mock("agents/mcp", () => ({
 	McpAgent: class MockMcpAgent {
 		server = {
@@ -22,6 +15,13 @@ jest.mock("agents/mcp", () => ({
 		});
 	},
 }));
+
+// Mock the github-activity resource to avoid ESM import issues
+jest.mock("../resources/github-activity", () => ({
+	registerGitHubActivityResource: jest.fn(),
+}));
+
+import { DuyetMCP } from "../index";
 
 // Mock registerAllTools
 jest.mock("../tools/index", () => ({

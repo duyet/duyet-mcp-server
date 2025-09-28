@@ -64,7 +64,10 @@ export function extractBlogPostFromItem(item: Element): BlogPostData {
 /**
  * Parse RSS XML content and extract blog posts
  */
-export function parseRSSContent(xml: string, limit = 1): { posts: BlogPostData[]; totalFound: number } {
+export function parseRSSContent(
+	xml: string,
+	limit = 1,
+): { posts: BlogPostData[]; totalFound: number } {
 	const doc = parseDocument(xml);
 	const items = getElementsByTagName("item", doc);
 
@@ -96,7 +99,10 @@ export function parseRSSContent(xml: string, limit = 1): { posts: BlogPostData[]
 /**
  * Fetch and parse RSS feed from URL
  */
-export async function fetchAndParseRSS(url: string, limit = 1): Promise<{ posts: BlogPostData[]; totalFound: number }> {
+export async function fetchAndParseRSS(
+	url: string,
+	limit = 1,
+): Promise<{ posts: BlogPostData[]; totalFound: number }> {
 	const response = await fetch(url);
 	if (!response.ok) {
 		throw new Error(`Failed to fetch RSS feed: ${response.status} ${response.statusText}`);
