@@ -4,6 +4,13 @@ import { z } from "zod";
 import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
 
+// Define schemas separately to avoid TypeScript inference issues with Zod version differences
+const roleTypeSchema = z.enum(["full_time", "contract", "consulting", "part_time"]).optional() as any;
+const techStackSchema = z.string().optional() as any;
+const companySizeSchema = z.enum(["startup", "scale_up", "enterprise", "agency"]).optional() as any;
+const contactEmailSchema = z.string().email().optional() as any;
+const additionalNotesSchema = z.string().max(500).optional() as any;
+
 /**
  * Register the hire_me MCP tool with D1 database integration
  */
@@ -16,27 +23,11 @@ export function registerHireMeTool(server: McpServer, env: Env) {
 			description:
 				"Get information about hiring Duyet for various roles - full-time, contract, consulting, or part-time positions. Includes expertise, experience, and next steps",
 			inputSchema: {
-				role_type: z
-					.enum(["full_time", "contract", "consulting", "part_time"])
-					.optional()
-					.describe("Type of engagement you're interested in"),
-				tech_stack: z.string().optional().describe("Technologies/tools your project uses"),
-				company_size: z
-					.enum(["startup", "scale_up", "enterprise", "agency"])
-					.optional()
-					.describe("Company size/type"),
-				contact_email: z
-					.string()
-					.email()
-					.optional()
-					.describe("Optional: Your email for follow-up"),
-				additional_notes: z
-					.string()
-					.max(500)
-					.optional()
-					.describe(
-						"Optional: Additional notes or specific requirements (max 500 characters)",
-					),
+				role_type: roleTypeSchema.describe("Type of engagement you're interested in"),
+				tech_stack: techStackSchema.describe("Technologies/tools your project uses"),
+				company_size: companySizeSchema.describe("Company size/type"),
+				contact_email: contactEmailSchema.describe("Optional: Your email for follow-up"),
+				additional_notes: additionalNotesSchema.describe("Optional: Additional notes or specific requirements (max 500 characters)"),
 			},
 		},
 		async ({ role_type, tech_stack, company_size, contact_email, additional_notes }) => {
@@ -69,7 +60,7 @@ export function registerHireMeTool(server: McpServer, env: Env) {
 					},
 				};
 
-				const info = roleInfo[role_type];
+				const info = roleInfo[role_type as keyof typeof roleInfo];
 				roleSpecificInfo = `\n${info.title}: ${info.details}\n`;
 			}
 
@@ -107,7 +98,7 @@ export function registerHireMeTool(server: McpServer, env: Env) {
 						"Open to the right opportunity, especially roles involving modernization and innovation.",
 					agency: "Interested in project-based work and bringing data expertise to diverse client challenges.",
 				};
-				companySizeInfo = `\n${sizePreferences[company_size]}\n`;
+				companySizeInfo = `\n${sizePreferences[company_size as keyof typeof sizePreferences]}\n`;
 			}
 
 			// Save hire inquiry to database if any optional data is provided
