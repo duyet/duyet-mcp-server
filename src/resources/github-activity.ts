@@ -34,7 +34,7 @@ export function registerGitHubActivityResource(server: McpServer) {
 			}: { limit?: string; include_details?: string },
 		) => {
 			try {
-				const limitNum = Math.min(Math.max(Number.parseInt(limit) || 5, 1), 20);
+				const limitNum = Math.min(Math.max(Number.parseInt(limit, 10) || 5, 1), 20);
 				const includeDetails = include_details === "true";
 
 				const data = await getGitHubActivityData(limitNum, includeDetails);

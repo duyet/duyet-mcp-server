@@ -24,7 +24,7 @@ export function registerBlogPostsResource(server: McpServer) {
 		},
 		async (uri: URL, { limit = "1" }: { limit?: string }) => {
 			try {
-				const limitNum = Math.min(Math.max(Number.parseInt(limit) || 1, 1), 10);
+				const limitNum = Math.min(Math.max(Number.parseInt(limit, 10) || 1, 1), 10);
 				const data = await getBlogPostsData(limitNum);
 
 				if (data.posts.length === 0) {

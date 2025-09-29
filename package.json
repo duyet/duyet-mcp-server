@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.13.0",
 		"@octokit/rest": "^22.0.0",
-		"agents": "^0.0.99",
+		"agents": "0.0.99",
 		"domutils": "^3.2.2",
 		"drizzle-orm": "^0.44.2",
 		"hono": "^4.8.3",
