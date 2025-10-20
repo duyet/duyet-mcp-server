@@ -45,6 +45,7 @@
 	"jest": {
 		"preset": "ts-jest",
 		"testEnvironment": "node",
+		"watchman": false,
 		"roots": [
 			"<rootDir>/src"
 		],
