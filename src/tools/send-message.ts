@@ -7,7 +7,12 @@ import { contacts } from "../database/schema";
 // Define schemas separately to avoid TypeScript inference issues with Zod version differences
 const messageSchema = z.string().min(10).max(500) as any;
 const contactEmailSchema = z.string().email().optional() as any;
-const purposeSchema = z.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"]) as any;
+const purposeSchema = z.enum([
+	"collaboration",
+	"job_opportunity",
+	"consulting",
+	"general_inquiry",
+]) as any;
 
 /**
  * Register the send_message MCP tool with D1 database integration

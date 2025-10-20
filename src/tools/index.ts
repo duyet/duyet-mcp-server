@@ -18,6 +18,10 @@ import { registerSendMessageTool } from "./send-message";
 import { registerHireMeTool } from "./hire-me";
 import { registerSayHiTool } from "./say-hi";
 
+// HR/Recruiter tools
+import { registerHRQuickQATool } from "./hr-quick-qa";
+import { registerJDSubmissionTool } from "./jd-submission";
+
 // Management tools
 import { registerGetAnalyticsTool } from "./contact-analytics";
 
@@ -41,6 +45,10 @@ export function registerAllTools(server: McpServer, env: Env) {
 	registerHireMeTool(server, env);
 	registerSayHiTool(server);
 
+	// HR/Recruiter tools
+	registerHRQuickQATool(server);
+	registerJDSubmissionTool(server, env);
+
 	// Management tools
 	registerGetAnalyticsTool(server, env);
 }
@@ -60,6 +68,9 @@ export {
 	registerSendMessageTool,
 	registerHireMeTool,
 	registerSayHiTool,
+	// HR/Recruiter tools
+	registerHRQuickQATool,
+	registerJDSubmissionTool,
 	// Management tools
 	registerGetAnalyticsTool,
 };

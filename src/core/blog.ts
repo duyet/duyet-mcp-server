@@ -2,6 +2,7 @@ import { parseDocument } from "htmlparser2";
 import { getElementsByTagName, textContent } from "domutils";
 import type { Element } from "domhandler";
 import type { BlogPostData, BlogPostsData } from "./types.js";
+import { cachedFetch } from "./cache.js";
 
 /**
  * Extract field content from RSS item element, handling CDATA and parsing quirks
@@ -97,18 +98,14 @@ export function parseRSSContent(
 }
 
 /**
- * Fetch and parse RSS feed from URL
+ * Fetch and parse RSS feed from URL with caching
  */
 export async function fetchAndParseRSS(
 	url: string,
 	limit = 1,
 ): Promise<{ posts: BlogPostData[]; totalFound: number }> {
-	const response = await fetch(url);
-	if (!response.ok) {
-		throw new Error(`Failed to fetch RSS feed: ${response.status} ${response.statusText}`);
-	}
-
-	const xml = await response.text();
+	// Cache RSS feed for 10 minutes (600000ms)
+	const xml = await cachedFetch(url, async (response) => response.text(), 600000);
 	return parseRSSContent(xml, limit);
 }
 

@@ -17,8 +17,12 @@ export function registerGetGitHubActivityTool(server: McpServer) {
 			description:
 				"Get Duyet's recent GitHub activity including commits, issues, pull requests, releases, and other public events",
 			inputSchema: {
-				limit: limitSchema.describe("Number of recent activities to retrieve (1-20, default: 5)"),
-				include_details: includeDetailsSchema.describe("Include detailed information like commit messages and issue titles"),
+				limit: limitSchema.describe(
+					"Number of recent activities to retrieve (1-20, default: 5)",
+				),
+				include_details: includeDetailsSchema.describe(
+					"Include detailed information like commit messages and issue titles",
+				),
 			},
 		},
 		async ({ limit = 5, include_details = false }) => {

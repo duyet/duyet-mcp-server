@@ -42,3 +42,18 @@ export {
 	formatGitHubEvent,
 	formatGitHubActivityForDisplay,
 } from "./github.js";
+
+// Export cache functions
+export { globalCache, cachedFetch } from "./cache.js";
+
+// Export llms.txt functions
+export type { LLMsTxtData } from "./llms-txt.js";
+export { fetchLLMsTxt, parseLLMsTxt, getDuyetLLMsTxt } from "./llms-txt.js";
+
+// Export career functions
+export type { CareerPreferences } from "./career.js";
+export {
+	getCareerPreferences,
+	formatCareerPreferences,
+	answerHRQuestion,
+} from "./career.js";

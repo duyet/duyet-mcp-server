@@ -5,7 +5,9 @@ import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
 
 // Define schemas separately to avoid TypeScript inference issues with Zod version differences
-const roleTypeSchema = z.enum(["full_time", "contract", "consulting", "part_time"]).optional() as any;
+const roleTypeSchema = z
+	.enum(["full_time", "contract", "consulting", "part_time"])
+	.optional() as any;
 const techStackSchema = z.string().optional() as any;
 const companySizeSchema = z.enum(["startup", "scale_up", "enterprise", "agency"]).optional() as any;
 const contactEmailSchema = z.string().email().optional() as any;
@@ -27,7 +29,9 @@ export function registerHireMeTool(server: McpServer, env: Env) {
 				tech_stack: techStackSchema.describe("Technologies/tools your project uses"),
 				company_size: companySizeSchema.describe("Company size/type"),
 				contact_email: contactEmailSchema.describe("Optional: Your email for follow-up"),
-				additional_notes: additionalNotesSchema.describe("Optional: Additional notes or specific requirements (max 500 characters)"),
+				additional_notes: additionalNotesSchema.describe(
+					"Optional: Additional notes or specific requirements (max 500 characters)",
+				),
 			},
 		},
 		async ({ role_type, tech_stack, company_size, contact_email, additional_notes }) => {

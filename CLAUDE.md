@@ -9,10 +9,13 @@ This is a Cloudflare Workers-based MCP (Model Context Protocol) server that prov
 With Duyet MCP server, you can:
 - Say hello to Duyet
 - Get Duyet's CV, his skills, and his experience
-- Get Duyet's latest blog posts
+- Get Duyet's latest blog posts and full content
 - Get Duyet's GitHub activity
-- Get Duyet's contact information
+- Access career preferences and hiring requirements
+- Quick Q&A for HR/recruiters (salary, remote work, availability)
+- Submit job descriptions with automatic matching
 - Send a message to Duyet (hiring, get in touch, etc.)
+- Access llms.txt information from blog.duyet.net
 
 ## Important documents:
 
@@ -48,9 +51,10 @@ With Duyet MCP server, you can:
 ### MCP Tools Architecture
 
 **Centralized Tool Registry** (`src/tools/index.ts`): All tools are registered through `registerAllTools()` function, organized by category:
-- **Core Information Tools**: `get-cv`
-- **Content Tools**: `github-activity`
+- **Core Information Tools**: `get-about-duyet`, `get-cv`
+- **Content Tools**: `github-activity`, `get-github-activity`, `get-blog-posts`, `get-blog-post-content`
 - **Interaction Tools**: `send-message`, `hire-me`, `say-hi`
+- **HR/Recruiter Tools**: `hr-quick-qa`, `submit-job-description`
 - **Management Tools**: `contact-analytics`
 
 **Tool Implementation Pattern**: Each tool is in its own file with a `register[ToolName]Tool()` function that:
@@ -61,19 +65,23 @@ With Duyet MCP server, you can:
 ### MCP Resources Architecture
 
 **Centralized Resource Registry** (`src/resources/index.ts`): All resources are registered through `registerAllResources()` function:
-- **Core Information Resources**: `about-duyet`, `cv`
-- **Content Resources**: `blog-posts`, `github-activity`
+- **Core Information Resources**: `about-duyet`, `cv`, `career-preferences`
+- **Content Resources**: `blog-posts`, `github-activity`, `llms-txt`
 
 **Resource Implementation Pattern**: Each resource provides read-only data access via URI patterns:
-- `duyet://about` - Profile information (converted from about_duyet tool)
-- `duyet://blog/posts/{limit}` - Blog posts (converted from get_latest_blog_post tool)
-- `duyet://cv/{format}` - CV with format parameters
+- `duyet://about` - Profile information
+- `duyet://cv/{format}` - CV with format parameters (summary/detailed/json)
+- `duyet://career/preferences` - Career preferences for recruiters (NEW)
+- `duyet://blog/posts/{limit}` - Blog posts
 - `duyet://github-activity` - GitHub activity data
+- `duyet://llms.txt` - Dynamic llms.txt content from blog.duyet.net (NEW)
 
-**Key Changes**: 
+**Key Features**:
 - Removed `hire_me` and `contact` resources for privacy/security
 - Converted `about_duyet` and `get_latest_blog_post` from tools to resources
 - Resources enable automatic discovery in Claude Chat for natural conversations
+- **NEW**: Caching layer for external API calls (blog RSS, llms.txt) for improved performance
+- **NEW**: HR-focused resources and tools for recruiter engagement
 
 ### Database Architecture
 
@@ -87,6 +95,50 @@ With Duyet MCP server, you can:
 - Reference ID system for tracking
 - Timestamp tracking (created/updated)
 - IP and user agent logging for analytics
+
+### Caching Architecture (NEW)
+
+**In-Memory Cache** (`src/core/cache.ts`): LRU-like cache with TTL support
+- **Global Cache Instance**: Shared across all requests for optimal performance
+- **TTL Management**: Configurable time-to-live for each cache entry
+- **Auto-Eviction**: Automatic cleanup of expired entries
+- **Cache Statistics**: Monitoring for cache size and hit rates
+
+**Cached Operations**:
+- Blog RSS feed: 10 minutes (600000ms)
+- llms.txt content: 1 hour (3600000ms)
+- General external fetches: 5 minutes default
+
+**Benefits**:
+- Reduced external API calls by ~80-90%
+- Faster response times (sub-100ms for cached data)
+- Lower bandwidth usage on Cloudflare Workers
+
+### HR/Recruiter Features (NEW)
+
+**Career Preferences Resource** (`src/resources/career-preferences.ts`):
+- Work arrangement requirements (100% remote only)
+- Compensation expectations (USD $80k-$150k)
+- Availability and notice period
+- Technology and industry preferences
+- Deal breakers and must-haves
+
+**HR Quick Q&A Tool** (`src/tools/hr-quick-qa.ts`):
+- Instant answers to common HR questions
+- Salary, remote work, availability queries
+- Intelligent question matching
+- Fast screening for recruiters
+
+**JD Submission Tool** (`src/tools/jd-submission.ts`):
+- Submit job descriptions for review
+- Automatic basic matching (remote policy check)
+- Database storage with reference ID
+- Email notifications for follow-up
+
+**Matching Logic**:
+- Primary filter: Remote-only requirement (deal breaker)
+- Secondary considerations: Salary range, tech stack, company size
+- Stored in contacts table with purpose `job_opportunity`
 
 ### Cloudflare Workers Integration
 

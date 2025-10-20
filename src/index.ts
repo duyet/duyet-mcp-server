@@ -20,27 +20,87 @@ export class DuyetMCP extends McpAgent {
 
 const app = new Hono<{ Bindings: Env }>();
 
-const LLMS_TXT = `Duyet MCP Server. See https://github.com/duyet/duyet-mcp-server for more details.
+import { getDuyetLLMsTxt } from "./core/llms-txt";
 
-Usage: Update your AI assistant configuration to point to the URL of Duyet MCP server
+// Dynamic llms.txt endpoint with fallback
+app.get("/", (c) => c.redirect("/llms.txt"));
+app.get("/llms.txt", async (c) => {
+	try {
+		const data = await getDuyetLLMsTxt();
+		return c.text(data.raw, 200, {
+			"Content-Type": "text/markdown; charset=utf-8",
+			"Cache-Control": "public, max-age=3600",
+		});
+	} catch (error) {
+		// Fallback content if blog.duyet.net/llms.txt is unavailable
+		const fallback = `# Duyet MCP Server
 
-\`\`\`
+> MCP (Model Context Protocol) server providing AI assistants with access to Duyet's professional information, blog content, and career data.
+
+## Features
+
+- Personal information and CV access
+- Blog posts and content
+- GitHub activity tracking
+- Career preferences and HR tools
+- Job description submission and matching
+
+## Usage
+
+Update your AI assistant configuration to point to the Duyet MCP server:
+
+\`\`\`json
 {
   "mcpServers": {
     "duyet-mcp-server": {
       "command": "npx",
-      "args": [
-        "mcp-remote",
-        "https://mcp.duyet.net/sse"
-      ]
+      "args": ["mcp-remote", "https://mcp.duyet.net/sse"]
     }
   }
 }
 \`\`\`
-  `;
 
-app.get("/", (c) => c.redirect("/llms.txt"));
-app.get("/llms.txt", (c) => c.text(LLMS_TXT));
+## Resources
+
+- GitHub: https://github.com/duyet/duyet-mcp-server
+- Blog: https://blog.duyet.net
+- Website: https://duyet.net
+
+## MCP Resources Available
+
+- \`duyet://about\` - Profile information
+- \`duyet://cv/{format}\` - CV (summary/detailed/json)
+- \`duyet://career/preferences\` - Career preferences for recruiters
+- \`duyet://blog/posts/{limit}\` - Blog posts
+- \`duyet://github-activity\` - GitHub activity
+- \`duyet://llms.txt\` - This file from blog.duyet.net
+
+## MCP Tools Available
+
+**Core Information:**
+- \`get-about-duyet\` - Get profile information
+- \`get-cv\` - Retrieve CV in various formats
+
+**Content:**
+- \`get-blog-posts\` - Get latest blog posts
+- \`get-blog-post-content\` - Get full post content
+- \`github-activity\` - Get GitHub activity
+
+**HR/Recruiter Tools:**
+- \`hr-quick-qa\` - Quick answers to common HR questions
+- \`submit-job-description\` - Submit JD for review with matching
+- \`hire-me\` - Get hiring information
+- \`send-message\` - Contact for opportunities
+
+**Interaction:**
+- \`say-hi\` - Friendly greeting`;
+
+		return c.text(fallback, 200, {
+			"Content-Type": "text/markdown; charset=utf-8",
+			"Cache-Control": "public, max-age=300",
+		});
+	}
+});
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
 
 app.mount("/sse", DuyetMCP.serveSSE("/sse").fetch, { replaceRequest: false });
