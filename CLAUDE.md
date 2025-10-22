@@ -34,6 +34,24 @@ With Duyet MCP server, you can:
 - `npm run test:coverage` - Run tests with coverage report
 - `npm run all` - Run complete CI pipeline (lint, format, type-check, test with coverage, deploy)
 
+## Git Workflow
+
+**Commit Requirements**:
+- All commits must include: `Co-authored-by: duyetbot <duyetbot@users.noreply.github.com>`
+- Follow semantic commit conventions (e.g., `feat:`, `fix:`, `docs:`, `refactor:`)
+- Use consistent scopes within the project
+- Write commit messages in simple, clear English
+
+**Example commit message**:
+```
+feat(tools): add hr-quick-qa tool for recruiter screening
+
+Implements intelligent Q&A matching for common HR questions
+about salary, remote work, and availability.
+
+Co-authored-by: duyetbot <duyetbot@users.noreply.github.com>
+```
+
 ## Architecture
 
 ### Core Components
