@@ -9,10 +9,12 @@ This is a Cloudflare Workers-based MCP (Model Context Protocol) server that prov
 With Duyet MCP server, you can:
 - Say hello to Duyet
 - Get Duyet's CV, his skills, and his experience
-- Get Duyet's latest blog posts
+- Get Duyet's latest blog posts and full article content
 - Get Duyet's GitHub activity
 - Get Duyet's contact information
 - Send a message to Duyet (hiring, get in touch, etc.)
+- Search the web for current information
+- Fetch and extract content from URLs (with domain validation)
 
 ## Important documents:
 
@@ -48,8 +50,9 @@ With Duyet MCP server, you can:
 ### MCP Tools Architecture
 
 **Centralized Tool Registry** (`src/tools/index.ts`): All tools are registered through `registerAllTools()` function, organized by category:
-- **Core Information Tools**: `get-cv`
-- **Content Tools**: `github-activity`
+- **Core Information Tools**: `get-cv`, `get-about-duyet`
+- **Content Tools**: `get-blog-posts`, `get-blog-post-content`, `github-activity`, `get-github-activity`
+- **Web Tools**: `web-search`, `web-fetch`
 - **Interaction Tools**: `send-message`, `hire-me`, `say-hi`
 - **Management Tools**: `contact-analytics`
 
@@ -161,6 +164,28 @@ await db.run(`SELECT * FROM contacts WHERE id = ${userId}`);
 ```
 
 **Error Handling**: Always sanitize database errors before returning to users.
+
+### Web Tools
+
+**Web Search Tool** (`src/tools/web-search.ts`):
+- Uses DuckDuckGo HTML interface for web searches
+- Returns structured results with titles, URLs, and snippets
+- Configurable result limit (1-10 results)
+- No API key required
+
+**Web Fetch Tool** (`src/tools/web-fetch.ts`):
+- Fetches content from URLs with domain validation
+- Supports HTML (extracts text), JSON, and plain text
+- Default whitelist: `duyet.net`, `blog.duyet.net`, `github.com`, `raw.githubusercontent.com`
+- Optional `allow_any_domain` flag for unrestricted access
+- Automatic content truncation for large responses
+- Optional header inclusion for debugging
+
+**Enhanced Blog Post Fetcher** (`src/core/blog.ts`):
+- `fetchBlogPostContent()` - Extracts article content, title, and metadata from blog posts
+- Supports both `blog.duyet.net` and `duyet.net` domains
+- Extracts metadata: author, publish date, tags
+- HTML parsing with `htmlparser2` for reliable content extraction
 
 ### MCP Resources
 

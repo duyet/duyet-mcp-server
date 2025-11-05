@@ -162,3 +162,134 @@ export function formatBlogPostsForTool(data: BlogPostsData): string {
 		2,
 	);
 }
+
+/**
+ * Extract article content from blog post HTML
+ */
+export function extractArticleContent(html: string): {
+	title: string | null;
+	content: string;
+	metadata: {
+		author?: string;
+		publishDate?: string;
+		tags?: string[];
+	};
+} {
+	const doc = parseDocument(html);
+
+	// Extract title
+	const titleElements = getElementsByTagName("h1", doc);
+	const title = titleElements.length > 0 ? textContent(titleElements[0]).trim() : null;
+
+	// Try to find article content in common blog structures
+	let contentElements: Element[] = [];
+
+	// Try main article tag first
+	contentElements = getElementsByTagName("article", doc);
+
+	// If no article tag, try common content classes
+	if (contentElements.length === 0) {
+		const allElements = getElementsByTagName("div", doc);
+		for (const el of allElements) {
+			const className = el.attribs?.class || "";
+			if (
+				className.includes("content") ||
+				className.includes("post") ||
+				className.includes("article") ||
+				className.includes("entry")
+			) {
+				contentElements.push(el);
+				break;
+			}
+		}
+	}
+
+	// Extract text content
+	let content = "";
+	if (contentElements.length > 0) {
+		// Get all paragraph tags from the content
+		const paragraphs = getElementsByTagName("p", contentElements[0]);
+		content = paragraphs.map((p) => textContent(p).trim()).join("\n\n");
+
+		// If no paragraphs, get all text
+		if (!content) {
+			content = textContent(contentElements[0]);
+		}
+	}
+
+	// Clean up content
+	content = content
+		.replace(/\s+/g, " ") // Normalize whitespace
+		.replace(/\n\s*\n/g, "\n\n") // Normalize line breaks
+		.trim();
+
+	// Extract metadata
+	const metadata: { author?: string; publishDate?: string; tags?: string[] } = {};
+
+	// Try to find author
+	const authorElements = getElementsByTagName("meta", doc);
+	for (const meta of authorElements) {
+		if (meta.attribs?.name === "author" || meta.attribs?.property === "article:author") {
+			metadata.author = meta.attribs.content;
+			break;
+		}
+	}
+
+	// Try to find publish date
+	for (const meta of authorElements) {
+		if (meta.attribs?.property === "article:published_time") {
+			metadata.publishDate = meta.attribs.content;
+			break;
+		}
+	}
+
+	// Try to find tags
+	const tags: string[] = [];
+	for (const meta of authorElements) {
+		if (meta.attribs?.property === "article:tag") {
+			tags.push(meta.attribs.content);
+		}
+	}
+	if (tags.length > 0) {
+		metadata.tags = tags;
+	}
+
+	return { title, content, metadata };
+}
+
+/**
+ * Fetch and extract blog post content from URL
+ */
+export async function fetchBlogPostContent(url: string): Promise<{
+	url: string;
+	title: string | null;
+	content: string;
+	metadata: {
+		author?: string;
+		publishDate?: string;
+		tags?: string[];
+	};
+	contentLength: number;
+}> {
+	// Validate URL
+	const blogUrl = new URL(url);
+	if (blogUrl.hostname !== "blog.duyet.net" && blogUrl.hostname !== "duyet.net") {
+		throw new Error("Only blog.duyet.net and duyet.net URLs are supported");
+	}
+
+	const response = await fetch(url);
+	if (!response.ok) {
+		throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+	}
+
+	const html = await response.text();
+	const { title, content, metadata } = extractArticleContent(html);
+
+	return {
+		url,
+		title,
+		content,
+		metadata,
+		contentLength: content.length,
+	};
+}

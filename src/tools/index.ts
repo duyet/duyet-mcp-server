@@ -13,6 +13,10 @@ import {
 	registerGetBlogPostContentTool,
 } from "./blog-posts";
 
+// Web tools
+import { registerWebSearchTool } from "./web-search";
+import { registerWebFetchTool } from "./web-fetch";
+
 // Interaction tools
 import { registerSendMessageTool } from "./send-message";
 import { registerHireMeTool } from "./hire-me";
@@ -36,6 +40,10 @@ export function registerAllTools(server: McpServer, env: Env) {
 	registerListBlogPostTool(server); // Legacy alias for compatibility
 	registerGetBlogPostContentTool(server);
 
+	// Web tools
+	registerWebSearchTool(server);
+	registerWebFetchTool(server);
+
 	// Interaction tools
 	registerSendMessageTool(server, env);
 	registerHireMeTool(server, env);
@@ -56,6 +64,9 @@ export {
 	registerGetBlogPostsTool,
 	registerListBlogPostTool,
 	registerGetBlogPostContentTool,
+	// Web tools
+	registerWebSearchTool,
+	registerWebFetchTool,
 	// Interaction tools
 	registerSendMessageTool,
 	registerHireMeTool,
