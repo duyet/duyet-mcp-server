@@ -331,7 +331,9 @@ describe("Web Fetch Tool Tests", () => {
             headers: {
                 get: (key: string) => mockHeaders.get(key),
                 forEach: (callback: (value: string, key: string) => void) => {
-                    mockHeaders.forEach((value, key) => callback(value, key));
+                    mockHeaders.forEach((value, key) => {
+                        callback(value, key);
+                    });
                 },
             },
             text: async () => "<html><body>Test</body></html>",
@@ -386,7 +388,7 @@ describe("Web Fetch Tool Tests", () => {
         registerWebFetchTool(mockServer);
 
         // Create large HTML content (> 10000 chars)
-        const largeContent = "<html><body>" + "A".repeat(15000) + "</body></html>";
+        const largeContent = `<html><body>${"A".repeat(15000)}</body></html>`;
 
         (global.fetch as jest.Mock).mockResolvedValueOnce({
             ok: true,
