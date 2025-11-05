@@ -219,8 +219,8 @@ describe("Tool Registration Tests", () => {
 	describe("Tool Registry", () => {
 		test("should register all tools", () => {
 			registerAllTools(mockServer, mockEnv);
-			// Should have called tool registration for all 11 tools
-			expect(mockServer.registerTool).toHaveBeenCalledTimes(11);
+			// Should have called tool registration for all 13 tools (11 original + 2 web tools)
+			expect(mockServer.registerTool).toHaveBeenCalledTimes(13);
 		});
 	});
 });
