@@ -1,6 +1,10 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { getBlogPostsData, formatBlogPostsForTool } from "../core/blog.js";
+import {
+	getBlogPostsData,
+	formatBlogPostsForTool,
+	fetchBlogPostContent,
+} from "../core/blog.js";
 
 // Define schemas separately to help with TypeScript inference
 const limitSchema = z.number().min(1).max(20).optional().default(5) as any;
@@ -111,53 +115,17 @@ export function registerGetBlogPostContentTool(server: McpServer) {
 		"get_blog_post_content",
 		{
 			title: "Get Blog Post Content",
-			description: "Get the full content of a specific blog post by URL",
+			description:
+				"Get the full content of a specific blog post by URL. Extracts article text, title, and metadata (author, publish date, tags) from blog.duyet.net or duyet.net posts.",
 			inputSchema: {
-				url: urlSchema.describe("The URL of the blog post to retrieve content from"),
+				url: urlSchema.describe(
+					"The URL of the blog post to retrieve content from (blog.duyet.net or duyet.net)",
+				),
 			},
 		},
 		async ({ url }) => {
 			try {
-				// Validate that it's a blog.duyet.net URL for security
-				const blogUrl = new URL(url);
-				if (blogUrl.hostname !== "blog.duyet.net") {
-					return {
-						content: [
-							{
-								type: "text",
-								text: JSON.stringify(
-									{
-										error: "Invalid URL",
-										message: "Only blog.duyet.net URLs are supported",
-									},
-									null,
-									2,
-								),
-							},
-						],
-					};
-				}
-
-				const response = await fetch(url);
-				if (!response.ok) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: JSON.stringify(
-									{
-										error: "Failed to fetch blog post",
-										message: `HTTP ${response.status}: ${response.statusText}`,
-									},
-									null,
-									2,
-								),
-							},
-						],
-					};
-				}
-
-				const htmlContent = await response.text();
+				const result = await fetchBlogPostContent(url);
 
 				return {
 					content: [
@@ -165,11 +133,11 @@ export function registerGetBlogPostContentTool(server: McpServer) {
 							type: "text",
 							text: JSON.stringify(
 								{
-									url,
-									content: htmlContent,
-									contentType:
-										response.headers.get("content-type") || "text/html",
-									contentLength: htmlContent.length,
+									url: result.url,
+									title: result.title,
+									content: result.content,
+									metadata: result.metadata,
+									contentLength: result.contentLength,
 								},
 								null,
 								2,
@@ -185,14 +153,14 @@ export function registerGetBlogPostContentTool(server: McpServer) {
 							text: JSON.stringify(
 								{
 									error: "Failed to retrieve blog post content",
-									message:
-										error instanceof Error ? error.message : "Unknown error",
+									message: error instanceof Error ? error.message : "Unknown error",
 								},
 								null,
 								2,
 							),
 						},
 					],
+					isError: true,
 				};
 			}
 		},
