@@ -6,6 +6,10 @@
 
 An experimental [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that helps AI assistants connect to and retrieve information about duyet. This server provides access to information primarily available at [https://duyet.net](https://duyet.net), making it available directly to your AI assistant.
 
+<a href="https://glama.ai/mcp/servers/@duyet/duyet-mcp-server">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@duyet/duyet-mcp-server/badge" alt="Duyet Server MCP server" />
+</a>
+
 Usage: Update MCP server configuration in your AI assistant:
 
 ```json
