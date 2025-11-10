@@ -21,10 +21,10 @@
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.13.0",
 		"@octokit/rest": "^22.0.0",
-		"agents": "0.0.99",
+		"agents": "0.2.21",
 		"domutils": "^3.2.2",
 		"drizzle-orm": "^0.44.2",
-		"hono": "^4.8.3",
+		"hono": "^4.10.4",
 		"htmlparser2": "^10.0.0",
 		"zod": "^3.25.67"
 	},
