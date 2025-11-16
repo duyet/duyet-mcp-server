@@ -1,6 +1,7 @@
 import { Octokit } from "@octokit/rest";
 import type { RestEndpointMethodTypes } from "@octokit/rest";
 import type { GitHubActivityData, GitHubActivityItem } from "./types.js";
+import { cacheOrFetch, CACHE_CONFIGS } from "../utils/cache.js";
 
 type GitHubEvent =
 	RestEndpointMethodTypes["activity"]["listPublicEventsForUser"]["response"]["data"][0];
@@ -81,22 +82,21 @@ export function formatGitHubEvent(event: GitHubEvent, includeDetails = false): G
 }
 
 /**
- * Get GitHub activity data for Duyet
+ * Fetch GitHub activity data (internal, not cached)
  */
-export async function getGitHubActivityData(
-	limit = 5,
-	includeDetails = false,
+async function fetchGitHubActivityData(
+	limit: number,
+	includeDetails: boolean,
 ): Promise<GitHubActivityData> {
 	const username = "duyet";
 	const profileUrl = `https://github.com/${username}`;
-	const limitNum = Math.min(Math.max(limit, 1), 20);
 
 	try {
 		const octokit = new Octokit();
 
 		const { data: events } = await octokit.rest.activity.listPublicEventsForUser({
 			username,
-			per_page: limitNum,
+			per_page: limit,
 		});
 
 		if (events.length === 0) {
@@ -120,6 +120,24 @@ export async function getGitHubActivityData(
 		const errorMessage = error instanceof Error ? error.message : "Unknown error";
 		throw new Error(`Error fetching GitHub activity: ${errorMessage}`);
 	}
+}
+
+/**
+ * Get GitHub activity data with caching (15 minutes TTL)
+ * This is the public API that should be used by tools/resources
+ */
+export async function getGitHubActivityData(
+	limit = 5,
+	includeDetails = false,
+): Promise<GitHubActivityData> {
+	const limitNum = Math.min(Math.max(limit, 1), 20);
+	const cacheKey = `github-activity-${limitNum}-${includeDetails}`;
+
+	return cacheOrFetch(
+		cacheKey,
+		CACHE_CONFIGS.GITHUB,
+		() => fetchGitHubActivityData(limitNum, includeDetails),
+	);
 }
 
 /**

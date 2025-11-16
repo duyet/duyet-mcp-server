@@ -26,10 +26,6 @@ jest.mock("../resources/blog-posts", () => ({
 	registerBlogPostsResource: jest.fn(),
 }));
 
-jest.mock("../tools/get-cv", () => ({
-	registerGetCVTool: jest.fn(),
-}));
-
 jest.mock("../tools/github-activity", () => ({
 	registerGitHubActivityTool: jest.fn(),
 }));
@@ -81,7 +77,6 @@ describe("Index Functions Coverage", () => {
 
 	describe("Tools Index", () => {
 		test("should call registerAllTools and invoke all tool registrations", () => {
-			const { registerGetCVTool } = require("../tools/get-cv");
 			const { registerGitHubActivityTool } = require("../tools/github-activity");
 			const { registerHireMeTool } = require("../tools/hire-me");
 			const { registerSayHiTool } = require("../tools/say-hi");
@@ -90,7 +85,6 @@ describe("Index Functions Coverage", () => {
 
 			registerAllTools(mockServer, mockEnv);
 
-			expect(registerGetCVTool).toHaveBeenCalledWith(mockServer);
 			expect(registerGitHubActivityTool).toHaveBeenCalledWith(mockServer);
 			expect(registerHireMeTool).toHaveBeenCalledWith(mockServer, mockEnv);
 			expect(registerSayHiTool).toHaveBeenCalledWith(mockServer);

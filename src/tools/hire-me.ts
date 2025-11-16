@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
+import { checkRateLimit } from "../utils/rate-limit";
 
 // Define schemas separately to avoid TypeScript inference issues with Zod version differences
 const roleTypeSchema = z.enum(["full_time", "contract", "consulting", "part_time"]).optional() as any;
@@ -31,6 +32,28 @@ export function registerHireMeTool(server: McpServer, env: Env) {
 			},
 		},
 		async ({ role_type, tech_stack, company_size, contact_email, additional_notes }) => {
+			// Check rate limiting if user is submitting data (not just browsing)
+			if (contact_email || additional_notes || role_type || tech_stack || company_size) {
+				const rateLimitCheck = await checkRateLimit(db, contact_email, "hire_me");
+				if (!rateLimitCheck.allowed) {
+					return {
+						content: [
+							{
+								type: "text",
+								text: `Rate Limit Exceeded
+
+${rateLimitCheck.reason}
+
+${rateLimitCheck.retryAfter ? `You can try again in ${Math.ceil(rateLimitCheck.retryAfter / 60)} minutes.` : ""}
+
+Alternative: Email me directly at me@duyet.net with your hiring inquiry.`,
+							},
+						],
+						isError: true,
+					};
+				}
+			}
+
 			const currentYear = new Date().getFullYear();
 			const experience = currentYear - 2017;
 
