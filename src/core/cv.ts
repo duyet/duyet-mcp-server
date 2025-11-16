@@ -1,13 +1,12 @@
 import type { CVData, CVFormat } from "./types.js";
+import { cacheOrFetch, CACHE_CONFIGS } from "../utils/cache.js";
 
 export type { CVFormat };
 
 /**
- * Fetch and process CV data from duyet.net
+ * Fetch CV data (internal, not cached)
  */
-export async function getCVData(format: CVFormat = "summary"): Promise<CVData> {
-	const cvUrl = "https://duyet.net/cv";
-
+async function fetchCVData(format: CVFormat, cvUrl: string): Promise<CVData> {
 	try {
 		const response = await fetch(cvUrl);
 
@@ -93,4 +92,19 @@ You can still access the CV directly at: ${cvUrl}`;
 			isJsonFormat: false,
 		};
 	}
+}
+
+/**
+ * Get CV data with caching (1 hour TTL)
+ * This is the public API that should be used by tools/resources
+ */
+export async function getCVData(format: CVFormat = "summary"): Promise<CVData> {
+	const cvUrl = "https://duyet.net/cv";
+	const cacheKey = `cv-${format}`;
+
+	return cacheOrFetch(
+		cacheKey,
+		CACHE_CONFIGS.CV,
+		() => fetchCVData(format, cvUrl),
+	);
 }

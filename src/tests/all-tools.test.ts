@@ -1,5 +1,4 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerGetCVTool } from "../tools/get-cv";
 import { registerHireMeTool } from "../tools/hire-me";
 import { registerSayHiTool } from "../tools/say-hi";
 import { registerSendMessageTool } from "../tools/send-message";
@@ -53,73 +52,6 @@ describe("Tool Registration Tests", () => {
 				expect.any(Object),
 				expect.any(Function),
 			);
-		});
-	});
-
-	describe("Get CV Tool", () => {
-		test("should register get-cv tool", () => {
-			registerGetCVTool(mockServer);
-			expect(mockServer.registerTool).toHaveBeenCalledWith(
-				"get_cv",
-				expect.any(Object),
-				expect.any(Function),
-			);
-		});
-
-		test("should handle CV tool with summary format", async () => {
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
-				if (name === "get_cv") {
-					toolHandler = handler;
-				}
-			});
-
-			registerGetCVTool(mockServer);
-			const result = await toolHandler({ format: "summary" });
-			expect(result.content[0].text).toContain("Duyet - Senior Data Engineer");
-			expect(result.content[0].text).toContain("Sr. Data Engineer with");
-		});
-
-		test("should handle CV tool with detailed format", async () => {
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
-				if (name === "get_cv") {
-					toolHandler = handler;
-				}
-			});
-
-			registerGetCVTool(mockServer);
-			const result = await toolHandler({ format: "detailed" });
-			expect(result.content[0].text).toContain("Key Highlights");
-			expect(result.content[0].text).toContain("Duyet - Senior Data Engineer");
-		});
-
-		test("should handle CV tool with json format", async () => {
-			let toolHandler: any;
-			(mockServer.registerTool as jest.Mock).mockImplementation((name, _config, handler) => {
-				if (name === "get_cv") {
-					toolHandler = handler;
-				}
-			});
-
-			// Mock JSON CV response
-			(global.fetch as jest.Mock).mockImplementation((url: string) => {
-				if (url.includes("cv.json")) {
-					return Promise.resolve({
-						ok: true,
-						text: async () => '{"name": "Duyet", "title": "Senior Data Engineer"}',
-					});
-				}
-				return Promise.resolve({
-					ok: true,
-					text: async () => "<title>Duyet - Senior Data Engineer</title>",
-				});
-			});
-
-			registerGetCVTool(mockServer);
-			const result = await toolHandler({ format: "json" });
-			expect(result.content[0].text).toContain("name");
-			expect(result.content[0].text).toContain("title");
 		});
 	});
 
@@ -219,8 +151,12 @@ describe("Tool Registration Tests", () => {
 	describe("Tool Registry", () => {
 		test("should register all tools", () => {
 			registerAllTools(mockServer, mockEnv);
-			// Should have called tool registration for all 13 tools (11 original + 2 web tools)
-			expect(mockServer.registerTool).toHaveBeenCalledTimes(13);
+			// Should have called tool registration for all 8 tools
+			// Content: github_activity, get_blog_post_content
+			// Web: web-search, web-fetch
+			// Interaction: send_message, hire_me, say_hi
+			// Management: get_analytics
+			expect(mockServer.registerTool).toHaveBeenCalledTimes(8);
 		});
 	});
 });

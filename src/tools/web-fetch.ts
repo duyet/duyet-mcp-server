@@ -17,15 +17,27 @@ interface FetchResult {
 }
 
 /**
- * Allowed domains for security
- * Add more trusted domains as needed
+ * Maximum content length to prevent memory issues (10MB)
+ */
+const MAX_CONTENT_LENGTH = 10 * 1024 * 1024; // 10MB
+
+/**
+ * Allowed domains for security (non-GitHub domains)
  */
 const ALLOWED_DOMAINS = [
     "duyet.net",
     "blog.duyet.net",
-    "github.com",
-    "raw.githubusercontent.com",
-    // Add more trusted domains
+];
+
+/**
+ * Allowed GitHub patterns for security
+ * Only allows Duyet's repositories and content
+ */
+const ALLOWED_GITHUB_PATTERNS = [
+    /^https?:\/\/github\.com\/duyet\//i,
+    /^https?:\/\/raw\.githubusercontent\.com\/duyet\//i,
+    /^https?:\/\/gist\.githubusercontent\.com\/duyet\//i,
+    /^https?:\/\/gist\.github\.com\/duyet\//i,
 ];
 
 /**
@@ -45,8 +57,15 @@ function isUrlAllowed(url: string, allowAnyDomain = false): boolean {
             return true;
         }
 
-        // Check if domain is in allowed list
         const hostname = urlObj.hostname.toLowerCase();
+        const fullUrl = url.toLowerCase();
+
+        // Check GitHub patterns (path-based validation)
+        if (hostname.includes("github")) {
+            return ALLOWED_GITHUB_PATTERNS.some(pattern => pattern.test(fullUrl));
+        }
+
+        // Check if domain is in allowed list
         return ALLOWED_DOMAINS.some(
             (domain) =>
                 hostname === domain || hostname.endsWith(`.${domain}`),
@@ -95,7 +114,7 @@ async function fetchUrl(
         throw new Error(
             allowAnyDomain
                 ? "Invalid URL protocol (only http/https allowed)"
-                : `URL not allowed. Allowed domains: ${ALLOWED_DOMAINS.join(", ")}`,
+                : `URL not allowed. Allowed domains: ${ALLOWED_DOMAINS.join(", ")}, and Duyet's GitHub repositories (github.com/duyet/*, raw.githubusercontent.com/duyet/*, gist.github.com/duyet/*)`,
         );
     }
 
@@ -109,6 +128,17 @@ async function fetchUrl(
 
         const contentType = response.headers.get("content-type") || "text/plain";
         const status = response.status;
+
+        // Check content length to prevent memory issues
+        const contentLength = response.headers.get("content-length");
+        if (contentLength) {
+            const size = Number.parseInt(contentLength, 10);
+            if (size > MAX_CONTENT_LENGTH) {
+                throw new Error(
+                    `Content too large: ${(size / 1024 / 1024).toFixed(2)}MB (max ${MAX_CONTENT_LENGTH / 1024 / 1024}MB)`,
+                );
+            }
+        }
 
         // Get response headers if requested
         const headers: Record<string, string> = {};

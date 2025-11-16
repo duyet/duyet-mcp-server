@@ -2,6 +2,7 @@ import { parseDocument } from "htmlparser2";
 import { getElementsByTagName, textContent } from "domutils";
 import type { Element } from "domhandler";
 import type { BlogPostData, BlogPostsData } from "./types.js";
+import { cacheOrFetch, CACHE_CONFIGS } from "../utils/cache.js";
 
 /**
  * Extract field content from RSS item element, handling CDATA and parsing quirks
@@ -113,14 +114,13 @@ export async function fetchAndParseRSS(
 }
 
 /**
- * Get blog posts data with all metadata
+ * Fetch blog posts data (internal, not cached)
  */
-export async function getBlogPostsData(limit = 5): Promise<BlogPostsData> {
+async function fetchBlogPostsData(limit: number): Promise<BlogPostsData> {
 	const feedUrl = "https://blog.duyet.net/rss.xml";
-	const limitNum = Math.min(Math.max(limit, 1), 20);
 
 	try {
-		const result = await fetchAndParseRSS(feedUrl, limitNum);
+		const result = await fetchAndParseRSS(feedUrl, limit);
 
 		return {
 			posts: result.posts,
@@ -132,6 +132,21 @@ export async function getBlogPostsData(limit = 5): Promise<BlogPostsData> {
 		const errorMessage = error instanceof Error ? error.message : "Unknown error";
 		throw new Error(`Error fetching blog posts: ${errorMessage}`);
 	}
+}
+
+/**
+ * Get blog posts data with caching (30 minutes TTL)
+ * This is the public API that should be used by tools/resources
+ */
+export async function getBlogPostsData(limit = 5): Promise<BlogPostsData> {
+	const limitNum = Math.min(Math.max(limit, 1), 20);
+	const cacheKey = `blog-posts-${limitNum}`;
+
+	return cacheOrFetch(
+		cacheKey,
+		CACHE_CONFIGS.BLOG,
+		() => fetchBlogPostsData(limitNum),
+	);
 }
 
 /**
@@ -258,9 +273,9 @@ export function extractArticleContent(html: string): {
 }
 
 /**
- * Fetch and extract blog post content from URL
+ * Fetch blog post content (internal, not cached)
  */
-export async function fetchBlogPostContent(url: string): Promise<{
+async function fetchBlogPostContentInternal(url: string): Promise<{
 	url: string;
 	title: string | null;
 	content: string;
@@ -292,4 +307,29 @@ export async function fetchBlogPostContent(url: string): Promise<{
 		metadata,
 		contentLength: content.length,
 	};
+}
+
+/**
+ * Fetch and extract blog post content from URL with caching (30 minutes TTL)
+ * This is the public API that should be used by tools/resources
+ */
+export async function fetchBlogPostContent(url: string): Promise<{
+	url: string;
+	title: string | null;
+	content: string;
+	metadata: {
+		author?: string;
+		publishDate?: string;
+		tags?: string[];
+	};
+	contentLength: number;
+}> {
+	// Use URL as cache key (normalized)
+	const cacheKey = `blog-post-${encodeURIComponent(url)}`;
+
+	return cacheOrFetch(
+		cacheKey,
+		CACHE_CONFIGS.BLOG,
+		() => fetchBlogPostContentInternal(url),
+	);
 }

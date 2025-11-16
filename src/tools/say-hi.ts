@@ -19,14 +19,14 @@ export function registerSayHiTool(server: McpServer) {
 			},
 		},
 		async ({ message }) => {
-			const greeting = message ? `Hi Duyet! ${message}` : "Hi Duyet! 👋";
+			const greeting = message ? `Hi Duyet! ${message}` : "Hi Duyet!";
 
 			const responses = [
-				"Thanks for saying hi! Hope you're having a great day! 😊",
-				"Hello there! Great to hear from you! 🌟",
-				"Hi! Always nice to get a friendly greeting! ✨",
-				"Hey! Thanks for reaching out. Hope all is well! 🚀",
-				"Hello! Appreciate you taking the time to say hi! 💫",
+				"Thanks for saying hi! Hope you're having a great day!",
+				"Hello there! Great to hear from you!",
+				"Hi! Always nice to get a friendly greeting!",
+				"Hey! Thanks for reaching out. Hope all is well!",
+				"Hello! Appreciate you taking the time to say hi!",
 			];
 
 			const randomResponse = responses[Math.floor(Math.random() * responses.length)];
@@ -40,12 +40,12 @@ export function registerSayHiTool(server: McpServer) {
 ${randomResponse}
 
 Connect with Duyet:
-📧 Email: me@duyet.net
-🐙 GitHub: https://github.com/duyet
-💼 LinkedIn: https://linkedin.com/in/duyet
-📝 Blog: https://blog.duyet.net
+Email: me@duyet.net
+GitHub: https://github.com/duyet
+LinkedIn: https://linkedin.com/in/duyet
+Blog: https://blog.duyet.net
 
-Feel free to reach out anytime! 🤝`,
+Feel free to reach out anytime!`,
 					},
 				],
 			};

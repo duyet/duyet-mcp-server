@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
+import { checkRateLimit } from "../utils/rate-limit";
 
 // Define schemas separately to avoid TypeScript inference issues with Zod version differences
 const messageSchema = z.string().min(10).max(500) as any;
@@ -28,6 +29,26 @@ export function registerSendMessageTool(server: McpServer, env: Env) {
 			},
 		},
 		async ({ message, contact_email, purpose }) => {
+			// Check rate limiting before processing
+			const rateLimitCheck = await checkRateLimit(db, contact_email, purpose);
+			if (!rateLimitCheck.allowed) {
+				return {
+					content: [
+						{
+							type: "text",
+							text: `Rate Limit Exceeded
+
+${rateLimitCheck.reason}
+
+${rateLimitCheck.retryAfter ? `You can try again in ${Math.ceil(rateLimitCheck.retryAfter / 60)} minutes.` : ""}
+
+Alternative: Email me directly at me@duyet.net`,
+						},
+					],
+					isError: true,
+				};
+			}
+
 			// Extract metadata - simplified for MCP context
 			const ip_address = "unknown";
 			const user_agent = "MCP Client";
