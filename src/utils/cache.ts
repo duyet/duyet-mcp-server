@@ -23,7 +23,7 @@ export const CACHE_CONFIGS = {
   CV: { prefix: "cv", ttl: 3600, cacheName: "duyet-mcp" }, // 1 hour
   BLOG: { prefix: "blog", ttl: 1800, cacheName: "duyet-mcp" }, // 30 minutes
   GITHUB: { prefix: "github", ttl: 900, cacheName: "duyet-mcp" }, // 15 minutes
-  ABOUT: { prefix: "about", ttl: 3600, cacheName: "duyet-mcp" }, // 1 hour
+  ABOUT: { prefix: "about", ttl: 86400, cacheName: "duyet-mcp" }, // 24 hours (static content)
 };
 
 /**

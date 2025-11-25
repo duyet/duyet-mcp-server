@@ -1,11 +1,27 @@
-import { Octokit } from "@octokit/rest";
-import type { RestEndpointMethodTypes } from "@octokit/rest";
 import type { GitHubActivityData, GitHubActivityItem } from "./types.js";
 import { cacheOrFetch, CACHE_CONFIGS } from "../utils/cache.js";
 import { logger } from "../utils/logger.js";
 
-type GitHubEvent =
-  RestEndpointMethodTypes["activity"]["listPublicEventsForUser"]["response"]["data"][0];
+/**
+ * GitHub Event type for public events API
+ * Replaces @octokit/rest types for lightweight implementation
+ */
+interface GitHubEvent {
+  id?: string;
+  type?: string;
+  created_at?: string;
+  repo?: {
+    name?: string;
+  };
+  payload?: {
+    action?: string;
+    ref_type?: string;
+    commits?: Array<{ message?: string }>;
+    issue?: { title?: string };
+    pull_request?: { title?: string };
+    release?: { tag_name?: string; name?: string };
+  };
+}
 
 /**
  * Format a single GitHub event into a structured activity item
@@ -16,32 +32,30 @@ export function formatGitHubEvent(
 ): GitHubActivityItem {
   const date = new Date(event.created_at || new Date()).toLocaleDateString();
   const repository = event.repo?.name || "Unknown repository";
+  const payload = event.payload;
 
   let action = "";
   let details = "";
 
   switch (event.type) {
     case "PushEvent": {
-      const payload = event.payload as any;
       const commits = payload?.commits?.length || 0;
       action = `Pushed ${commits} commit${commits > 1 ? "s" : ""}`;
       if (includeDetails && payload?.commits) {
         const commitMessages = payload.commits
           .slice(0, 3)
-          .map((c: any) => `  - ${c.message}`)
+          .map((c) => `  - ${c.message}`)
           .join("\n");
         details = `\n${commitMessages}`;
       }
       break;
     }
     case "CreateEvent": {
-      const payload = event.payload as any;
       const refType = payload?.ref_type || "repository";
       action = `Created ${refType}`;
       break;
     }
     case "IssuesEvent": {
-      const payload = event.payload as any;
       const issueAction = payload?.action || "updated";
       action = `${issueAction} issue`;
       if (includeDetails && payload?.issue) {
@@ -50,7 +64,6 @@ export function formatGitHubEvent(
       break;
     }
     case "PullRequestEvent": {
-      const payload = event.payload as any;
       const prAction = payload?.action || "updated";
       action = `${prAction} pull request`;
       if (includeDetails && payload?.pull_request) {
@@ -65,7 +78,6 @@ export function formatGitHubEvent(
       action = "Forked repository";
       break;
     case "ReleaseEvent": {
-      const payload = event.payload as any;
       action = `${payload?.action || "created"} release`;
       if (includeDetails && payload?.release) {
         details = `\n  - ${payload.release.tag_name}: ${payload.release.name}`;
@@ -87,6 +99,7 @@ export function formatGitHubEvent(
 
 /**
  * Fetch GitHub activity data (internal, not cached)
+ * Uses native fetch instead of @octokit/rest for lightweight implementation
  */
 async function fetchGitHubActivityData(
   limit: number,
@@ -94,6 +107,7 @@ async function fetchGitHubActivityData(
 ): Promise<GitHubActivityData> {
   const username = "duyet";
   const profileUrl = `https://github.com/${username}`;
+  const apiUrl = `https://api.github.com/users/${username}/events?per_page=${limit}`;
 
   try {
     const startTime = Date.now();
@@ -102,20 +116,24 @@ async function fetchGitHubActivityData(
       includeDetails,
     });
 
-    const octokit = new Octokit();
-
-    const { data: events } =
-      await octokit.rest.activity.listPublicEventsForUser({
-        username,
-        per_page: limit,
-      });
+    const response = await fetch(apiUrl, {
+      headers: {
+        Accept: "application/vnd.github.v3+json",
+        "User-Agent": "DuyetMCP/0.1 (+https://duyet.net)",
+      },
+    });
 
     const duration = Date.now() - startTime;
-    logger.fetch(
-      `https://api.github.com/users/${username}/events`,
-      200,
-      duration,
-    );
+
+    if (!response.ok) {
+      logger.fetch(apiUrl, response.status, duration);
+      throw new Error(
+        `GitHub API returned ${response.status}: ${response.statusText}`,
+      );
+    }
+
+    const events: GitHubEvent[] = await response.json();
+    logger.fetch(apiUrl, response.status, duration);
 
     if (events.length === 0) {
       logger.debug("fetch", "No GitHub events found", { username });
