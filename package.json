@@ -45,6 +45,7 @@
 	"jest": {
 		"preset": "ts-jest/presets/default-esm",
 		"testEnvironment": "node",
+		"watchman": false,
 		"extensionsToTreatAsEsm": [
 			".ts"
 		],

@@ -4,18 +4,21 @@ import { Hono } from "hono";
 
 import { registerAllTools } from "./tools/index";
 import { registerAllResources } from "./resources/index";
+import { logger } from "./utils/logger";
 
 export class DuyetMCP extends McpAgent {
-	server = new McpServer({
-		name: "Duyet MCP Server",
-		version: "0.1.0",
-	});
+  server = new McpServer({
+    name: "Duyet MCP Server",
+    version: "0.1.0",
+  });
 
-	async init() {
-		// Register all MCP tools and resources - env should be available through this.env
-		registerAllTools(this.server, this.env as Env);
-		registerAllResources(this.server, this.env as Env);
-	}
+  async init() {
+    logger.info("init", "Initializing DuyetMCP server");
+    // Register all MCP tools and resources - env should be available through this.env
+    registerAllTools(this.server, this.env as Env);
+    registerAllResources(this.server, this.env as Env);
+    logger.info("init", "DuyetMCP server initialized successfully");
+  }
 }
 
 const app = new Hono<{ Bindings: Env }>();
@@ -47,16 +50,25 @@ app.mount("/sse", DuyetMCP.serveSSE("/sse").fetch, { replaceRequest: false });
 app.mount("/mcp", DuyetMCP.serve("/mcp").fetch, { replaceRequest: false });
 
 export default {
-	async fetch(request: Request, env: Env, ctx: ExecutionContext) {
-		try {
-			if (request.headers.get("Upgrade") === "websocket") {
-				const mcpApp = DuyetMCP.serve("/mcp");
-				return mcpApp.fetch(request, env, ctx);
-			}
-			return app.fetch(request, env, ctx);
-		} catch (error) {
-			console.error("Application Error:", error);
-			return new Response("Internal Server Error", { status: 500 });
-		}
-	},
+  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    const url = new URL(request.url);
+    logger.request(request.method, url.pathname, {
+      headers: Object.fromEntries(request.headers),
+    });
+
+    try {
+      if (request.headers.get("Upgrade") === "websocket") {
+        logger.debug("request", "WebSocket upgrade requested");
+        const mcpApp = DuyetMCP.serve("/mcp");
+        return mcpApp.fetch(request, env, ctx);
+      }
+      return app.fetch(request, env, ctx);
+    } catch (error) {
+      logger.error("request", "Application error", {
+        error: error instanceof Error ? error.message : String(error),
+        path: url.pathname,
+      });
+      return new Response("Internal Server Error", { status: 500 });
+    }
+  },
 };
