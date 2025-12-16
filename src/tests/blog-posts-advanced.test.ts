@@ -1,3 +1,4 @@
+import { describe, expect, test, beforeEach, mock, type Mock } from "bun:test";
 import { parseDocument } from "htmlparser2";
 import { getElementsByTagName } from "domutils";
 import {
@@ -8,16 +9,17 @@ import {
 } from "../core/blog";
 import { registerBlogPostsResource } from "../resources/blog-posts";
 
-global.fetch = jest.fn();
+// Mock fetch globally
+const mockFetch = mock(() => Promise.resolve({} as Response));
+globalThis.fetch = mockFetch as unknown as typeof fetch;
 
 const createMockServer = () =>
 	({
-		registerResource: jest.fn(),
-	}) as any;
+		registerResource: mock(() => undefined),
+	}) as unknown as { registerResource: Mock<(...args: unknown[]) => unknown> };
 
 beforeEach(() => {
-	jest.clearAllMocks();
-	(global.fetch as jest.Mock).mockClear();
+	mockFetch.mockClear();
 });
 
 describe("Blog Posts Advanced Coverage", () => {
@@ -25,14 +27,14 @@ describe("Blog Posts Advanced Coverage", () => {
 		test("should handle RSS with empty CDATA sections", () => {
 			const emptyRSS = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
-	<channel>
-		<item>
-			<title><![CDATA[]]></title>
-			<description><![CDATA[]]></description>
-			<link></link>
-			<pubDate></pubDate>
-		</item>
-	</channel>
+    <channel>
+        <item>
+            <title><![CDATA[]]></title>
+            <description><![CDATA[]]></description>
+            <link></link>
+            <pubDate></pubDate>
+        </item>
+    </channel>
 </rss>`;
 
 			const result = parseRSSContent(emptyRSS, 5);
@@ -43,16 +45,16 @@ describe("Blog Posts Advanced Coverage", () => {
 		test("should handle RSS with malformed XML", () => {
 			const malformedRSS = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
-	<channel>
-		<item>
-			<title>Test Title</title>
-			<description>Test Description</description>
-			<link>https://test.com</link>
-		</item>
-		<item>
-			<title><!--[CDATA[Comment Title]]--></title>
-		</item>
-	</channel>
+    <channel>
+        <item>
+            <title>Test Title</title>
+            <description>Test Description</description>
+            <link>https://test.com</link>
+        </item>
+        <item>
+            <title><!--[CDATA[Comment Title]]--></title>
+        </item>
+    </channel>
 </rss>`;
 
 			const result = parseRSSContent(malformedRSS, 5);
@@ -72,16 +74,16 @@ describe("Blog Posts Advanced Coverage", () => {
 		test("should handle posts with empty titles", () => {
 			const rssWithEmptyTitles = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
-	<channel>
-		<item>
-			<title></title>
-			<description>Description without title</description>
-		</item>
-		<item>
-			<title><![CDATA[Valid Title]]></title>
-			<description>Valid description</description>
-		</item>
-	</channel>
+    <channel>
+        <item>
+            <title></title>
+            <description>Description without title</description>
+        </item>
+        <item>
+            <title><![CDATA[Valid Title]]></title>
+            <description>Valid description</description>
+        </item>
+    </channel>
 </rss>`;
 
 			const result = parseRSSContent(rssWithEmptyTitles, 5);
@@ -95,23 +97,23 @@ describe("Blog Posts Advanced Coverage", () => {
 		test("should register blog posts resource", async () => {
 			const mockServer = createMockServer();
 
-			(global.fetch as jest.Mock).mockResolvedValue({
+			mockFetch.mockResolvedValue({
 				ok: true,
 				text: async () => `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
-	<channel>
-		<item>
-			<title><![CDATA[Test Post]]></title>
-			<description><![CDATA[Test Description]]></description>
-			<link>https://test.com</link>
-			<pubDate>Mon, 01 Jan 2024 00:00:00 GMT</pubDate>
-		</item>
-	</channel>
+    <channel>
+        <item>
+            <title><![CDATA[Test Post]]></title>
+            <description><![CDATA[Test Description]]></description>
+            <link>https://test.com</link>
+            <pubDate>Mon, 01 Jan 2024 00:00:00 GMT</pubDate>
+        </item>
+    </channel>
 </rss>`,
-			});
+			} as Response);
 
 			let resourceHandler: any;
-			(mockServer.registerResource as jest.Mock).mockImplementation(
+			mockServer.registerResource.mockImplementation(
 				(name, _template, _metadata, handler) => {
 					if (name === "blog-posts") {
 						resourceHandler = handler;
@@ -119,7 +121,7 @@ describe("Blog Posts Advanced Coverage", () => {
 				},
 			);
 
-			registerBlogPostsResource(mockServer);
+			registerBlogPostsResource(mockServer as any);
 			const result = await resourceHandler(new URL("duyet://blog/posts/1"), { limit: "1" });
 
 			expect(result.contents[0].text).toContain("Test Post");
@@ -128,10 +130,10 @@ describe("Blog Posts Advanced Coverage", () => {
 		test("should handle blog posts resource fetch errors", async () => {
 			const mockServer = createMockServer();
 
-			(global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
+			mockFetch.mockRejectedValue(new Error("Network error"));
 
 			let resourceHandler: any;
-			(mockServer.registerResource as jest.Mock).mockImplementation(
+			mockServer.registerResource.mockImplementation(
 				(name, _template, _metadata, handler) => {
 					if (name === "blog-posts") {
 						resourceHandler = handler;
@@ -139,7 +141,7 @@ describe("Blog Posts Advanced Coverage", () => {
 				},
 			);
 
-			registerBlogPostsResource(mockServer);
+			registerBlogPostsResource(mockServer as any);
 			const result = await resourceHandler(new URL("duyet://blog/posts/5"), { limit: "5" });
 
 			expect(result.contents[0].text).toContain("Error");
@@ -147,7 +149,7 @@ describe("Blog Posts Advanced Coverage", () => {
 
 		test("should register blog posts resource correctly", () => {
 			const mockServer = createMockServer();
-			registerBlogPostsResource(mockServer);
+			registerBlogPostsResource(mockServer as any);
 			expect(mockServer.registerResource).toHaveBeenCalledWith(
 				"blog-posts",
 				expect.any(Object),
@@ -161,8 +163,8 @@ describe("Blog Posts Advanced Coverage", () => {
 		test("should handle elements with no text content", () => {
 			const emptyElementXML = `<?xml version="1.0" encoding="UTF-8"?>
 <item>
-	<title></title>
-	<link></link>
+    <title></title>
+    <link></link>
 </item>`;
 
 			const doc = parseDocument(emptyElementXML);
@@ -175,9 +177,9 @@ describe("Blog Posts Advanced Coverage", () => {
 		test("should handle nested elements properly", () => {
 			const nestedXML = `<?xml version="1.0" encoding="UTF-8"?>
 <item>
-	<title>
-		<span>Nested Title</span>
-	</title>
+    <title>
+        <span>Nested Title</span>
+    </title>
 </item>`;
 
 			const doc = parseDocument(nestedXML);
