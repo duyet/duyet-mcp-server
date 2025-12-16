@@ -1,61 +1,42 @@
 /**
  * Simple resource coverage test to improve overall coverage above 90%
  */
-
-// Import individual resource functions to test them directly
+import { describe, expect, test, beforeEach, mock } from "bun:test";
 import { registerAboutDuyetResource } from "../resources/about-duyet";
+import { calculateYearsOfExperience, getAboutDuyetData } from "../core/about";
 
-// Mock fetch globally for external calls
-global.fetch = jest.fn();
+// Mock fetch globally
+const mockFetch = mock(() => Promise.resolve({} as Response));
+globalThis.fetch = mockFetch as unknown as typeof fetch;
 
-// Simple mock environment and server
-const _mockEnv = { DB: {} } as Env;
-const mockServer = {
-  registerResource: jest.fn(
-    (
-      name: string,
-      _uriOrTemplate: any,
-      _config: any,
-      handler: (...args: any[]) => any,
-    ) => {
-      // Store handler for testing
-      if (name === "about-duyet") {
-        // Test the handler directly to improve coverage
-        handler(new URL("duyet://about")).then((result: any) => {
-          expect(result.contents).toBeDefined();
-        });
-      }
-    },
-  ),
-} as any;
+// Simple mock server
+const createMockServer = () =>
+	({
+		registerResource: mock(() => undefined),
+	}) as any;
 
 describe("Resource Coverage Tests", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      text: async () => "<title>Test</title>",
-      json: async () => [{ type: "PushEvent" }],
-    });
-  });
+	beforeEach(() => {
+		mockFetch.mockClear();
+		mockFetch.mockResolvedValue({
+			ok: true,
+			text: async () => "<title>Test</title>",
+			json: async () => [{ type: "PushEvent" }],
+		} as Response);
+	});
 
-  test("should improve about-duyet resource coverage", () => {
-    registerAboutDuyetResource(mockServer);
-    expect(mockServer.registerResource).toHaveBeenCalled();
-  });
+	test("should improve about-duyet resource coverage", () => {
+		const mockServer = createMockServer();
+		registerAboutDuyetResource(mockServer);
+		expect(mockServer.registerResource).toHaveBeenCalled();
+	});
 
-  test("should call utility functions", () => {
-    // Import and use utility functions from core about module
-    const {
-      calculateYearsOfExperience,
-      getAboutDuyetData,
-    } = require("../core/about");
+	test("should call utility functions", () => {
+		const years = calculateYearsOfExperience();
+		expect(years).toBeGreaterThan(0);
 
-    const years = calculateYearsOfExperience();
-    expect(years).toBeGreaterThan(0);
-
-    const data = getAboutDuyetData();
-    expect(data.content).toContain("Duyet");
-    expect(data.yearsOfExperience).toBeGreaterThan(0);
-  });
+		const data = getAboutDuyetData();
+		expect(data.content).toContain("Duyet");
+		expect(data.yearsOfExperience).toBeGreaterThan(0);
+	});
 });

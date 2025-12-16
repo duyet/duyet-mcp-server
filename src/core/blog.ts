@@ -142,11 +142,7 @@ export async function getBlogPostsData(limit = 5): Promise<BlogPostsData> {
 	const limitNum = Math.min(Math.max(limit, 1), 20);
 	const cacheKey = `blog-posts-${limitNum}`;
 
-	return cacheOrFetch(
-		cacheKey,
-		CACHE_CONFIGS.BLOG,
-		() => fetchBlogPostsData(limitNum),
-	);
+	return cacheOrFetch(cacheKey, CACHE_CONFIGS.BLOG, () => fetchBlogPostsData(limitNum));
 }
 
 /**
@@ -327,9 +323,5 @@ export async function fetchBlogPostContent(url: string): Promise<{
 	// Use URL as cache key (normalized)
 	const cacheKey = `blog-post-${encodeURIComponent(url)}`;
 
-	return cacheOrFetch(
-		cacheKey,
-		CACHE_CONFIGS.BLOG,
-		() => fetchBlogPostContentInternal(url),
-	);
+	return cacheOrFetch(cacheKey, CACHE_CONFIGS.BLOG, () => fetchBlogPostContentInternal(url));
 }

@@ -10,27 +10,27 @@ import { registerGitHubActivityResource } from "./github-activity";
  * Register all MCP resources with the server
  */
 export function registerAllResources(server: McpServer, _env: Env) {
-  logger.info("init", "Registering MCP resources");
+	logger.info("init", "Registering MCP resources");
 
-  // Core information resources
-  registerAboutDuyetResource(server);
-  logger.resource("about-duyet", "registered");
-  registerCVResource(server);
-  logger.resource("cv", "registered");
+	// Core information resources
+	registerAboutDuyetResource(server);
+	logger.resource("about-duyet", "registered");
+	registerCVResource(server);
+	logger.resource("cv", "registered");
 
-  // Content resources
-  registerBlogPostsResource(server);
-  logger.resource("blog-posts", "registered");
-  registerGitHubActivityResource(server);
-  logger.resource("github-activity", "registered");
+	// Content resources
+	registerBlogPostsResource(server);
+	logger.resource("blog-posts", "registered");
+	registerGitHubActivityResource(server);
+	logger.resource("github-activity", "registered");
 
-  logger.info("init", "All MCP resources registered", { count: 4 });
+	logger.info("init", "All MCP resources registered", { count: 4 });
 }
 
 // Export individual resource registration functions for selective use
 export {
-  registerAboutDuyetResource,
-  registerCVResource,
-  registerBlogPostsResource,
-  registerGitHubActivityResource,
+	registerAboutDuyetResource,
+	registerCVResource,
+	registerBlogPostsResource,
+	registerGitHubActivityResource,
 };

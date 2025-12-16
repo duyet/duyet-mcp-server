@@ -3,7 +3,9 @@ import { z } from "zod";
 import { count, sql, gte } from "drizzle-orm";
 
 // Define schemas separately to avoid TypeScript inference issues with Zod version differences
-const reportTypeSchema = z.enum(["summary", "purpose_breakdown", "daily_trends", "recent_activity", "custom_period"]).default("summary") as any;
+const reportTypeSchema = z
+	.enum(["summary", "purpose_breakdown", "daily_trends", "recent_activity", "custom_period"])
+	.default("summary") as any;
 const dateFromSchema = z.string().optional() as any;
 const dateToSchema = z.string().optional() as any;
 
@@ -25,7 +27,9 @@ export function registerGetAnalyticsTool(server: McpServer, env: Env) {
 				"Generate analytics reports on contact submissions including summary statistics, purpose breakdown, daily trends, and recent activity patterns",
 			inputSchema: {
 				report_type: reportTypeSchema.describe("Type of analytics report to generate"),
-				date_from: dateFromSchema.describe("Start date for custom period (YYYY-MM-DD format)"),
+				date_from: dateFromSchema.describe(
+					"Start date for custom period (YYYY-MM-DD format)",
+				),
 				date_to: dateToSchema.describe("End date for custom period (YYYY-MM-DD format)"),
 			},
 		},
