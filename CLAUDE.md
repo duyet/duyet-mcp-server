@@ -13,8 +13,6 @@ With Duyet MCP server, you can:
 - Get Duyet's GitHub activity
 - Get Duyet's contact information
 - Send a message to Duyet (hiring, get in touch, etc.)
-- Search the web for current information
-- Fetch and extract content from URLs (with domain validation)
 
 ## Important documents:
 
@@ -51,7 +49,6 @@ With Duyet MCP server, you can:
 
 **Centralized Tool Registry** (`src/tools/index.ts`): All tools are registered through `registerAllTools()` function, organized by category:
 - **Content Tools**: `github_activity`, `get_blog_post_content`
-- **Web Tools**: `web-search`, `web-fetch`
 - **Interaction Tools**: `send_message`, `hire_me`, `say_hi`
 - **Management Tools**: `contact_analytics`
 
@@ -128,12 +125,6 @@ return cacheOrFetch(cacheKey, CACHE_CONFIGS.CV, () => fetchCVData(format, cvUrl)
 - **Fail-open policy**: If rate limit check fails, allow submission (availability over strict security)
 - **Clear feedback**: Users receive retry-after times in error messages
 
-**Web Fetch Security**:
-- **Domain whitelist**: Only `duyet.net`, `blog.duyet.net`, and Duyet's GitHub repositories
-- **GitHub restrictions**: Path-based validation (`github.com/duyet/*`, not `github.com/*`)
-- **Content-length checks**: Max 10MB downloads to prevent memory issues
-- **Protocol validation**: Only HTTP/HTTPS allowed
-
 **Database Security**:
 - **Parameterized queries**: All Drizzle ORM queries prevent SQL injection
 - **Error sanitization**: Never expose database errors to users
@@ -204,21 +195,7 @@ await db.run(`SELECT * FROM contacts WHERE id = ${userId}`);
 
 **Error Handling**: Always sanitize database errors before returning to users.
 
-### Web Tools
-
-**Web Search Tool** (`src/tools/web-search.ts`):
-- Uses DuckDuckGo HTML interface for web searches
-- Returns structured results with titles, URLs, and snippets
-- Configurable result limit (1-10 results)
-- No API key required
-
-**Web Fetch Tool** (`src/tools/web-fetch.ts`):
-- Fetches content from URLs with domain validation
-- Supports HTML (extracts text), JSON, and plain text
-- Default whitelist: `duyet.net`, `blog.duyet.net`, `github.com`, `raw.githubusercontent.com`
-- Optional `allow_any_domain` flag for unrestricted access
-- Automatic content truncation for large responses
-- Optional header inclusion for debugging
+### Blog Post Fetcher
 
 **Enhanced Blog Post Fetcher** (`src/core/blog.ts`):
 - `fetchBlogPostContent()` - Extracts article content, title, and metadata from blog posts

@@ -149,12 +149,11 @@ describe("Tool Registration Tests", () => {
   describe("Tool Registry", () => {
     test("should register all tools", () => {
       registerAllTools(mockServer, mockEnv);
-      // Should have called tool registration for all 8 tools
+      // Should have called tool registration for all 6 tools
       // Content: github_activity, get_blog_post_content
-      // Web: web-search, web-fetch
       // Interaction: send_message, hire_me, say_hi
       // Management: get_analytics
-      expect(mockServer.registerTool).toHaveBeenCalledTimes(8);
+      expect(mockServer.registerTool).toHaveBeenCalledTimes(6);
     });
   });
 });

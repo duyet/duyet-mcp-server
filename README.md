@@ -130,10 +130,6 @@ Tools provide interactive functionality with input parameters and side effects.
 - **`get_blog_post_content`** - Get the full content of a specific blog post by URL, including title, content, and metadata (author, publish date, tags)
 - **`get_github_activity`** - Retrieve Duyet's recent GitHub activity including commits, issues, pull requests, releases, and other public events. View up to 20 recent activities with optional detailed information
 
-### Web Tools
-- **`web-search`** - Search the web for information using DuckDuckGo. Returns titles, URLs, and snippets of search results (1-10 results)
-- **`web-fetch`** - Fetch content from a URL. Supports HTML (extracts text), JSON, and plain text. By default, only allows trusted domains (`duyet.net`, `blog.duyet.net`, `github.com`) for security
-
 ### Interaction Tools
 - **`send_message`** - Send a message to Duyet for collaboration, job opportunities, consulting, or general inquiries. Messages are saved with a reference ID for follow-up
 - **`hire_me`** - Get information about hiring Duyet for various roles - full-time, contract, consulting, or part-time positions. Includes expertise, experience, and next steps

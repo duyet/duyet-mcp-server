@@ -5,10 +5,6 @@ import { logger } from "../utils/logger";
 import { registerGitHubActivityTool } from "./github-activity";
 import { registerGetBlogPostContentTool } from "./blog-posts";
 
-// Web tools
-import { registerWebSearchTool } from "./web-search";
-import { registerWebFetchTool } from "./web-fetch";
-
 // Interaction tools
 import { registerSendMessageTool } from "./send-message";
 import { registerHireMeTool } from "./hire-me";
@@ -29,12 +25,6 @@ export function registerAllTools(server: McpServer, env: Env) {
   registerGetBlogPostContentTool(server);
   logger.tool("get_blog_post_content", "registered");
 
-  // Web tools
-  registerWebSearchTool(server);
-  logger.tool("web-search", "registered");
-  registerWebFetchTool(server);
-  logger.tool("web-fetch", "registered");
-
   // Interaction tools
   registerSendMessageTool(server, env);
   logger.tool("send_message", "registered");
@@ -47,7 +37,7 @@ export function registerAllTools(server: McpServer, env: Env) {
   registerGetAnalyticsTool(server, env);
   logger.tool("get_analytics", "registered");
 
-  logger.info("init", "All MCP tools registered", { count: 8 });
+  logger.info("init", "All MCP tools registered", { count: 6 });
 }
 
 // Export individual tool registration functions for selective use
@@ -55,9 +45,6 @@ export {
   // Content tools
   registerGitHubActivityTool,
   registerGetBlogPostContentTool,
-  // Web tools
-  registerWebSearchTool,
-  registerWebFetchTool,
   // Interaction tools
   registerSendMessageTool,
   registerHireMeTool,
