@@ -7,94 +7,91 @@ import { logger } from "../utils/logger.js";
  * Replaces @octokit/rest types for lightweight implementation
  */
 interface GitHubEvent {
-  id?: string;
-  type?: string;
-  created_at?: string;
-  repo?: {
-    name?: string;
-  };
-  payload?: {
-    action?: string;
-    ref_type?: string;
-    commits?: Array<{ message?: string }>;
-    issue?: { title?: string };
-    pull_request?: { title?: string };
-    release?: { tag_name?: string; name?: string };
-  };
+	id?: string;
+	type?: string;
+	created_at?: string;
+	repo?: {
+		name?: string;
+	};
+	payload?: {
+		action?: string;
+		ref_type?: string;
+		commits?: Array<{ message?: string }>;
+		issue?: { title?: string };
+		pull_request?: { title?: string };
+		release?: { tag_name?: string; name?: string };
+	};
 }
 
 /**
  * Format a single GitHub event into a structured activity item
  */
-export function formatGitHubEvent(
-  event: GitHubEvent,
-  includeDetails = false,
-): GitHubActivityItem {
-  const date = new Date(event.created_at || new Date()).toLocaleDateString();
-  const repository = event.repo?.name || "Unknown repository";
-  const payload = event.payload;
+export function formatGitHubEvent(event: GitHubEvent, includeDetails = false): GitHubActivityItem {
+	const date = new Date(event.created_at || new Date()).toLocaleDateString();
+	const repository = event.repo?.name || "Unknown repository";
+	const payload = event.payload;
 
-  let action = "";
-  let details = "";
+	let action = "";
+	let details = "";
 
-  switch (event.type) {
-    case "PushEvent": {
-      const commits = payload?.commits?.length || 0;
-      action = `Pushed ${commits} commit${commits > 1 ? "s" : ""}`;
-      if (includeDetails && payload?.commits) {
-        const commitMessages = payload.commits
-          .slice(0, 3)
-          .map((c) => `  - ${c.message}`)
-          .join("\n");
-        details = `\n${commitMessages}`;
-      }
-      break;
-    }
-    case "CreateEvent": {
-      const refType = payload?.ref_type || "repository";
-      action = `Created ${refType}`;
-      break;
-    }
-    case "IssuesEvent": {
-      const issueAction = payload?.action || "updated";
-      action = `${issueAction} issue`;
-      if (includeDetails && payload?.issue) {
-        details = `\n  - ${payload.issue.title}`;
-      }
-      break;
-    }
-    case "PullRequestEvent": {
-      const prAction = payload?.action || "updated";
-      action = `${prAction} pull request`;
-      if (includeDetails && payload?.pull_request) {
-        details = `\n  - ${payload.pull_request.title}`;
-      }
-      break;
-    }
-    case "WatchEvent":
-      action = "Starred repository";
-      break;
-    case "ForkEvent":
-      action = "Forked repository";
-      break;
-    case "ReleaseEvent": {
-      action = `${payload?.action || "created"} release`;
-      if (includeDetails && payload?.release) {
-        details = `\n  - ${payload.release.tag_name}: ${payload.release.name}`;
-      }
-      break;
-    }
-    default:
-      action = `${(event.type || "Unknown").replace("Event", "")}`;
-  }
+	switch (event.type) {
+		case "PushEvent": {
+			const commits = payload?.commits?.length || 0;
+			action = `Pushed ${commits} commit${commits > 1 ? "s" : ""}`;
+			if (includeDetails && payload?.commits) {
+				const commitMessages = payload.commits
+					.slice(0, 3)
+					.map((c) => `  - ${c.message}`)
+					.join("\n");
+				details = `\n${commitMessages}`;
+			}
+			break;
+		}
+		case "CreateEvent": {
+			const refType = payload?.ref_type || "repository";
+			action = `Created ${refType}`;
+			break;
+		}
+		case "IssuesEvent": {
+			const issueAction = payload?.action || "updated";
+			action = `${issueAction} issue`;
+			if (includeDetails && payload?.issue) {
+				details = `\n  - ${payload.issue.title}`;
+			}
+			break;
+		}
+		case "PullRequestEvent": {
+			const prAction = payload?.action || "updated";
+			action = `${prAction} pull request`;
+			if (includeDetails && payload?.pull_request) {
+				details = `\n  - ${payload.pull_request.title}`;
+			}
+			break;
+		}
+		case "WatchEvent":
+			action = "Starred repository";
+			break;
+		case "ForkEvent":
+			action = "Forked repository";
+			break;
+		case "ReleaseEvent": {
+			action = `${payload?.action || "created"} release`;
+			if (includeDetails && payload?.release) {
+				details = `\n  - ${payload.release.tag_name}: ${payload.release.name}`;
+			}
+			break;
+		}
+		default:
+			action = `${(event.type || "Unknown").replace("Event", "")}`;
+	}
 
-  return {
-    type: event.type || "Unknown",
-    action,
-    repository,
-    date,
-    details: details || undefined,
-  };
+	return {
+		type: event.type || "Unknown",
+		action,
+		repository,
+		date,
+		details: details || undefined,
+	};
 }
 
 /**
@@ -102,70 +99,65 @@ export function formatGitHubEvent(
  * Uses native fetch instead of @octokit/rest for lightweight implementation
  */
 async function fetchGitHubActivityData(
-  limit: number,
-  includeDetails: boolean,
+	limit: number,
+	includeDetails: boolean,
 ): Promise<GitHubActivityData> {
-  const username = "duyet";
-  const profileUrl = `https://github.com/${username}`;
-  const apiUrl = `https://api.github.com/users/${username}/events?per_page=${limit}`;
+	const username = "duyet";
+	const profileUrl = `https://github.com/${username}`;
+	const apiUrl = `https://api.github.com/users/${username}/events?per_page=${limit}`;
 
-  try {
-    const startTime = Date.now();
-    logger.debug("fetch", `Fetching GitHub activity for ${username}`, {
-      limit,
-      includeDetails,
-    });
+	try {
+		const startTime = Date.now();
+		logger.debug("fetch", `Fetching GitHub activity for ${username}`, {
+			limit,
+			includeDetails,
+		});
 
-    const response = await fetch(apiUrl, {
-      headers: {
-        Accept: "application/vnd.github.v3+json",
-        "User-Agent": "DuyetMCP/0.1 (+https://duyet.net)",
-      },
-    });
+		const response = await fetch(apiUrl, {
+			headers: {
+				Accept: "application/vnd.github.v3+json",
+				"User-Agent": "DuyetMCP/0.1 (+https://duyet.net)",
+			},
+		});
 
-    const duration = Date.now() - startTime;
+		const duration = Date.now() - startTime;
 
-    if (!response.ok) {
-      logger.fetch(apiUrl, response.status, duration);
-      throw new Error(
-        `GitHub API returned ${response.status}: ${response.statusText}`,
-      );
-    }
+		if (!response.ok) {
+			logger.fetch(apiUrl, response.status, duration);
+			throw new Error(`GitHub API returned ${response.status}: ${response.statusText}`);
+		}
 
-    const events: GitHubEvent[] = await response.json();
-    logger.fetch(apiUrl, response.status, duration);
+		const events: GitHubEvent[] = await response.json();
+		logger.fetch(apiUrl, response.status, duration);
 
-    if (events.length === 0) {
-      logger.debug("fetch", "No GitHub events found", { username });
-      return {
-        activities: [],
-        totalRetrieved: 0,
-        profileUrl,
-        username,
-      };
-    }
+		if (events.length === 0) {
+			logger.debug("fetch", "No GitHub events found", { username });
+			return {
+				activities: [],
+				totalRetrieved: 0,
+				profileUrl,
+				username,
+			};
+		}
 
-    const activities = events.map((event) =>
-      formatGitHubEvent(event, includeDetails),
-    );
+		const activities = events.map((event) => formatGitHubEvent(event, includeDetails));
 
-    logger.debug("fetch", `Retrieved ${activities.length} GitHub activities`, {
-      username,
-      count: activities.length,
-    });
+		logger.debug("fetch", `Retrieved ${activities.length} GitHub activities`, {
+			username,
+			count: activities.length,
+		});
 
-    return {
-      activities,
-      totalRetrieved: activities.length,
-      profileUrl,
-      username,
-    };
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    logger.error("fetch", `GitHub API error: ${errorMessage}`, { username });
-    throw new Error(`Error fetching GitHub activity: ${errorMessage}`);
-  }
+		return {
+			activities,
+			totalRetrieved: activities.length,
+			profileUrl,
+			username,
+		};
+	} catch (error) {
+		const errorMessage = error instanceof Error ? error.message : "Unknown error";
+		logger.error("fetch", `GitHub API error: ${errorMessage}`, { username });
+		throw new Error(`Error fetching GitHub activity: ${errorMessage}`);
+	}
 }
 
 /**
@@ -173,35 +165,33 @@ async function fetchGitHubActivityData(
  * This is the public API that should be used by tools/resources
  */
 export async function getGitHubActivityData(
-  limit = 5,
-  includeDetails = false,
+	limit = 5,
+	includeDetails = false,
 ): Promise<GitHubActivityData> {
-  const limitNum = Math.min(Math.max(limit, 1), 20);
-  const cacheKey = `github-activity-${limitNum}-${includeDetails}`;
+	const limitNum = Math.min(Math.max(limit, 1), 20);
+	const cacheKey = `github-activity-${limitNum}-${includeDetails}`;
 
-  return cacheOrFetch(cacheKey, CACHE_CONFIGS.GITHUB, () =>
-    fetchGitHubActivityData(limitNum, includeDetails),
-  );
+	return cacheOrFetch(cacheKey, CACHE_CONFIGS.GITHUB, () =>
+		fetchGitHubActivityData(limitNum, includeDetails),
+	);
 }
 
 /**
  * Format GitHub activity data for display
  */
-export function formatGitHubActivityForDisplay(
-  data: GitHubActivityData,
-): string {
-  if (data.activities.length === 0) {
-    return "No recent GitHub activity found.";
-  }
+export function formatGitHubActivityForDisplay(data: GitHubActivityData): string {
+	if (data.activities.length === 0) {
+		return "No recent GitHub activity found.";
+	}
 
-  const activityList = data.activities
-    .map(
-      (activity) =>
-        `${activity.action} in ${activity.repository} (${activity.date})${activity.details || ""}`,
-    )
-    .join("\n\n");
+	const activityList = data.activities
+		.map(
+			(activity) =>
+				`${activity.action} in ${activity.repository} (${activity.date})${activity.details || ""}`,
+		)
+		.join("\n\n");
 
-  return `Recent GitHub Activity for ${data.username}:
+	return `Recent GitHub Activity for ${data.username}:
 
 ${activityList}
 

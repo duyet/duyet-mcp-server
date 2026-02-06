@@ -20,16 +20,18 @@ With Duyet MCP server, you can:
 
 ## Development Commands
 
-- `npm run dev` - Start local development server with hot reloading
-- `npm run deploy` - Deploy to Cloudflare Workers
-- `npm run format` - Format code using Biome formatter
-- `npm run lint:fix` - Fix linting issues using Biome
-- `npm run type-check` - Run TypeScript type checking without emitting files
-- `npm run cf-typegen` - Generate Cloudflare Worker types
-- `npm test` - Run all tests
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Run tests with coverage report
-- `npm run all` - Run complete CI pipeline (lint, format, type-check, test with coverage, deploy)
+This project uses **Bun** as the JavaScript runtime and test runner.
+
+- `bun run dev` - Start local development server with hot reloading
+- `bun run deploy` - Deploy to Cloudflare Workers
+- `bun run format` - Format code using Biome formatter
+- `bun run lint:fix` - Fix linting issues using Biome
+- `bun run type-check` - Run TypeScript type checking without emitting files
+- `bun run cf-typegen` - Generate Cloudflare Worker types
+- `bun test` - Run all tests using Bun's built-in test runner
+- `bun test --watch` - Run tests in watch mode
+- `bun test --coverage` - Run tests with coverage report
+- `bun run all` - Run complete CI pipeline (lint, format, type-check, test with coverage, deploy)
 
 ## Architecture
 

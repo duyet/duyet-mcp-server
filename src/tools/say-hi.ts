@@ -15,7 +15,9 @@ export function registerSayHiTool(server: McpServer) {
 			description:
 				"Send a friendly greeting to Duyet with an optional personal message. Get contact information and connection links",
 			inputSchema: {
-				message: messageSchema.describe("Optional personal message to include with the greeting"),
+				message: messageSchema.describe(
+					"Optional personal message to include with the greeting",
+				),
 			},
 		},
 		async ({ message }) => {

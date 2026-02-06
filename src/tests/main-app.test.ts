@@ -1,32 +1,5 @@
-// Mock the agents library FIRST before any imports
-jest.mock("agents/mcp", () => ({
-	McpAgent: class MockMcpAgent {
-		server = {
-			tool: jest.fn(),
-			registerTool: jest.fn(),
-		};
-		env = {};
-		async init() {}
-		static serve = jest.fn().mockReturnValue({
-			fetch: jest.fn(),
-		});
-		static serveSSE = jest.fn().mockReturnValue({
-			fetch: jest.fn(),
-		});
-	},
-}));
-
-// Mock the github-activity resource to avoid ESM import issues
-jest.mock("../resources/github-activity", () => ({
-	registerGitHubActivityResource: jest.fn(),
-}));
-
+import { describe, expect, test } from "bun:test";
 import { DuyetMCP } from "../index";
-
-// Mock registerAllTools
-jest.mock("../tools/index", () => ({
-	registerAllTools: jest.fn(),
-}));
 
 describe("Main Application Tests", () => {
 	describe("DuyetMCP Class", () => {

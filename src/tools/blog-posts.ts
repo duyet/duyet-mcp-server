@@ -51,7 +51,8 @@ export function registerGetBlogPostContentTool(server: McpServer) {
 							text: JSON.stringify(
 								{
 									error: "Failed to retrieve blog post content",
-									message: error instanceof Error ? error.message : "Unknown error",
+									message:
+										error instanceof Error ? error.message : "Unknown error",
 								},
 								null,
 								2,

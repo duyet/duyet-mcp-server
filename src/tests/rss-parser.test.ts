@@ -1,4 +1,4 @@
-// Jest globals are available without import in Jest environment
+import { describe, expect, it } from "bun:test";
 import { parseDocument } from "htmlparser2";
 import { getElementsByTagName } from "domutils";
 import {

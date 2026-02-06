@@ -11,11 +11,11 @@
 		"start": "wrangler dev",
 		"cf-typegen": "wrangler types",
 		"type-check": "tsc --noEmit",
-		"test": "jest",
-		"test:watch": "jest --watch",
-		"test:coverage": "env JEST_JUNIT_CLASSNAME=\"{filepath}\" jest --coverage",
-		"pre-commit": "npm run type-check && npm run test && npm run lint",
-		"all": "npm run lint:fix && npm run lint && npm run type-check && npm run test:coverage && npm run deploy",
+		"test": "bun test",
+		"test:watch": "bun test --watch",
+		"test:coverage": "bun test --coverage",
+		"pre-commit": "bun run type-check && bun test && bun run lint",
+		"all": "bun run lint:fix && bun run lint && bun run type-check && bun test --coverage && bun run deploy",
 		"prepare": "husky"
 	},
 	"dependencies": {
@@ -29,72 +29,12 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.6",
-		"@types/jest": "^30.0.0",
-		"@types/node": "^24.0.4",
+		"@types/bun": "^1.2.6",
 		"dotenv": "^17.0.0",
 		"drizzle-kit": "^0.31.4",
 		"husky": "^9.1.7",
-		"jest": "^30.0.0",
-		"jest-junit": "^16.0.0",
-		"ts-jest": "^29.1.2",
 		"typescript": "^5.8.3",
 		"wrangler": "^4.22.0"
 	},
-	"type": "module",
-	"jest": {
-		"preset": "ts-jest/presets/default-esm",
-		"testEnvironment": "node",
-		"watchman": false,
-		"extensionsToTreatAsEsm": [
-			".ts"
-		],
-		"moduleNameMapper": {
-			"^(\\.{1,2}/.*)\\.js$": "$1"
-		},
-		"transform": {
-			"^.+\\.tsx?$": [
-				"ts-jest",
-				{
-					"useESM": true
-				}
-			]
-		},
-		"roots": [
-			"<rootDir>/src"
-		],
-		"testMatch": [
-			"**/__tests__/**/*.ts",
-			"**/?(*.)+(spec|test).ts"
-		],
-		"modulePathIgnorePatterns": [
-			"<rootDir>/src/index.ts",
-			"<rootDir>/worker-configuration.d.ts"
-		],
-		"collectCoverageFrom": [
-			"src/**/*.ts",
-			"!src/**/*.d.ts",
-			"!src/tests/**/*",
-			"!src/**/*.test.ts",
-			"!src/**/*.spec.ts",
-			"!src/index.ts"
-		],
-		"coverageReporters": [
-			"text",
-			"lcov",
-			"html",
-			"json-summary"
-		],
-		"reporters": [
-			"default",
-			"jest-junit"
-		],
-		"coverageThreshold": {
-			"global": {
-				"branches": 15,
-				"functions": 18,
-				"lines": 20,
-				"statements": 20
-			}
-		}
-	}
+	"type": "module"
 }

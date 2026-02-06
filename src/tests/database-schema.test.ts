@@ -1,7 +1,7 @@
 /**
  * Database schema validation tests
  */
-
+import { describe, expect, it } from "bun:test";
 import type { ContactPurpose, CreateContactInput } from "../database/types";
 
 describe("Database Schema Validation", () => {

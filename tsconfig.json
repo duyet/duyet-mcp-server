@@ -16,7 +16,7 @@
 		"skipLibCheck": true,
 		"allowImportingTsExtensions": true,
 		"allowArbitraryExtensions": true,
-		"types": ["./worker-configuration.d.ts", "node", "jest"]
+		"types": ["./worker-configuration.d.ts", "bun-types"]
 	},
 	"include": ["worker-configuration.d.ts", "src/**/*.ts"]
 }

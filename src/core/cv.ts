@@ -102,9 +102,5 @@ export async function getCVData(format: CVFormat = "summary"): Promise<CVData> {
 	const cvUrl = "https://duyet.net/cv";
 	const cacheKey = `cv-${format}`;
 
-	return cacheOrFetch(
-		cacheKey,
-		CACHE_CONFIGS.CV,
-		() => fetchCVData(format, cvUrl),
-	);
+	return cacheOrFetch(cacheKey, CACHE_CONFIGS.CV, () => fetchCVData(format, cvUrl));
 }
