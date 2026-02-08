@@ -36,16 +36,16 @@ describe("Index Functions Coverage", () => {
 	describe("Resources Index", () => {
 		test("should call registerAllResources and invoke all resource registrations", () => {
 			registerAllResources(mockServer as any, mockEnv);
-			// Should register 4 resources: about-duyet, cv, blog-posts, github-activity
-			expect(mockServer.registerResource).toHaveBeenCalledTimes(4);
+			// Should register 5 resources: about-duyet, cv, blog-posts, github-activity, llms-txt
+			expect(mockServer.registerResource).toHaveBeenCalledTimes(5);
 		});
 	});
 
 	describe("Tools Index", () => {
 		test("should call registerAllTools and invoke all tool registrations", () => {
 			registerAllTools(mockServer as any, mockEnv);
-			// Should register 8 tools
-			expect(mockServer.registerTool).toHaveBeenCalledTimes(8);
+			// Should register 6 tools: github_activity, get_blog_post_content, send_message, hire_me, say_hi, get_analytics
+			expect(mockServer.registerTool).toHaveBeenCalledTimes(6);
 		});
 	});
 });

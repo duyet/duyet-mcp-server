@@ -325,3 +325,36 @@ export async function fetchBlogPostContent(url: string): Promise<{
 
 	return cacheOrFetch(cacheKey, CACHE_CONFIGS.BLOG, () => fetchBlogPostContentInternal(url));
 }
+
+/**
+ * Fetch llms.txt content (internal, not cached)
+ * llms.txt is a comprehensive markdown index of all blog posts for LLM consumption
+ */
+async function fetchLlmsTxtInternal(): Promise<string> {
+	const llmsTxtUrl = "https://blog.duyet.net/llms.txt";
+
+	const response = await fetch(llmsTxtUrl);
+	if (!response.ok) {
+		throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+	}
+
+	return await response.text();
+}
+
+/**
+ * Fetch llms.txt content with caching (30 minutes TTL)
+ * This is the public API that should be used by tools/resources
+ */
+export async function fetchLlmsTxt(): Promise<string> {
+	const cacheKey = "llms-txt";
+	return cacheOrFetch(cacheKey, CACHE_CONFIGS.BLOG, () => fetchLlmsTxtInternal());
+}
+
+/**
+ * Convert .html blog post URL to .md URL for markdown content access
+ * @param url - The .html URL to convert
+ * @returns The .md URL
+ */
+export function convertToMarkdownUrl(url: string): string {
+	return url.replace(/\.html$/, ".md");
+}

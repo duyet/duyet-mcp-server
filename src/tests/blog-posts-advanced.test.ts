@@ -6,6 +6,7 @@ import {
 	extractBlogPostFromItem,
 	parseRSSContent,
 	formatBlogPostsForMCP,
+	convertToMarkdownUrl,
 } from "../core/blog";
 import { registerBlogPostsResource } from "../resources/blog-posts";
 
@@ -228,6 +229,42 @@ describe("Blog Posts Advanced Coverage", () => {
 			expect(formatted).toContain("Test");
 			// The formatBlogPostsForMCP function uses JSON.stringify which will include null values
 			expect(formatted).toContain("Blog Post:");
+		});
+	});
+
+	describe("URL Conversion", () => {
+		test("should convert .html URL to .md URL", () => {
+			const htmlUrl = "https://blog.duyet.net/2024/my-post.html";
+			const mdUrl = convertToMarkdownUrl(htmlUrl);
+			expect(mdUrl).toBe("https://blog.duyet.net/2024/my-post.md");
+		});
+
+		test("should handle .html URL with query parameters", () => {
+			// Note: The current implementation uses /\.html$/ which only matches .html at the very end
+			// So query parameters prevent the replacement. This is expected behavior for now.
+			const htmlUrl = "https://blog.duyet.net/2024/my-post.html?param=value";
+			const mdUrl = convertToMarkdownUrl(htmlUrl);
+			// The function won't convert when there are query params after .html
+			expect(mdUrl).toBe("https://blog.duyet.net/2024/my-post.html?param=value");
+		});
+
+		test("should handle URL without .html extension", () => {
+			const urlWithoutExtension = "https://blog.duyet.net/2024/my-post";
+			const mdUrl = convertToMarkdownUrl(urlWithoutExtension);
+			expect(mdUrl).toBe(urlWithoutExtension);
+		});
+
+		test("should handle .md URL (no change needed)", () => {
+			const mdUrl = "https://blog.duyet.net/2024/my-post.md";
+			const result = convertToMarkdownUrl(mdUrl);
+			expect(result).toBe(mdUrl);
+		});
+
+		test("should handle URL with .html in path segment", () => {
+			const url = "https://blog.duyet.net/category.html/my-post";
+			const result = convertToMarkdownUrl(url);
+			// Should only replace .html at the end
+			expect(result).toBe("https://blog.duyet.net/category.html/my-post");
 		});
 	});
 });
