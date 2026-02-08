@@ -23,23 +23,71 @@ export class DuyetMCP extends McpAgent {
 
 const app = new Hono<{ Bindings: Env }>();
 
-const LLMS_TXT = `Duyet MCP Server. See https://github.com/duyet/duyet-mcp-server for more details.
+const LLMS_TXT = `# Duyet MCP Server
 
-Usage: Update your AI assistant configuration to point to the URL of Duyet MCP server
+Model Context Protocol (MCP) server that provides AI assistants with access to information about Duyet's work, projects, and blog content.
 
-\`\`\`
+Repository: https://github.com/duyet/duyet-mcp-server
+Deployed: https://duyet-mcp-server.duyet.workers.dev
+
+## Connection
+
+Update your AI assistant (e.g., Claude Desktop) configuration:
+
+\`\`\`json
 {
   "mcpServers": {
     "duyet-mcp-server": {
       "command": "npx",
-      "args": [
-        "mcp-remote",
-        "https://mcp.duyet.net/sse"
-      ]
+      "args": ["mcp-remote", "https://mcp.duyet.net/sse"]
     }
   }
 }
 \`\`\`
+
+## MCP Resources (5)
+
+Resources provide read-only data access. Automatically discoverable by MCP clients.
+
+| Resource URI | Description |
+|--------------|-------------|
+| \`duyet://about\` | Profile information about Duyet Le - Senior Data Engineer |
+| \`duyet://cv/{format}\` | CV/Resume with format options: summary, detailed, json |
+| \`duyet://blog/posts/{limit}\` | Latest blog posts (1-10, default: 5) |
+| \`duyet://github-activity\` | Recent GitHub activity (commits, PRs, issues) |
+| \`duyet://blog/llms.txt\` | Comprehensive index of 296+ blog posts for LLM consumption |
+
+## MCP Tools (6)
+
+Tools are callable functions that perform actions or retrieve dynamic data.
+
+| Tool Name | Description |
+|-----------|-------------|
+| \`github_activity\` | Get recent GitHub activity including commits, issues, PRs, releases |
+| \`get_blog_post_content\` | Fetch full article content from a blog post URL |
+| \`send_message\` | Send a message to Duyet (collaboration, job opportunities) |
+| \`hire_me\` | Get information about hiring Duyet (full-time, contract, consulting) |
+| \`say_hi\` | Send a friendly greeting to Duyet |
+| \`get_analytics\` | Get contact submission analytics and reports |
+
+## Blog Content
+
+Access 296+ technical articles covering:
+- Data Engineering (Apache Spark, ClickHouse, Airflow, DuckDB)
+- Cloud Computing (AWS, GCP, Azure, Kubernetes)
+- Programming (Rust, Python, JavaScript/TypeScript)
+- Machine Learning & AI
+- Software Engineering Best Practices
+
+Blog: https://blog.duyet.net
+llms.txt: https://blog.duyet.net/llms.txt
+
+## Contact
+
+- Email: me@duyet.net
+- GitHub: https://github.com/duyet
+- LinkedIn: https://linkedin.com/in/duyet
+- Website: https://duyet.net
   `;
 
 app.get("/", (c) => c.redirect("/llms.txt"));
