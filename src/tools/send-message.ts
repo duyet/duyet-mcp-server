@@ -4,16 +4,12 @@ import { z } from "zod";
 import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
 import { checkRateLimit } from "../utils/rate-limit";
+import { logger } from "../utils/logger";
 
-// Define schemas separately to avoid TypeScript inference issues with Zod version differences
-const messageSchema = z.string().min(10).max(500) as any;
-const contactEmailSchema = z.string().email().optional() as any;
-const purposeSchema = z.enum([
-	"collaboration",
-	"job_opportunity",
-	"consulting",
-	"general_inquiry",
-]) as any;
+// Define schemas for tool parameters
+const messageSchema = z.string().min(10).max(500);
+const contactEmailSchema = z.string().email().optional();
+const purposeSchema = z.enum(["collaboration", "job_opportunity", "consulting", "general_inquiry"]);
 
 /**
  * Register the send_message MCP tool with D1 database integration
@@ -68,8 +64,11 @@ Alternative: Email me directly at me@duyet.net`,
 					userAgent: user_agent,
 					referenceId,
 				});
-			} catch (_e: any) {
+			} catch (error) {
 				// Log error securely without exposing details
+				logger.error("database", "Failed to save send_message", {
+					error: error instanceof Error ? error.message : String(error),
+				});
 				return {
 					content: [
 						{

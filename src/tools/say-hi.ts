@@ -1,8 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-// Define schema separately to avoid TypeScript inference issues with Zod version differences
-const messageSchema = z.string().optional() as any;
+// Define schema for tool parameter
+const messageSchema = z.string().optional();
 
 /**
  * Register the say-hi MCP tool for greeting Duyet

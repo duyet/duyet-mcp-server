@@ -4,15 +4,16 @@ import { z } from "zod";
 import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
 import { checkRateLimit } from "../utils/rate-limit";
+import { logger } from "../utils/logger";
 
-// Define schemas separately to avoid TypeScript inference issues with Zod version differences
-const roleTypeSchema = z
-	.enum(["full_time", "contract", "consulting", "part_time"])
-	.optional() as any;
-const techStackSchema = z.string().optional() as any;
-const companySizeSchema = z.enum(["startup", "scale_up", "enterprise", "agency"]).optional() as any;
-const contactEmailSchema = z.string().email().optional() as any;
-const additionalNotesSchema = z.string().max(500).optional() as any;
+const HIRE_YEAR = 2017;
+
+// Define schemas for tool parameters
+const roleTypeSchema = z.enum(["full_time", "contract", "consulting", "part_time"]).optional();
+const techStackSchema = z.string().optional();
+const companySizeSchema = z.enum(["startup", "scale_up", "enterprise", "agency"]).optional();
+const contactEmailSchema = z.string().email().optional();
+const additionalNotesSchema = z.string().max(500).optional();
 
 /**
  * Register the hire_me MCP tool with D1 database integration
@@ -59,7 +60,7 @@ Alternative: Email me directly at me@duyet.net with your hiring inquiry.`,
 			}
 
 			const currentYear = new Date().getFullYear();
-			const experience = currentYear - 2017;
+			const experience = currentYear - HIRE_YEAR;
 
 			let roleSpecificInfo = "";
 
@@ -159,8 +160,11 @@ Alternative: Email me directly at me@duyet.net with your hiring inquiry.`,
 						userAgent: user_agent,
 						referenceId,
 					});
-				} catch (_e: any) {
-					// Continue execution even if DB save fails, but don't expose the reference ID
+				} catch (error) {
+					// Log error securely without exposing details
+					logger.error("database", "Failed to save hire_me inquiry", {
+						error: error instanceof Error ? error.message : String(error),
+					});
 					referenceId = undefined;
 				}
 			}

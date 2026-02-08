@@ -1,7 +1,7 @@
 /**
  * Database operations unit tests
  */
-import { describe, expect, test, beforeEach, mock } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { getDb } from "../database";
 import { contacts } from "../database/schema";
 

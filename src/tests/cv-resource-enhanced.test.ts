@@ -166,7 +166,7 @@ describe("CV Resource Enhanced Tests", () => {
 			string,
 			unknown,
 			{ title: string; description: string; mimeType: string },
-			Function,
+			(...args: unknown[]) => unknown,
 		];
 		const [name, template, metadata, handler] = registerCall;
 
