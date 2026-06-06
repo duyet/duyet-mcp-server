@@ -3,7 +3,10 @@
  *
  * Provides structured logging with levels and categories.
  * All debug logs can be enabled/disabled via environment.
+ * Optionally forwards logs to connected MCP clients via sendLoggingMessage.
  */
+
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 export type LogCategory =
@@ -15,6 +18,14 @@ export type LogCategory =
 	| "fetch"
 	| "database"
 	| "auth";
+
+/** Maps our log levels to MCP logging levels */
+const MCP_LEVEL_MAP: Record<LogLevel, "debug" | "info" | "warning" | "error"> = {
+	debug: "debug",
+	info: "info",
+	warn: "warning",
+	error: "error",
+};
 
 interface LogEntry {
 	timestamp: string;
@@ -30,6 +41,7 @@ interface LogEntry {
 class Logger {
 	private enabled = true;
 	private minLevel: LogLevel = "debug";
+	private mcpServer: McpServer | null = null;
 
 	private levelPriority: Record<LogLevel, number> = {
 		debug: 0,
@@ -37,6 +49,14 @@ class Logger {
 		warn: 2,
 		error: 3,
 	};
+
+	/**
+	 * Attach an MCP server instance to forward logs to connected clients.
+	 * Only info/warn/error levels are forwarded to avoid flooding the client.
+	 */
+	setMcpServer(server: McpServer): void {
+		this.mcpServer = server;
+	}
 
 	/**
 	 * Check if logging should occur for given level
@@ -52,6 +72,24 @@ class Logger {
 	private formatLog(entry: LogEntry): string {
 		const dataStr = entry.data ? ` ${JSON.stringify(entry.data)}` : "";
 		return `[${entry.timestamp}] [${entry.level.toUpperCase()}] [${entry.category}] ${entry.message}${dataStr}`;
+	}
+
+	/**
+	 * Forward a log message to connected MCP clients.
+	 * Only forwards info+ levels. Silently ignores failures.
+	 */
+	private sendToMcpClient(level: LogLevel, category: LogCategory, message: string): void {
+		if (!this.mcpServer || this.levelPriority[level] < this.levelPriority.info) return;
+
+		this.mcpServer
+			.sendLoggingMessage({
+				level: MCP_LEVEL_MAP[level],
+				logger: `duyet-mcp/${category}`,
+				data: message,
+			})
+			.catch(() => {
+				// Silent failure — client may not support logging
+			});
 	}
 
 	/**
@@ -85,6 +123,8 @@ class Logger {
 			default:
 				console.log(formatted);
 		}
+
+		this.sendToMcpClient(level, category, message);
 	}
 
 	// Convenience methods for different levels
