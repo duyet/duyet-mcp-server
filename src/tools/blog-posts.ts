@@ -2,9 +2,6 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { fetchBlogPostContent } from "../core/blog.js";
 
-// Define schema for URL validation
-const urlSchema = z.string().url() as any;
-
 /**
  * Register the get blog post content tool
  */
@@ -15,10 +12,19 @@ export function registerGetBlogPostContentTool(server: McpServer) {
 			title: "Get Blog Post Content",
 			description:
 				"Get the full content of a specific blog post by URL. Extracts article text, title, and metadata (author, publish date, tags) from blog.duyet.net or duyet.net posts.",
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false,
+				idempotentHint: true,
+				openWorldHint: true,
+			},
 			inputSchema: {
-				url: urlSchema.describe(
-					"The URL of the blog post to retrieve content from (blog.duyet.net or duyet.net)",
-				),
+				url: z
+					.string()
+					.url()
+					.describe(
+						"The URL of the blog post to retrieve content from (blog.duyet.net or duyet.net)",
+					),
 			},
 		},
 		async ({ url }) => {

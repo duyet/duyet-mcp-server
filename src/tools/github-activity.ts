@@ -2,10 +2,6 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getGitHubActivityData, formatGitHubActivityForDisplay } from "../core/github.js";
 
-// Define schemas separately to avoid TypeScript inference issues with Zod version differences
-const limitSchema = z.number().min(1).max(20).optional().default(5) as any;
-const includeDetailsSchema = z.boolean().optional().default(false) as any;
-
 /**
  * Register the GitHub activity tool
  */
@@ -16,13 +12,39 @@ export function registerGitHubActivityTool(server: McpServer) {
 			title: "GitHub Activity",
 			description:
 				"Get Duyet's recent GitHub activity including commits, issues, pull requests, releases, and other public events",
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false,
+				idempotentHint: true,
+				openWorldHint: true,
+			},
 			inputSchema: {
-				limit: limitSchema.describe(
-					"Number of recent activities to retrieve (1-20, default: 5)",
+				limit: z
+					.number()
+					.min(1)
+					.max(20)
+					.optional()
+					.default(5)
+					.describe("Number of recent activities to retrieve (1-20, default: 5)"),
+				include_details: z
+					.boolean()
+					.optional()
+					.default(false)
+					.describe("Include detailed information like commit messages and issue titles"),
+			},
+			outputSchema: {
+				activities: z.array(
+					z.object({
+						type: z.string(),
+						action: z.string(),
+						repository: z.string(),
+						date: z.string(),
+						details: z.string().optional(),
+					}),
 				),
-				include_details: includeDetailsSchema.describe(
-					"Include detailed information like commit messages and issue titles",
-				),
+				totalRetrieved: z.number(),
+				profileUrl: z.string(),
+				username: z.string(),
 			},
 		},
 		async ({ limit = 5, include_details = false }) => {
@@ -31,9 +53,15 @@ export function registerGitHubActivityTool(server: McpServer) {
 				const formattedContent = formatGitHubActivityForDisplay(data);
 
 				return {
+					structuredContent: {
+						activities: data.activities,
+						totalRetrieved: data.totalRetrieved,
+						profileUrl: data.profileUrl,
+						username: data.username,
+					},
 					content: [
 						{
-							type: "text",
+							type: "text" as const,
 							text: formattedContent,
 						},
 					],
@@ -49,7 +77,7 @@ GitHub Profile: https://github.com/duyet`;
 				return {
 					content: [
 						{
-							type: "text",
+							type: "text" as const,
 							text: errorContent,
 						},
 					],
