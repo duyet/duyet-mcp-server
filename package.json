@@ -1,6 +1,6 @@
 {
 	"name": "duyet-mcp-server",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"private": true,
 	"scripts": {
 		"deploy": "wrangler deploy",
@@ -22,7 +22,7 @@
 		"@modelcontextprotocol/sdk": "^1.13.0",
 		"agents": "0.3.10",
 		"domutils": "^3.2.2",
-		"drizzle-orm": "^0.44.2",
+		"drizzle-orm": "^0.45.2",
 		"hono": "^4.8.3",
 		"htmlparser2": "^10.0.0",
 		"zod": "^3.25.67"

@@ -23,6 +23,12 @@ export function registerSendMessageTool(server: McpServer, env: Env) {
 			title: "Send Message to Duyet",
 			description:
 				"Send a message to Duyet for collaboration, job opportunities, consulting, or general inquiries. Messages are saved with a reference ID for follow-up",
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: false,
+				openWorldHint: false,
+			},
 			inputSchema: {
 				message: messageSchema.describe("Message to send to Duyet (10-500 characters)"),
 				contact_email: contactEmailSchema.describe("Optional: Your email for response"),

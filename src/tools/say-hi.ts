@@ -14,6 +14,12 @@ export function registerSayHiTool(server: McpServer) {
 			title: "Say Hi",
 			description:
 				"Send a friendly greeting to Duyet with an optional personal message. Get contact information and connection links",
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false,
+				idempotentHint: true,
+				openWorldHint: false,
+			},
 			inputSchema: {
 				message: messageSchema.describe(
 					"Optional personal message to include with the greeting",
