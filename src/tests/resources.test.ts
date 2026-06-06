@@ -51,13 +51,19 @@ describe("Resource Registration Coverage Tests", () => {
 
 	test("should register all resources and call them", () => {
 		registerAllResources(mockServer as any, mockEnv);
-		// Should have called resource registration for 4 resources
-		expect(mockServer.registerResource).toHaveBeenCalledTimes(4);
+		// Should have called resource registration for 5 resources
+		expect(mockServer.registerResource).toHaveBeenCalledTimes(5);
 
 		// Verify all resource types were registered
 		const registeredNames = mockServer.registerResource.mock.calls.map((call) => call[0]);
 		expect(registeredNames).toEqual(
-			expect.arrayContaining(["about-duyet", "cv", "blog-posts", "github-activity"]),
+			expect.arrayContaining([
+				"about-duyet",
+				"cv",
+				"blog-posts",
+				"github-activity",
+				"llms-txt",
+			]),
 		);
 	});
 });

@@ -4,19 +4,23 @@ import { Hono } from "hono";
 
 import { registerAllTools } from "./tools/index";
 import { registerAllResources } from "./resources/index";
+import { registerAllPrompts } from "./prompts/index";
 import { logger } from "./utils/logger";
 
 export class DuyetMCP extends McpAgent {
 	server = new McpServer({
 		name: "Duyet MCP Server",
-		version: "0.1.0",
+		version: "0.2.0",
 	});
 
 	async init() {
 		logger.info("init", "Initializing DuyetMCP server");
-		// Register all MCP tools and resources - env should be available through this.env
+		logger.setMcpServer(this.server);
+
+		// Register all MCP tools, resources, and prompts
 		registerAllTools(this.server, this.env as Env);
 		registerAllResources(this.server, this.env as Env);
+		registerAllPrompts(this.server);
 		logger.info("init", "DuyetMCP server initialized successfully");
 	}
 }
@@ -32,7 +36,20 @@ Deployed: https://duyet-mcp-server.duyet.workers.dev
 
 ## Connection
 
-Update your AI assistant (e.g., Claude Desktop) configuration:
+Streamable HTTP (recommended):
+
+\`\`\`json
+{
+  "mcpServers": {
+    "duyet-mcp-server": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://mcp.duyet.net/mcp"]
+    }
+  }
+}
+\`\`\`
+
+SSE (legacy):
 
 \`\`\`json
 {
@@ -59,16 +76,26 @@ Resources provide read-only data access. Automatically discoverable by MCP clien
 
 ## MCP Tools (6)
 
-Tools are callable functions that perform actions or retrieve dynamic data.
+Tools are callable functions that perform actions or retrieve dynamic data. All tools include annotations (readOnlyHint, destructiveHint, idempotentHint, openWorldHint).
 
 | Tool Name | Description |
 |-----------|-------------|
-| \`github_activity\` | Get recent GitHub activity including commits, issues, PRs, releases |
+| \`github_activity\` | Get recent GitHub activity including commits, issues, PRs, releases (structured output) |
 | \`get_blog_post_content\` | Fetch full article content from a blog post URL |
 | \`send_message\` | Send a message to Duyet (collaboration, job opportunities) |
 | \`hire_me\` | Get information about hiring Duyet (full-time, contract, consulting) |
 | \`say_hi\` | Send a friendly greeting to Duyet |
 | \`get_analytics\` | Get contact submission analytics and reports |
+
+## MCP Prompts (3)
+
+Prompts are pre-built templates that clients can surface in their UI.
+
+| Prompt Name | Description |
+|-------------|-------------|
+| \`introduce-duyet\` | Generate an introduction using profile and CV resources |
+| \`review-blog\` | Fetch and summarize a blog post (arg: url) |
+| \`hiring-inquiry\` | Tailored hiring information (args: role_type, tech_stack) |
 
 ## Blog Content
 

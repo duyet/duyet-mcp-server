@@ -26,6 +26,12 @@ export function registerHireMeTool(server: McpServer, env: Env) {
 			title: "Hire Me",
 			description:
 				"Get information about hiring Duyet for various roles - full-time, contract, consulting, or part-time positions. Includes expertise, experience, and next steps",
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: false,
+				openWorldHint: false,
+			},
 			inputSchema: {
 				role_type: roleTypeSchema.describe("Type of engagement you're interested in"),
 				tech_stack: techStackSchema.describe("Technologies/tools your project uses"),
