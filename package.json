@@ -19,7 +19,7 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"@modelcontextprotocol/sdk": "1.25.2",
+		"@modelcontextprotocol/sdk": "1.26.0",
 		"agents": "0.3.10",
 		"domutils": "^4.0.0",
 		"drizzle-orm": "^0.45.2",
