@@ -40,7 +40,9 @@ interface LogEntry {
  */
 class Logger {
 	private enabled = true;
-	private minLevel: LogLevel = "debug";
+	// Default to "info": with Workers observability enabled, every console line
+	// is a billable log event, and debug logs fire on every request.
+	private minLevel: LogLevel = "info";
 	private mcpServer: McpServer | null = null;
 
 	private levelPriority: Record<LogLevel, number> = {

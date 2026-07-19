@@ -144,59 +144,27 @@ Here are examples of natural conversation flows using this MCP server:
 
 ### Learning About Duyet
 
-```
-User: Who is Duyet and what does he do?
-
-Claude: [Automatically accesses duyet://about resource]
-Duyet is a Data Engineer with 8 years of experience. He is confident in his knowledge of Data Engineering concepts, best practices and state-of-the-art data and Cloud technologies. You can check out his blog at https://blog.duyet.net, his CV at https://duyet.net/cv, and his projects at https://github.com/duyet.
-
-User: What has he been writing about lately?
-
-Claude: [Automatically accesses duyet://blog/posts/3 resource]  
-His latest blog posts include topics on data engineering, cloud technologies, and distributed systems. Would you like me to show you more details about any specific post?
-
-User: What's he working on currently?
-
-Claude: [Automatically accesses duyet://github-activity resource]
-Based on his recent GitHub activity, Duyet has been working on MCP server implementations, data pipeline projects, and contributing to open source tools for data engineering.
-```
+| 🧑 User | 🤖 Claude |
+|---------|-----------|
+| Who is Duyet and what does he do? | *[accesses `duyet://about`]* Duyet is a Data Engineer with 8 years of experience, confident in Data Engineering concepts, best practices and state-of-the-art data and Cloud technologies. Blog: https://blog.duyet.net · CV: https://duyet.net/cv · GitHub: https://github.com/duyet |
+| What has he been writing about lately? | *[accesses `duyet://blog/posts/3`]* His latest posts cover data engineering, cloud technologies, and distributed systems. Want details on a specific post? |
+| What's he working on currently? | *[accesses `duyet://github-activity`]* Recent GitHub activity shows work on MCP server implementations, data pipeline projects, and open source data engineering tools. |
 
 ### Hiring and Collaboration
 
-```
-User: I'm looking to hire a data engineer. Can you help me contact Duyet?
-
-Claude: I can help you send a message to Duyet using the send_message tool. What type of opportunity is this?
-
-User: It's a full-time position at our startup working with Kafka and Spark
-
-Claude: [Uses send_message tool]
-What would you like to say in your message to Duyet? I'll make sure to include that this is about a full-time position with Kafka and Spark technologies.
-
-User: Hi Duyet, we're a Series A startup building real-time data platforms. We'd love to discuss a Senior Data Engineer role working with Kafka, Spark, and cloud infrastructure. Remote-friendly position with competitive equity.
-
-Claude: [Executes send_message tool with the message]
-Your message has been sent successfully! Here's your reference ID: abc-123-def for follow-up. Duyet can be reached directly at me@duyet.net, LinkedIn: https://linkedin.com/in/duyet, or GitHub: https://github.com/duyet.
-```
+| 🧑 User | 🤖 Claude |
+|---------|-----------|
+| I'm looking to hire a data engineer. Can you help me contact Duyet? | I can send a message to Duyet using the `send_message` tool. What type of opportunity is this? |
+| It's a full-time position at our startup working with Kafka and Spark | *[prepares `send_message`]* What would you like to say? I'll note it's a full-time role with Kafka and Spark. |
+| Hi Duyet, we're a Series A startup building real-time data platforms. We'd love to discuss a Senior Data Engineer role — Kafka, Spark, cloud infra, remote-friendly with equity. | *[executes `send_message`]* Message sent! Reference ID: `abc-123-def`. You can also reach Duyet at me@duyet.net, LinkedIn: https://linkedin.com/in/duyet, GitHub: https://github.com/duyet |
 
 ### Technical Research
 
-```
-User: I want to understand Duyet's technical background before our interview
-
-Claude: [Automatically accesses duyet://cv/detailed resource]
-Based on Duyet's detailed CV, he has 8 years of experience in data engineering with expertise in Apache Spark, Kafka, cloud platforms, and distributed systems. His experience includes building scalable data pipelines and working with modern data stack technologies.
-
-User: Can you show me some of his recent technical work?
-
-Claude: [Automatically accesses duyet://github-activity resource]
-His recent GitHub activity shows contributions to data engineering projects, MCP server implementations, and open source tools. He's been actively working on distributed systems and cloud-native data solutions.
-
-User: What kind of content does he write about?
-
-Claude: [Automatically accesses duyet://blog/posts/5 resource]
-His technical blog covers topics like building scalable data pipelines, modern data engineering best practices, cloud technologies, and distributed systems architecture.
-```
+| 🧑 User | 🤖 Claude |
+|---------|-----------|
+| I want to understand Duyet's technical background before our interview | *[accesses `duyet://cv/detailed`]* 8 years in data engineering: Apache Spark, Kafka, cloud platforms, distributed systems, scalable data pipelines and the modern data stack. |
+| Can you show me some of his recent technical work? | *[accesses `duyet://github-activity`]* Recent contributions include data engineering projects, MCP server implementations, and open source tooling for distributed, cloud-native data systems. |
+| What kind of content does he write about? | *[accesses `duyet://blog/posts/5`]* Scalable data pipelines, modern data engineering best practices, cloud technologies, and distributed systems architecture. |
 
 ## Natural Discovery Pattern
 

@@ -17,7 +17,7 @@ import { registerGetAnalyticsTool } from "./contact-analytics";
  * Register all MCP tools with the server
  */
 export function registerAllTools(server: McpServer, env: Env) {
-	logger.info("init", "Registering MCP tools");
+	logger.debug("init", "Registering MCP tools");
 
 	// Content tools
 	registerGitHubActivityTool(server);
@@ -37,7 +37,7 @@ export function registerAllTools(server: McpServer, env: Env) {
 	registerGetAnalyticsTool(server, env);
 	logger.tool("get_analytics", "registered");
 
-	logger.info("init", "All MCP tools registered", { count: 6 });
+	logger.debug("init", "All MCP tools registered", { count: 6 });
 }
 
 // Export individual tool registration functions for selective use

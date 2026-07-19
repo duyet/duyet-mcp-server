@@ -9,7 +9,7 @@ import { registerHiringInquiryPrompt } from "./hiring-inquiry";
  * Register all MCP prompts with the server
  */
 export function registerAllPrompts(server: McpServer) {
-	logger.info("init", "Registering MCP prompts");
+	logger.debug("init", "Registering MCP prompts");
 
 	registerIntroduceDuyetPrompt(server);
 	logger.debug("init", "Prompt registered: introduce-duyet");
@@ -20,7 +20,7 @@ export function registerAllPrompts(server: McpServer) {
 	registerHiringInquiryPrompt(server);
 	logger.debug("init", "Prompt registered: hiring-inquiry");
 
-	logger.info("init", "All MCP prompts registered", { count: 3 });
+	logger.debug("init", "All MCP prompts registered", { count: 3 });
 }
 
 export { registerIntroduceDuyetPrompt, registerReviewBlogPrompt, registerHiringInquiryPrompt };

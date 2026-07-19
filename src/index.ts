@@ -105,7 +105,7 @@ llms.txt: https://blog.duyet.net/llms.txt
   `;
 
 app.get("/", (c) => c.redirect("/llms.txt"));
-app.get("/llms.txt", (c) => c.text(LLMS_TXT));
+app.get("/llms.txt", (c) => c.text(LLMS_TXT, 200, { "Cache-Control": "public, max-age=3600" }));
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
 
 // Stateless Streamable HTTP MCP endpoint: a fresh server + transport per request,
