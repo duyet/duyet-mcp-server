@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const contacts = sqliteTable("contacts", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
@@ -22,3 +22,24 @@ export const contacts = sqliteTable("contacts", {
 	createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),
 	updatedAt: integer("updated_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),
 });
+
+/**
+ * Long-term MCP usage aggregates (one row per day/client/method/tool/country).
+ * Analytics Engine keeps raw events only ~90 days; this table keeps daily
+ * rollups forever with a single upsert per request.
+ */
+export const usageStats = sqliteTable(
+	"usage_stats",
+	{
+		date: text("date").notNull(), // YYYY-MM-DD
+		client: text("client").notNull().default(""),
+		clientVersion: text("client_version").notNull().default(""),
+		method: text("method").notNull().default(""),
+		tool: text("tool").notNull().default(""),
+		country: text("country").notNull().default(""),
+		count: integer("count").notNull().default(0),
+	},
+	(t) => [
+		primaryKey({ columns: [t.date, t.client, t.clientVersion, t.method, t.tool, t.country] }),
+	],
+);

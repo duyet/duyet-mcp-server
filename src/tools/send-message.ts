@@ -5,6 +5,7 @@ import { getDb } from "../database/index";
 import { contacts } from "../database/schema";
 import { checkRateLimit } from "../utils/rate-limit";
 import { logger } from "../utils/logger";
+import { notifyDuyet } from "../utils/notify";
 
 // Define schemas for tool parameters
 const messageSchema = z.string().min(10).max(500);
@@ -70,6 +71,12 @@ Alternative: Email me directly at me@duyet.net`,
 					userAgent: user_agent,
 					referenceId,
 				});
+				// Forward to Duyet via Telegram/email when configured
+				await notifyDuyet(
+					env,
+					`New message [${purpose}] [${referenceId.slice(0, 8)}]`,
+					`${message}\n\nContact: ${contact_email ?? "not provided"}`,
+				);
 			} catch (error) {
 				// Log error securely without exposing details
 				logger.error("database", "Failed to save send_message", {

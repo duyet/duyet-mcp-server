@@ -36,8 +36,8 @@ describe("Index Functions Coverage", () => {
 	describe("Resources Index", () => {
 		test("should call registerAllResources and invoke all resource registrations", () => {
 			registerAllResources(mockServer as any, mockEnv);
-			// Should register 5 resources: about-duyet, cv, blog-posts, github-activity, llms-txt
-			expect(mockServer.registerResource).toHaveBeenCalledTimes(5);
+			// Should register 6 resources: about-duyet, cv, blog-posts, github-activity, llms-txt, projects
+			expect(mockServer.registerResource).toHaveBeenCalledTimes(6);
 		});
 	});
 

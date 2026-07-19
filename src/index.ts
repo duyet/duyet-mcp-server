@@ -7,6 +7,7 @@ import { registerAllTools } from "./tools/index";
 import { registerAllResources } from "./resources/index";
 import { registerAllPrompts } from "./prompts/index";
 import { logger } from "./utils/logger";
+import { trackMcpRequest } from "./utils/track";
 
 /**
  * Create a fresh MCP server for a single request.
@@ -36,12 +37,45 @@ Deployed: https://duyet-mcp-server.duyet.workers.dev
 
 ## Connection
 
-Streamable HTTP:
+Endpoint: https://mcp.duyet.net/mcp (Streamable HTTP, stateless)
+
+Claude Code:
+
+\`\`\`bash
+claude mcp add --transport http duyet https://mcp.duyet.net/mcp
+\`\`\`
+
+Claude Desktop / claude.ai: Settings -> Connectors -> Add custom connector -> https://mcp.duyet.net/mcp
+
+Cursor / Windsurf / VS Code / Zed (mcp.json):
 
 \`\`\`json
 {
   "mcpServers": {
-    "duyet-mcp-server": {
+    "duyet": { "url": "https://mcp.duyet.net/mcp" }
+  }
+}
+\`\`\`
+
+Codex CLI (config.toml):
+
+\`\`\`toml
+[mcp_servers.duyet]
+url = "https://mcp.duyet.net/mcp"
+\`\`\`
+
+Gemini CLI:
+
+\`\`\`bash
+gemini mcp add --transport http duyet https://mcp.duyet.net/mcp
+\`\`\`
+
+Clients without native remote MCP support (stdio only):
+
+\`\`\`json
+{
+  "mcpServers": {
+    "duyet": {
       "command": "npx",
       "args": ["mcp-remote", "https://mcp.duyet.net/mcp"]
     }
@@ -49,7 +83,7 @@ Streamable HTTP:
 }
 \`\`\`
 
-## MCP Resources (5)
+## MCP Resources (6)
 
 Resources provide read-only data access. Automatically discoverable by MCP clients.
 
@@ -60,6 +94,7 @@ Resources provide read-only data access. Automatically discoverable by MCP clien
 | \`duyet://blog/posts/{limit}\` | Latest blog posts (1-10, default: 5) |
 | \`duyet://github-activity\` | Recent GitHub activity (commits, PRs, issues) |
 | \`duyet://blog/llms.txt\` | Comprehensive index of 296+ blog posts for LLM consumption |
+| \`duyet://projects/{limit}\` | Open source projects & products, sorted by GitHub stars (live) |
 
 ## MCP Tools (6)
 
@@ -100,6 +135,7 @@ llms.txt: https://blog.duyet.net/llms.txt
 
 - Email: me@duyet.net
 - GitHub: https://github.com/duyet
+- X/Twitter: https://x.com/_duyet
 - LinkedIn: https://linkedin.com/in/duyet
 - Website: https://duyet.net
   `;
@@ -115,12 +151,15 @@ app.post("/mcp", async (c) => {
 	const server = createMcpServer(c.env);
 
 	try {
+		const body = await c.req.json();
+		c.executionCtx.waitUntil(trackMcpRequest(c.env, c.req.raw, body));
+
 		const transport = new StreamableHTTPServerTransport({
 			sessionIdGenerator: undefined,
 		});
 
 		await server.connect(transport);
-		await transport.handleRequest(req, res, await c.req.json());
+		await transport.handleRequest(req, res, body);
 
 		res.on("close", () => {
 			transport.close();

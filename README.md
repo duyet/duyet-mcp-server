@@ -6,31 +6,38 @@
 
 An experimental [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that helps AI assistants connect to and retrieve information about duyet. This server provides access to information primarily available at [https://duyet.net](https://duyet.net), making it available directly to your AI assistant.
 
-Usage: Update MCP server configuration in your AI assistant:
+**Endpoint:** `https://mcp.duyet.net/mcp` (Streamable HTTP, stateless — works with every major MCP client)
+
+## Connect from Any MCP Client
+
+| Client | How to connect |
+|--------|----------------|
+| **Claude Code** | `claude mcp add --transport http duyet https://mcp.duyet.net/mcp` |
+| **Claude Desktop / claude.ai** | Settings → Connectors → Add custom connector → `https://mcp.duyet.net/mcp` |
+| **Cursor** | Add to `~/.cursor/mcp.json` → `{"mcpServers": {"duyet": {"url": "https://mcp.duyet.net/mcp"}}}` |
+| **Windsurf** | Add to `~/.codeium/windsurf/mcp_config.json` → `{"mcpServers": {"duyet": {"serverUrl": "https://mcp.duyet.net/mcp"}}}` |
+| **VS Code (Copilot)** | `code --add-mcp '{"name":"duyet","type":"http","url":"https://mcp.duyet.net/mcp"}'` |
+| **Codex CLI** | Add to `~/.codex/config.toml` → `[mcp_servers.duyet]` with `url = "https://mcp.duyet.net/mcp"` |
+| **Gemini CLI** | `gemini mcp add --transport http duyet https://mcp.duyet.net/mcp` |
+| **Zed** | Settings → `context_servers` → `{"duyet": {"source": "custom", "url": "https://mcp.duyet.net/mcp"}}` |
+| **Cloudflare AI Playground** | Enter `https://mcp.duyet.net/mcp` at https://playground.ai.cloudflare.com |
+| **Anything else (stdio-only)** | Use the [mcp-remote](https://www.npmjs.com/package/mcp-remote) proxy — config below |
+
+<details>
+<summary>mcp-remote proxy config (for stdio-only clients)</summary>
 
 ```json
 {
   "mcpServers": {
-    "duyet-mcp-server": {
+    "duyet": {
       "command": "npx",
-      "args": [
-        "mcp-remote",
-        "https://mcp.duyet.net/sse"
-      ]
+      "args": ["mcp-remote", "https://mcp.duyet.net/mcp"]
     }
   }
 }
 ```
 
-If you are using Claude Code:
-
-```bash
-claude mcp add --transport http duyet https://mcp.duyet.net/mcp
-```
-
-Endpoints:
-- https://mcp.duyet.net/sse
-- https://mcp.duyet.net/mcp
+</details>
 
 ![](./.github/screenshots/screenshot-1.png)
 ![](./.github/screenshots/screenshot-2.png)

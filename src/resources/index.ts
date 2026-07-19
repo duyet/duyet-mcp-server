@@ -6,6 +6,7 @@ import { registerCVResource } from "./cv";
 import { registerBlogPostsResource } from "./blog-posts";
 import { registerGitHubActivityResource } from "./github-activity";
 import { registerLlmsTxtResource } from "./llms-txt";
+import { registerProjectsResource } from "./projects";
 
 /**
  * Register all MCP resources with the server
@@ -26,8 +27,10 @@ export function registerAllResources(server: McpServer, _env: Env) {
 	logger.resource("github-activity", "registered");
 	registerLlmsTxtResource(server);
 	logger.resource("llms-txt", "registered");
+	registerProjectsResource(server);
+	logger.resource("projects", "registered");
 
-	logger.debug("init", "All MCP resources registered", { count: 5 });
+	logger.debug("init", "All MCP resources registered", { count: 6 });
 }
 
 // Export individual resource registration functions for selective use
@@ -37,4 +40,5 @@ export {
 	registerBlogPostsResource,
 	registerGitHubActivityResource,
 	registerLlmsTxtResource,
+	registerProjectsResource,
 };
