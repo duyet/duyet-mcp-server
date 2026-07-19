@@ -10,6 +10,7 @@ import { logger } from "./utils/logger";
 import { trackMcpRequest } from "./utils/track";
 import { renderUsagePage } from "./usage";
 import { renderHomePage } from "./home";
+import pkg from "../package.json";
 
 /**
  * Create a fresh MCP server for a single request.
@@ -18,7 +19,7 @@ import { renderHomePage } from "./home";
 export function createMcpServer(env: Env): McpServer {
 	const server = new McpServer({
 		name: "Duyet MCP Server",
-		version: "0.2.0",
+		version: pkg.version,
 	});
 
 	registerAllTools(server, env);
