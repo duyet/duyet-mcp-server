@@ -31,8 +31,10 @@ describe("DuyetMCP Main Application", () => {
 
 			const response = await app.fetch(request, mockEnv, mockCtx);
 
-			expect(response.status).toBe(302);
-			expect(response.headers.get("Location")).toBe("/llms.txt");
+			expect(response.status).toBe(200);
+			const html = await response.text();
+			expect(html).toContain("Duyet MCP Server");
+			expect(html).toContain("/llms.txt");
 		});
 
 		test("should handle llms.txt path correctly", async () => {

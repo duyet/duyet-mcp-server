@@ -9,6 +9,7 @@ import { registerAllPrompts } from "./prompts/index";
 import { logger } from "./utils/logger";
 import { trackMcpRequest } from "./utils/track";
 import { renderUsagePage } from "./usage";
+import { renderHomePage } from "./home";
 
 /**
  * Create a fresh MCP server for a single request.
@@ -141,7 +142,7 @@ llms.txt: https://blog.duyet.net/llms.txt
 - Website: https://duyet.net
   `;
 
-app.get("/", (c) => c.redirect("/llms.txt"));
+app.get("/", (c) => c.html(renderHomePage(), 200, { "Cache-Control": "public, max-age=3600" }));
 app.get("/llms.txt", (c) => c.text(LLMS_TXT, 200, { "Cache-Control": "public, max-age=3600" }));
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
 
