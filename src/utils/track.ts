@@ -112,6 +112,7 @@ async function trackToD1(env: Env, t: TrackedRequest): Promise<void> {
 			clientVersion: t.clientVersion,
 			method: t.method,
 			tool: t.toolName,
+			resource: t.resourceUri,
 			country: t.country,
 			count: 1,
 		})
@@ -122,6 +123,7 @@ async function trackToD1(env: Env, t: TrackedRequest): Promise<void> {
 				usageStats.clientVersion,
 				usageStats.method,
 				usageStats.tool,
+				usageStats.resource,
 				usageStats.country,
 			],
 			set: { count: sql`${usageStats.count} + 1` },

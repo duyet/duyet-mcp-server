@@ -36,10 +36,13 @@ export const usageStats = sqliteTable(
 		clientVersion: text("client_version").notNull().default(""),
 		method: text("method").notNull().default(""),
 		tool: text("tool").notNull().default(""),
+		resource: text("resource").notNull().default(""),
 		country: text("country").notNull().default(""),
 		count: integer("count").notNull().default(0),
 	},
 	(t) => [
-		primaryKey({ columns: [t.date, t.client, t.clientVersion, t.method, t.tool, t.country] }),
+		primaryKey({
+			columns: [t.date, t.client, t.clientVersion, t.method, t.tool, t.resource, t.country],
+		}),
 	],
 );

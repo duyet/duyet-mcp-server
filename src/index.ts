@@ -8,6 +8,7 @@ import { registerAllResources } from "./resources/index";
 import { registerAllPrompts } from "./prompts/index";
 import { logger } from "./utils/logger";
 import { trackMcpRequest } from "./utils/track";
+import { renderUsagePage } from "./usage";
 
 /**
  * Create a fresh MCP server for a single request.
@@ -143,6 +144,18 @@ llms.txt: https://blog.duyet.net/llms.txt
 app.get("/", (c) => c.redirect("/llms.txt"));
 app.get("/llms.txt", (c) => c.text(LLMS_TXT, 200, { "Cache-Control": "public, max-age=3600" }));
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
+
+app.get("/usage", async (c) => {
+	try {
+		const html = await renderUsagePage(c.env);
+		return c.html(html, 200, { "Cache-Control": "public, max-age=300" });
+	} catch (error) {
+		logger.error("request", "Usage page failed", {
+			error: error instanceof Error ? error.message : String(error),
+		});
+		return c.text("Usage stats temporarily unavailable", 500);
+	}
+});
 
 // Stateless Streamable HTTP MCP endpoint: a fresh server + transport per request,
 // no sessions, no Durable Objects.
