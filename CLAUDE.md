@@ -37,14 +37,15 @@ This project uses **Bun** as the JavaScript runtime and test runner.
 
 ### Core Components
 
-**DuyetMCP Class** (`src/index.ts`): Main MCP agent that extends `McpAgent` from the agents library. Contains:
+**createMcpServer Factory** (`src/index.ts`): Creates a fresh, stateless `McpServer` per request (no Durable Objects, no sessions). Contains:
 - MCP server configuration with name and version
 - Tool registration via `registerAllTools()` from centralized tool registry
+- Served over stateless Streamable HTTP (`StreamableHTTPServerTransport` with `sessionIdGenerator: undefined`, bridged via `fetch-to-node`)
 
 **Hono Application** (`src/index.ts`): HTTP server that provides:
-- Root endpoint with usage instructions
-- SSE endpoint for real-time MCP communication (`/sse`) - **recommended for browser connections**
-- Standard MCP endpoint (`/mcp`) - WebSocket-based with CORS restrictions
+- Root endpoint with usage instructions (redirects to `/llms.txt`)
+- Standard MCP endpoint (`/mcp`) - stateless Streamable HTTP (POST only)
+- Legacy `/sse` endpoint returns 410 Gone (removed: it pinned a Durable Object awake per connection and dominated billing)
 - Favicon redirect to blog icon
 
 ### MCP Tools Architecture
@@ -93,12 +94,12 @@ This project uses **Bun** as the JavaScript runtime and test runner.
 
 ### Cloudflare Workers Integration
 
-- **Durable Objects**: Uses `DuyetMCP` class as a Durable Object for persistent connections
+- **No Durable Objects**: The server is stateless; each `/mcp` POST is a self-contained JSON-RPC exchange (zero DO billing)
 - **D1 Database**: SQLite database for contact storage (`duyet-mcp-contacts`)
 - **Analytics Engine**: Contact analytics tracking (`contact_analytics` dataset)
 - **Smart Placement**: Enabled for optimal geographic distribution
 - **Observability**: Built-in monitoring enabled
-- **Migrations**: Configured for class name changes (MyMCP → DuyetMCP)
+- **Migrations**: DO class history recorded in wrangler.jsonc (MyMCP → DuyetMCP → deleted in v3)
 
 ### Performance & Caching
 
@@ -135,7 +136,7 @@ return cacheOrFetch(cacheKey, CACHE_CONFIGS.CV, () => fetchCVData(format, cvUrl)
 ## Key Dependencies
 
 - `@modelcontextprotocol/sdk`: Core MCP functionality
-- `agents`: MCP agent framework with `McpAgent` base class
+- `fetch-to-node`: Bridges Fetch API requests to Node req/res for the MCP SDK transport
 - `hono`: Lightweight web framework for HTTP handling
 - `drizzle-orm`: Type-safe database ORM
 - `htmlparser2` & `domutils`: XML/HTML parsing for RSS feeds
@@ -229,9 +230,9 @@ app.all("/sse/*", async (c) => {
 
 ## Connection Endpoints
 
-- **SSE Endpoint** (`/sse`): Recommended for browser-based connections, CORS-friendly
-- **MCP Endpoint** (`/mcp`): WebSocket-based, may have CORS restrictions in browsers
-- **Root Endpoint** (`/`): Provides connection instructions and configuration examples
+- **MCP Endpoint** (`/mcp`): Stateless Streamable HTTP (POST only)
+- **SSE Endpoint** (`/sse`): Removed (410 Gone) — use `/mcp`
+- **Root Endpoint** (`/`): Redirects to `/llms.txt` with connection instructions
 
 ## Testing
 

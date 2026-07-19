@@ -1,5 +1,6 @@
-import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { toFetchResponse, toReqRes } from "fetch-to-node";
 import { Hono } from "hono";
 
 import { registerAllTools } from "./tools/index";
@@ -7,22 +8,21 @@ import { registerAllResources } from "./resources/index";
 import { registerAllPrompts } from "./prompts/index";
 import { logger } from "./utils/logger";
 
-export class DuyetMCP extends McpAgent {
-	server = new McpServer({
+/**
+ * Create a fresh MCP server for a single request.
+ * The server is stateless: no sessions, no Durable Objects.
+ */
+export function createMcpServer(env: Env): McpServer {
+	const server = new McpServer({
 		name: "Duyet MCP Server",
 		version: "0.2.0",
 	});
 
-	async init() {
-		logger.info("init", "Initializing DuyetMCP server");
-		logger.setMcpServer(this.server);
+	registerAllTools(server, env);
+	registerAllResources(server, env);
+	registerAllPrompts(server);
 
-		// Register all MCP tools, resources, and prompts
-		registerAllTools(this.server, this.env as Env);
-		registerAllResources(this.server, this.env as Env);
-		registerAllPrompts(this.server);
-		logger.info("init", "DuyetMCP server initialized successfully");
-	}
+	return server;
 }
 
 const app = new Hono<{ Bindings: Env }>();
@@ -36,7 +36,7 @@ Deployed: https://duyet-mcp-server.duyet.workers.dev
 
 ## Connection
 
-Streamable HTTP (recommended):
+Streamable HTTP:
 
 \`\`\`json
 {
@@ -44,19 +44,6 @@ Streamable HTTP (recommended):
     "duyet-mcp-server": {
       "command": "npx",
       "args": ["mcp-remote", "https://mcp.duyet.net/mcp"]
-    }
-  }
-}
-\`\`\`
-
-SSE (legacy):
-
-\`\`\`json
-{
-  "mcpServers": {
-    "duyet-mcp-server": {
-      "command": "npx",
-      "args": ["mcp-remote", "https://mcp.duyet.net/sse"]
     }
   }
 }
@@ -121,8 +108,57 @@ app.get("/", (c) => c.redirect("/llms.txt"));
 app.get("/llms.txt", (c) => c.text(LLMS_TXT));
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
 
-app.mount("/sse", DuyetMCP.serveSSE("/sse").fetch, { replaceRequest: false });
-app.mount("/mcp", DuyetMCP.serve("/mcp").fetch, { replaceRequest: false });
+// Stateless Streamable HTTP MCP endpoint: a fresh server + transport per request,
+// no sessions, no Durable Objects.
+app.post("/mcp", async (c) => {
+	const { req, res } = toReqRes(c.req.raw);
+	const server = createMcpServer(c.env);
+
+	try {
+		const transport = new StreamableHTTPServerTransport({
+			sessionIdGenerator: undefined,
+		});
+
+		await server.connect(transport);
+		await transport.handleRequest(req, res, await c.req.json());
+
+		res.on("close", () => {
+			transport.close();
+			server.close();
+		});
+
+		return toFetchResponse(res);
+	} catch (error) {
+		logger.error("request", "MCP request failed", {
+			error: error instanceof Error ? error.message : String(error),
+		});
+		return c.json(
+			{
+				jsonrpc: "2.0",
+				error: { code: -32603, message: "Internal server error" },
+				id: null,
+			},
+			500,
+		);
+	}
+});
+
+// Stateless mode has no server-initiated stream and no sessions to delete.
+app.on(["GET", "DELETE"], "/mcp", (c) =>
+	c.json(
+		{
+			jsonrpc: "2.0",
+			error: { code: -32000, message: "Method not allowed" },
+			id: null,
+		},
+		405,
+	),
+);
+
+// Legacy SSE endpoint removed: SSE required a Durable Object held awake for the
+// lifetime of every connection, which dominated Durable Objects billing.
+app.all("/sse/*", (c) => c.text("The SSE endpoint has been removed. Use /mcp instead.", 410));
+app.all("/sse", (c) => c.text("The SSE endpoint has been removed. Use /mcp instead.", 410));
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext) {
@@ -132,11 +168,6 @@ export default {
 		});
 
 		try {
-			if (request.headers.get("Upgrade") === "websocket") {
-				logger.debug("request", "WebSocket upgrade requested");
-				const mcpApp = DuyetMCP.serve("/mcp");
-				return mcpApp.fetch(request, env, ctx);
-			}
 			return app.fetch(request, env, ctx);
 		} catch (error) {
 			logger.error("request", "Application error", {

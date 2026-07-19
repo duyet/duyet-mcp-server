@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach, mock } from "bun:test";
-import app, { DuyetMCP } from "../index";
+import app, { createMcpServer } from "../index";
 
 describe("DuyetMCP Main Application", () => {
 	let mockEnv: Env;
@@ -18,10 +18,10 @@ describe("DuyetMCP Main Application", () => {
 		} as unknown as ExecutionContext;
 	});
 
-	describe("DuyetMCP Class", () => {
-		test("should have DuyetMCP exported", () => {
-			expect(DuyetMCP).toBeDefined();
-			expect(typeof DuyetMCP).toBe("function");
+	describe("MCP Server Factory", () => {
+		test("should have createMcpServer exported", () => {
+			expect(createMcpServer).toBeDefined();
+			expect(typeof createMcpServer).toBe("function");
 		});
 	});
 

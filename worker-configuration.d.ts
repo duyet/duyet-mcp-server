@@ -3,7 +3,6 @@
 // Runtime types generated with workerd@1.20250803.0 2025-03-10 nodejs_compat
 declare namespace Cloudflare {
 	interface Env {
-		MCP_OBJECT: DurableObjectNamespace<import("./src/index").DuyetMCP>;
 		DB: D1Database;
 		ANALYTICS: AnalyticsEngineDataset;
 	}

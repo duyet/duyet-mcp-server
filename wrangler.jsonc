@@ -21,16 +21,12 @@
 					"to": "DuyetMCP"
 				}
 			]
+		},
+		{
+			"tag": "v3",
+			"deleted_classes": ["DuyetMCP"]
 		}
 	],
-	"durable_objects": {
-		"bindings": [
-			{
-				"class_name": "DuyetMCP",
-				"name": "MCP_OBJECT"
-			}
-		]
-	},
 	"observability": {
 		"enabled": true
 	},
