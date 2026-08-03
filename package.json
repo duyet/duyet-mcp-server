@@ -19,7 +19,7 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"@modelcontextprotocol/sdk": "1.29.0",
+		"@modelcontextprotocol/sdk": "1.30.0",
 		"domutils": "^4.0.0",
 		"drizzle-orm": "^0.45.2",
 		"fetch-to-node": "^2.1.0",
@@ -38,7 +38,7 @@
 		"wrangler": "^4.22.0"
 	},
 	"overrides": {
-		"@modelcontextprotocol/sdk": "1.29.0"
+		"@modelcontextprotocol/sdk": "1.30.0"
 	},
 	"type": "module"
 }
