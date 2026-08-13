@@ -1,96 +1,202 @@
 /**
- * / — minimal black & white landing page: what this MCP server is,
- * how to connect, tools/resources, an example conversation, and links.
- * Fully self-contained (inline CSS only).
+ * / - overview page: what this MCP server is, how to connect, what it exposes.
+ * Styling comes from the shared design layer in ./ui/theme.
  */
 
-export function renderHomePage(): string {
-	return `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Duyet MCP Server</title>
-<meta name="description" content="MCP server exposing Duyet's CV, blog, projects and contact tools to AI assistants.">
-<style>
-	:root { color-scheme: light dark; }
-	* { box-sizing: border-box; margin: 0; }
-	body { font: 16px/1.7 ui-monospace, "SF Mono", Menlo, monospace; background: #fff; color: #111; max-width: 680px; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
-	@media (prefers-color-scheme: dark) { body { background: #0a0a0a; color: #e8e8e8; } pre, code, .chat { background: #161616 !important; border-color: #2a2a2a !important; } th, td { border-color: #2a2a2a !important; } hr { border-color: #2a2a2a !important; } }
-	h1 { font-size: 1.5rem; margin-bottom: .5rem; }
-	h2 { font-size: 1.05rem; margin: 2.5rem 0 .75rem; text-transform: uppercase; letter-spacing: .08em; }
-	p { margin-bottom: 1rem; }
-	a { color: inherit; }
-	pre { background: #f5f5f5; border: 1px solid #ddd; padding: .75rem 1rem; overflow-x: auto; font-size: .85rem; margin-bottom: 1rem; }
-	code { background: #f5f5f5; padding: .1em .35em; font-size: .9em; }
-	pre code { background: none; padding: 0; }
-	table { border-collapse: collapse; width: 100%; font-size: .875rem; margin-bottom: 1rem; }
-	th, td { border: 1px solid #ddd; padding: .4rem .6rem; text-align: left; vertical-align: top; }
-	th { font-weight: 600; }
-	.chat { background: #f5f5f5; border: 1px solid #ddd; padding: 1rem; font-size: .875rem; margin-bottom: 1rem; }
-	.chat b { display: inline-block; min-width: 4.5rem; }
-	.chat p { margin-bottom: .6rem; }
-	hr { border: 0; border-top: 1px solid #ddd; margin: 2.5rem 0; }
-	footer { font-size: .8rem; margin-top: 3rem; }
-	ul { margin: 0 0 1rem 1.2rem; }
-</style>
-</head>
-<body>
-	<h1>Duyet MCP Server</h1>
-	<p>A <a href="https://modelcontextprotocol.io">Model Context Protocol</a> server that lets AI assistants ask about
-	<a href="https://duyet.net">Duyet</a> — Sr. Data Engineer — his CV, blog, projects, GitHub activity — and send him messages.</p>
+import { renderPage } from "./ui/theme";
 
-	<h2>Connect</h2>
-	<p>Endpoint: <code>https://mcp.duyet.net/mcp</code> (Streamable HTTP)</p>
-	<pre><code># Claude Code
-claude mcp add --transport http duyet https://mcp.duyet.net/mcp
+const CSS = `
+.hero { padding: 4.5rem 0 3.5rem; border-bottom: 1px solid var(--border); }
+.hero h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); max-width: 16ch; }
+.hero p { margin-top: 0.9rem; max-width: 56ch; font-size: 1.0625rem; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.75rem; }
 
-# Claude Desktop / claude.ai
-Settings &gt; Connectors &gt; Add custom connector &gt; https://mcp.duyet.net/mcp
+section { padding: 3rem 0; border-bottom: 1px solid var(--border); }
+section:last-of-type { border-bottom: 0; }
+section > h2 { margin-bottom: 1.25rem; }
 
-# Cursor / Windsurf / VS Code / Zed (mcp.json)
-{ "mcpServers": { "duyet": { "url": "https://mcp.duyet.net/mcp" } } }</code></pre>
+/* Endpoint strip: the single most-copied string on the page. */
+.endpoint {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+	padding: 0.75rem 0.75rem 0.75rem 1rem;
+	border: 1px solid var(--border-strong);
+	border-radius: var(--radius);
+	background: var(--surface-raised);
+	margin-bottom: 1.5rem;
+}
+.endpoint-url { font-family: var(--mono); font-size: 0.875rem; flex: 1 1 auto; word-break: break-all; }
+.endpoint-note { font-size: 0.8125rem; color: var(--text-faint); }
 
-	<h2>Tools</h2>
-	<table>
-		<tr><th>Tool</th><th>What it does</th></tr>
-		<tr><td><code>github_activity</code></td><td>Recent commits, PRs, issues, releases</td></tr>
-		<tr><td><code>get_blog_post_content</code></td><td>Full article content from a blog URL</td></tr>
-		<tr><td><code>send_message</code></td><td>Send Duyet a message (forwarded directly)</td></tr>
-		<tr><td><code>hire_me</code></td><td>Hiring info — paste a job description and it reaches Duyet</td></tr>
-		<tr><td><code>say_hi</code></td><td>Send a friendly greeting</td></tr>
-		<tr><td><code>get_analytics</code></td><td>Contact submission analytics</td></tr>
-	</table>
+.clients { display: grid; gap: 1.25rem; }
+.client-name { font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; }
 
-	<h2>Resources</h2>
-	<table>
-		<tr><th>URI</th><th>Content</th></tr>
-		<tr><td><code>duyet://about</code></td><td>Profile, skills, open-to-work, links</td></tr>
-		<tr><td><code>duyet://cv/{format}</code></td><td>CV — summary, detailed, or json</td></tr>
-		<tr><td><code>duyet://blog/posts/{limit}</code></td><td>Latest blog posts</td></tr>
-		<tr><td><code>duyet://projects/{limit}</code></td><td>Open source projects by stars (live)</td></tr>
-		<tr><td><code>duyet://github-activity</code></td><td>Recent GitHub activity</td></tr>
-		<tr><td><code>duyet://blog/llms.txt</code></td><td>Index of 296+ blog posts</td></tr>
-	</table>
+/* Reference tables: this is API documentation, so a table is the honest shape. */
+.ref { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.ref th, .ref td { padding: 0.6rem 0.75rem 0.6rem 0; vertical-align: top; text-align: left; border-bottom: 1px solid var(--border); }
+.ref thead th { font-size: 0.75rem; font-weight: 600; color: var(--text-faint); padding-top: 0; }
+.ref tbody tr:last-child td { border-bottom: 0; }
+.ref th:first-child, .ref td:first-child { width: 34%; white-space: nowrap; }
+.ref td:first-child code { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 500; }
+.ref td:last-child { color: var(--text-muted); }
 
-	<h2>Example conversation</h2>
-	<div class="chat">
-		<p><b>You:</b> Who is Duyet and what is he working on?</p>
-		<p><b>Claude:</b> <em>[reads duyet://about and duyet://github-activity]</em> Duyet is a Sr. Data Engineer with 9+ years of experience… recently working on MCP servers and data tooling.</p>
-		<p><b>You:</b> We're hiring — here's the JD: <em>(paste)</em></p>
-		<p><b>Claude:</b> <em>[calls hire_me with the JD]</em> Sent! Duyet will receive your job description with a reference ID.</p>
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+
+.chat { border-left: 2px solid var(--accent-line); padding-left: 1.1rem; display: grid; gap: 0.85rem; }
+.chat-turn { font-size: 0.9375rem; }
+.chat-who { font-family: var(--mono); font-size: 0.75rem; color: var(--text-faint); display: block; }
+.chat-act { color: var(--text-faint); font-family: var(--mono); font-size: 0.8125rem; }
+
+.links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-size: 0.875rem; }
+
+@media (max-width: 720px) {
+	.split { grid-template-columns: 1fr; gap: 2rem; }
+	.hero { padding: 3rem 0 2.5rem; }
+	.ref td:first-child { width: 40%; white-space: normal; }
+}
+`;
+
+const TOOLS: [string, string][] = [
+	["github_activity", "Recent commits, pull requests, issues and releases"],
+	["get_blog_post_content", "Full article text for a given blog URL"],
+	["send_message", "Send Duyet a message, forwarded directly"],
+	["hire_me", "Paste a job description and it reaches Duyet"],
+	["say_hi", "Send a short greeting"],
+	["get_analytics", "Contact submission analytics"],
+];
+
+const RESOURCES: [string, string][] = [
+	["duyet://about", "Profile, skills, availability and links"],
+	["duyet://cv/{format}", "CV as summary, detailed or json"],
+	["duyet://blog/posts/{limit}", "Latest blog posts"],
+	["duyet://projects/{limit}", "Open source projects ranked by stars"],
+	["duyet://github-activity", "Recent GitHub activity"],
+	["duyet://blog/llms.txt", "Index of every published blog post"],
+];
+
+const refTable = (nameLabel: string, rows: [string, string][]) =>
+	`<table class="ref">
+		<thead><tr><th scope="col">${nameLabel}</th><th scope="col">Description</th></tr></thead>
+		<tbody>${rows.map(([k, v]) => `<tr><td><code>${k}</code></td><td>${v}</td></tr>`).join("")}</tbody>
+	</table>`;
+
+const BODY = `
+<main>
+	<div class="wrap">
+		<div class="hero">
+			<h1>An MCP server for asking about Duyet</h1>
+			<p>Connect your assistant to a live endpoint that serves Duyet's CV, blog, open source
+			projects and GitHub activity, and lets you send him a message.</p>
+			<div class="hero-actions">
+				<a class="btn btn-primary" href="/playground">Open playground</a>
+				<button class="btn" id="copy-endpoint" type="button" data-url="https://mcp.duyet.net/mcp">Copy endpoint</button>
+			</div>
+		</div>
+
+		<section>
+			<h2>Connect</h2>
+			<div class="endpoint">
+				<span class="endpoint-url">https://mcp.duyet.net/mcp</span>
+				<span class="endpoint-note">Streamable HTTP</span>
+			</div>
+			<div class="clients">
+				<div>
+					<div class="client-name">Claude Code</div>
+					<pre><code>claude mcp add --transport http duyet https://mcp.duyet.net/mcp</code></pre>
+				</div>
+				<div>
+					<div class="client-name">Claude Desktop and claude.ai</div>
+					<pre><code>Settings &gt; Connectors &gt; Add custom connector &gt; https://mcp.duyet.net/mcp</code></pre>
+				</div>
+				<div>
+					<div class="client-name">Cursor, Windsurf, VS Code, Zed</div>
+					<pre><code>{ "mcpServers": { "duyet": { "url": "https://mcp.duyet.net/mcp" } } }</code></pre>
+				</div>
+			</div>
+		</section>
+
+		<section>
+			<h2>What it exposes</h2>
+			<div class="split">
+				<div>
+					<h3>Tools</h3>
+					${refTable("Tool", TOOLS)}
+				</div>
+				<div>
+					<h3>Resources</h3>
+					${refTable("URI", RESOURCES)}
+				</div>
+			</div>
+		</section>
+
+		<section>
+			<h2>What it looks like in a chat</h2>
+			<div class="chat">
+				<div class="chat-turn">
+					<span class="chat-who">you</span>
+					Who is Duyet and what is he working on?
+				</div>
+				<div class="chat-turn">
+					<span class="chat-who">assistant</span>
+					<span class="chat-act">reads duyet://about and duyet://github-activity</span><br>
+					Duyet is a senior data engineer with 9 years of experience, currently working on
+					MCP servers and ClickHouse tooling.
+				</div>
+				<div class="chat-turn">
+					<span class="chat-who">you</span>
+					We are hiring. Here is the job description.
+				</div>
+				<div class="chat-turn">
+					<span class="chat-who">assistant</span>
+					<span class="chat-act">calls hire_me</span><br>
+					Sent. Duyet will receive the description with a reference ID.
+				</div>
+			</div>
+		</section>
+
+		<section>
+			<h2>Elsewhere</h2>
+			<div class="links">
+				<a href="/llms.txt">/llms.txt</a>
+				<a href="https://duyet.net">duyet.net</a>
+				<a href="https://blog.duyet.net">blog</a>
+				<a href="https://duyet.net/cv">cv</a>
+				<a href="https://github.com/duyet">github</a>
+				<a href="https://x.com/_duyet">x</a>
+				<a href="https://linkedin.com/in/duyet">linkedin</a>
+			</div>
+		</section>
 	</div>
+</main>
+`;
 
-	<h2>Links</h2>
-	<ul>
-		<li><a href="/llms.txt">/llms.txt</a> — this page for agents (plain text)</li>
-		<li><a href="/usage">/usage</a> — live usage telemetry</li>
-		<li><a href="https://duyet.net">duyet.net</a> · <a href="https://blog.duyet.net">blog</a> · <a href="https://duyet.net/cv">cv</a></li>
-		<li><a href="https://github.com/duyet">github.com/duyet</a> · <a href="https://x.com/_duyet">x.com/_duyet</a> · <a href="https://linkedin.com/in/duyet">linkedin</a></li>
-	</ul>
+const TAIL = `<script>
+(function () {
+	var btn = document.getElementById("copy-endpoint");
+	if (!btn || !navigator.clipboard) return;
+	btn.addEventListener("click", function () {
+		var original = btn.textContent;
+		var restore = function () {
+			setTimeout(function () { btn.textContent = original; }, 1600);
+		};
+		navigator.clipboard.writeText(btn.dataset.url).then(
+			function () { btn.textContent = "Copied"; restore(); },
+			function () { btn.textContent = "Copy failed"; restore(); },
+		);
+	});
+})();
+</script>`;
 
-	<hr>
-	<footer>Open source: <a href="https://github.com/duyet/duyet-mcp-server">duyet/duyet-mcp-server</a> · Cloudflare Workers · stateless, no cookies, minimal telemetry (<a href="/usage">public</a>)</footer>
-</body>
-</html>`;
+export function renderHomePage(): string {
+	return renderPage({
+		title: "Duyet MCP Server",
+		description:
+			"MCP server exposing Duyet's CV, blog, projects and contact tools to AI assistants.",
+		current: "home",
+		css: CSS,
+		body: BODY,
+		tail: TAIL,
+	});
 }

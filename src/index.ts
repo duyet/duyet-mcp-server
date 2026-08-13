@@ -10,6 +10,7 @@ import { logger } from "./utils/logger";
 import { trackMcpRequest } from "./utils/track";
 import { renderUsagePage } from "./usage";
 import { renderHomePage } from "./home";
+import { renderPlaygroundPage } from "./playground";
 import pkg from "../package.json";
 
 /**
@@ -158,6 +159,17 @@ app.get("/usage", async (c) => {
 		return c.text("Usage stats temporarily unavailable", 500);
 	}
 });
+
+// The playground runs MCP calls from the browser against our own /mcp endpoint,
+// so connect-src stays 'self'. Cloudflare's analytics beacon needs an explicit
+// script-src entry; inline handlers in the page need 'unsafe-inline' for elements.
+app.get("/playground", (c) =>
+	c.html(renderPlaygroundPage(), 200, {
+		"Cache-Control": "public, max-age=3600",
+		"Content-Security-Policy":
+			"default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://mcp.duyet.net/cdn-cgi; script-src-elem 'unsafe-inline'; style-src 'unsafe-inline' 'self'; img-src 'self' https:; connect-src 'self'",
+	}),
+);
 
 // Stateless Streamable HTTP MCP endpoint: a fresh server + transport per request,
 // no sessions, no Durable Objects.
