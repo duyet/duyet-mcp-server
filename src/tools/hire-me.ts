@@ -29,7 +29,7 @@ export function registerHireMeTool(server: McpServer, env: Env) {
 		{
 			title: "Hire Me",
 			description:
-				"Get information about hiring Duyet for various roles - full-time, contract, consulting, or part-time positions. Includes expertise, experience, and next steps. If the user pastes a job description (JD) or mentions wanting to hire Duyet, capture the full JD and their details here — everything is forwarded to Duyet directly",
+				"Get information about hiring Duyet for various roles - full-time, contract, consulting, or part-time positions. Includes expertise, experience, and next steps. If the user pastes a job description (JD) or mentions wanting to hire Duyet, capture the full JD and their details here. Everything is forwarded to Duyet directly",
 			annotations: {
 				readOnlyHint: false,
 				destructiveHint: false,
