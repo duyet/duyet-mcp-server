@@ -35,9 +35,10 @@ section > h2 { margin-bottom: 1.25rem; }
 
 /* Reference tables: this is API documentation, so a table is the honest shape. */
 .ref { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-.ref td { padding: 0.6rem 0.75rem 0.6rem 0; vertical-align: top; border-bottom: 1px solid var(--border); }
-.ref tr:last-child td { border-bottom: 0; }
-.ref td:first-child { width: 34%; white-space: nowrap; }
+.ref th, .ref td { padding: 0.6rem 0.75rem 0.6rem 0; vertical-align: top; text-align: left; border-bottom: 1px solid var(--border); }
+.ref thead th { font-size: 0.75rem; font-weight: 600; color: var(--text-faint); padding-top: 0; }
+.ref tbody tr:last-child td { border-bottom: 0; }
+.ref th:first-child, .ref td:first-child { width: 34%; white-space: nowrap; }
 .ref td:first-child code { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 500; }
 .ref td:last-child { color: var(--text-muted); }
 
@@ -75,8 +76,11 @@ const RESOURCES: [string, string][] = [
 	["duyet://blog/llms.txt", "Index of every published blog post"],
 ];
 
-const refRows = (rows: [string, string][]) =>
-	rows.map(([k, v]) => `<tr><td><code>${k}</code></td><td>${v}</td></tr>`).join("");
+const refTable = (nameLabel: string, rows: [string, string][]) =>
+	`<table class="ref">
+		<thead><tr><th scope="col">${nameLabel}</th><th scope="col">Description</th></tr></thead>
+		<tbody>${rows.map(([k, v]) => `<tr><td><code>${k}</code></td><td>${v}</td></tr>`).join("")}</tbody>
+	</table>`;
 
 const BODY = `
 <main>
@@ -118,11 +122,11 @@ const BODY = `
 			<div class="split">
 				<div>
 					<h3>Tools</h3>
-					<table class="ref">${refRows(TOOLS)}</table>
+					${refTable("Tool", TOOLS)}
 				</div>
 				<div>
 					<h3>Resources</h3>
-					<table class="ref">${refRows(RESOURCES)}</table>
+					${refTable("URI", RESOURCES)}
 				</div>
 			</div>
 		</section>
@@ -173,11 +177,14 @@ const TAIL = `<script>
 	var btn = document.getElementById("copy-endpoint");
 	if (!btn || !navigator.clipboard) return;
 	btn.addEventListener("click", function () {
-		navigator.clipboard.writeText(btn.dataset.url).then(function () {
-			var original = btn.textContent;
-			btn.textContent = "Copied";
+		var original = btn.textContent;
+		var restore = function () {
 			setTimeout(function () { btn.textContent = original; }, 1600);
-		});
+		};
+		navigator.clipboard.writeText(btn.dataset.url).then(
+			function () { btn.textContent = "Copied"; restore(); },
+			function () { btn.textContent = "Copy failed"; restore(); },
+		);
 	});
 })();
 </script>`;

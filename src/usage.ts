@@ -25,10 +25,14 @@ function esc(s: string): string {
 
 /** Encode a JSON value so it is safe to embed inside an HTML single-quoted attribute. */
 function attrJson(v: unknown): string {
+	// The result is interpolated into a double-quoted HTML attribute, so the
+	// double quotes in the JSON must be escaped too or the attribute ends at
+	// the first one and the payload is truncated to "[{".
 	return JSON.stringify(v)
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
 		.replace(/'/g, "&#39;");
 }
 
@@ -290,8 +294,11 @@ const TAIL = `<div class="tooltip" id="tip"></div>
 		const top = Number(chart.dataset.top || 0);
 		const height = Number(chart.dataset.height || 0);
 		if (!values.length) continue;
-		const show = () => { tip.style.opacity = "1"; cross.setAttribute("opacity", "1"); };
-		const hide = () => { tip.style.opacity = "0"; cross.setAttribute("opacity", "0"); };
+		// Set the inline style, not the SVG presentation attribute: presentation
+		// attributes rank below author stylesheet rules, so .crosshair{opacity:0}
+		// would keep winning and the crosshair would never appear.
+		const show = () => { tip.style.opacity = "1"; cross.style.opacity = "1"; };
+		const hide = () => { tip.style.opacity = "0"; cross.style.opacity = "0"; };
 		svg.addEventListener("mousemove", (e) => {
 			const r = svg.getBoundingClientRect();
 			const fx = (e.clientX - r.left) / r.width;
