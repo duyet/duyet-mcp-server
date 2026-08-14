@@ -35,7 +35,10 @@ const EMPTY: UsageData = {
 	byResource: [],
 };
 
-/** Identifiers cannot be bound as query parameters, so restrict them to a safe shape. */
+/**
+ * Identifiers cannot be bound as query parameters, so restrict them to a safe
+ * shape. This stays raw SQL on purpose: Drizzle here only talks to D1.
+ */
 export function safeTableName(name: string | undefined): string {
 	const candidate = name || "mcp_requests";
 	if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(candidate)) {

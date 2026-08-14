@@ -36,17 +36,6 @@ interface TrackedRequest {
 	city: string;
 	asn: string;
 	colo: string;
-	ipHash: string;
-}
-
-/** Non-cryptographic hash for approximate unique-user counting. Not reversible to an IP. */
-function fnv1a(input: string): string {
-	let hash = 0x811c9dc5;
-	for (let i = 0; i < input.length; i++) {
-		hash ^= input.charCodeAt(i);
-		hash = Math.imul(hash, 0x01000193);
-	}
-	return (hash >>> 0).toString(16);
 }
 
 function extract(request: Request, body: unknown): TrackedRequest {
@@ -55,7 +44,6 @@ function extract(request: Request, body: unknown): TrackedRequest {
 	const cf = (
 		request as { cf?: { country?: string; colo?: string; city?: string; asn?: number } }
 	).cf;
-	const ip = request.headers.get("CF-Connecting-IP") ?? "";
 
 	return {
 		method,
@@ -70,7 +58,6 @@ function extract(request: Request, body: unknown): TrackedRequest {
 		city: cf?.city ?? "",
 		asn: cf?.asn ? String(cf.asn) : "",
 		colo: cf?.colo ?? "",
-		ipHash: ip ? fnv1a(ip) : "",
 	};
 }
 
@@ -90,7 +77,6 @@ function toRow(t: TrackedRequest): Record<string, unknown> {
 		city: t.city,
 		asn: t.asn,
 		colo: t.colo,
-		ip_hash: t.ipHash,
 	};
 }
 

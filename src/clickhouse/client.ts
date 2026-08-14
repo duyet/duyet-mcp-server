@@ -16,7 +16,16 @@ import { logger } from "../utils/logger";
 
 /** Set when the ClickHouse sink is fully configured; otherwise tracking is skipped. */
 export function isClickHouseConfigured(env: Env): boolean {
-	return Boolean(env.CLICKHOUSE_URL && env.CLICKHOUSE_USER && env.CLICKHOUSE_PASSWORD);
+	// Access is part of the contract: the instance is only reachable through
+	// a Tunnel fronted by Access. Missing either secret would send unauthenticated
+	// requests at the tunnel hostname.
+	return Boolean(
+		env.CLICKHOUSE_URL &&
+			env.CLICKHOUSE_USER &&
+			env.CLICKHOUSE_PASSWORD &&
+			env.CF_ACCESS_CLIENT_ID &&
+			env.CF_ACCESS_CLIENT_SECRET,
+	);
 }
 
 function endpoint(env: Env, params: Record<string, string> = {}): string {
@@ -49,9 +58,13 @@ async function exec(env: Env, body: string, params?: Record<string, string>): Pr
 	});
 
 	if (!response.ok) {
-		// ClickHouse returns the failure reason as plain text in the body.
+		// Keep the server body in logs only. Thrown errors can reach /usage.
 		const detail = (await response.text().catch(() => "")).slice(0, 400);
-		throw new Error(`ClickHouse ${response.status}: ${detail}`);
+		logger.warn("database", "ClickHouse request failed", {
+			status: response.status,
+			detail,
+		});
+		throw new Error(`ClickHouse request failed with HTTP ${response.status}`);
 	}
 	return response;
 }
@@ -59,6 +72,13 @@ async function exec(env: Env, body: string, params?: Record<string, string>): Pr
 /**
  * Insert rows using JSONEachRow. Values are sent as JSON, so nothing is
  * concatenated into SQL and there is no injection surface.
+ *
+ * This is raw HTTP on purpose. Drizzle in this repo only talks to D1 and has
+ * no ClickHouse dialect. `table` must already have passed through
+ * `safeTableName`; identifiers cannot be bound as query parameters.
+ *
+ * Live traffic inserts one row per request, so async_insert lets the server
+ * buffer parts instead of creating one part per MCP call.
  */
 export async function insertRows(
 	env: Env,
@@ -67,7 +87,11 @@ export async function insertRows(
 ): Promise<void> {
 	if (rows.length === 0) return;
 	const payload = rows.map((r) => JSON.stringify(r)).join("\n");
-	await exec(env, payload, { query: `INSERT INTO ${table} FORMAT JSONEachRow` });
+	await exec(env, payload, {
+		query: `INSERT INTO ${table} FORMAT JSONEachRow`,
+		async_insert: "1",
+		wait_for_async_insert: "1",
+	});
 }
 
 interface JsonResponse<T> {

@@ -6,8 +6,9 @@
  */
 
 import { isClickHouseConfigured } from "./clickhouse/client";
-import { fetchUsageData, type Row } from "./clickhouse/usage-queries";
+import { fetchUsageData, type Row, type UsageData } from "./clickhouse/usage-queries";
 import { renderPage } from "./ui/theme";
+import { logger } from "./utils/logger";
 
 /** Categorical ramp for donut segments and bars, cycled in order. */
 function color(i: number): string {
@@ -353,6 +354,19 @@ export async function renderUsagePage(env: Env): Promise<string> {
 		);
 	}
 
+	let data: UsageData;
+	try {
+		data = await fetchUsageData(env);
+	} catch (error) {
+		logger.warn("database", "Usage query failed", {
+			error: error instanceof Error ? error.message : String(error),
+		});
+		return renderNotice(
+			"Usage analytics are temporarily unavailable",
+			"The dashboard could not load telemetry right now.",
+		);
+	}
+
 	const {
 		total: totalCount,
 		byDay,
@@ -362,7 +376,7 @@ export async function renderUsagePage(env: Env): Promise<string> {
 		byVersion,
 		byTool,
 		byResource,
-	} = await fetchUsageData(env);
+	} = data;
 
 	const body = `
 <main>

@@ -27,15 +27,11 @@ CREATE TABLE IF NOT EXISTS mcp_requests
 
     user_agent       String,
 
-    -- Cloudflare request metadata.
+    -- Cloudflare request metadata. No IP or IP-derived identifier is stored.
     country          LowCardinality(String),
     city             String,
     asn              String,
-    colo             LowCardinality(String),
-
-    -- Non-cryptographic FNV-1a hash of the client IP, for approximate unique
-    -- counting. Not reversible to an address, and no raw IP is ever stored.
-    ip_hash          String
+    colo             LowCardinality(String)
 )
 ENGINE = MergeTree
 PARTITION BY toYYYYMM(timestamp)

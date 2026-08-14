@@ -42,10 +42,16 @@ function captureFetch(response: Response): Captured[] {
 }
 
 describe("isClickHouseConfigured", () => {
-	it("requires url, user and password", () => {
+	it("requires url, user, password and Access secrets", () => {
 		expect(isClickHouseConfigured(env())).toBe(true);
 		expect(isClickHouseConfigured(env({ CLICKHOUSE_URL: "" } as Partial<Env>))).toBe(false);
 		expect(isClickHouseConfigured(env({ CLICKHOUSE_PASSWORD: "" } as Partial<Env>))).toBe(
+			false,
+		);
+		expect(isClickHouseConfigured(env({ CF_ACCESS_CLIENT_ID: "" } as Partial<Env>))).toBe(
+			false,
+		);
+		expect(isClickHouseConfigured(env({ CF_ACCESS_CLIENT_SECRET: "" } as Partial<Env>))).toBe(
 			false,
 		);
 	});
@@ -86,9 +92,10 @@ describe("insertRows", () => {
 		const [call] = calls;
 		expect(call.url).toContain("database=mcp");
 		// URLSearchParams encodes spaces as "+", which decodeURIComponent leaves alone.
-		expect(new URL(call.url).searchParams.get("query")).toBe(
-			"INSERT INTO mcp_requests FORMAT JSONEachRow",
-		);
+		const sent = new URL(call.url).searchParams;
+		expect(sent.get("query")).toBe("INSERT INTO mcp_requests FORMAT JSONEachRow");
+		expect(sent.get("async_insert")).toBe("1");
+		expect(sent.get("wait_for_async_insert")).toBe("1");
 		expect(call.headers["X-ClickHouse-User"]).toBe("writer");
 		expect(call.headers["X-ClickHouse-Key"]).toBe("secret");
 		expect(call.headers["CF-Access-Client-Id"]).toBe("client-id");
@@ -103,10 +110,10 @@ describe("insertRows", () => {
 		expect(calls).toHaveLength(0);
 	});
 
-	it("surfaces the ClickHouse error body", async () => {
+	it("throws a sanitized status without the ClickHouse body", async () => {
 		captureFetch(new Response("Code: 60. Unknown table", { status: 404 }));
 		await expect(insertRows(env(), "mcp_requests", [{ a: 1 }])).rejects.toThrow(
-			/ClickHouse 404: Code: 60/,
+			"ClickHouse request failed with HTTP 404",
 		);
 	});
 
@@ -193,5 +200,22 @@ describe("fetchUsageData", () => {
 		const calls = captureFetch(new Response(JSON.stringify({ data: [] }), { status: 200 }));
 		await fetchUsageData(env());
 		expect(calls).toHaveLength(1);
+	});
+});
+
+describe("renderUsagePage", () => {
+	it("does not leak ClickHouse error text when the query fails", async () => {
+		const { renderUsagePage } = await import("../usage");
+		captureFetch(new Response("Code: 60. DB::Exception: secret table", { status: 500 }));
+		const html = await renderUsagePage(env());
+		expect(html).toContain("Usage analytics are temporarily unavailable");
+		expect(html).not.toContain("Code: 60");
+		expect(html).not.toContain("secret table");
+	});
+
+	it("explains when ClickHouse is not configured", async () => {
+		const { renderUsagePage } = await import("../usage");
+		const html = await renderUsagePage(env({ CLICKHOUSE_URL: "" } as Partial<Env>));
+		expect(html).toContain("Usage analytics are not configured");
 	});
 });
