@@ -1,18 +1,13 @@
 /**
- * /usage - public telemetry dashboard rendered from D1 usage_stats rollups.
+ * /usage - public telemetry dashboard rendered from raw ClickHouse events.
  * Charts are generated server-side as inline SVG so they stay fully within the
  * Worker CSP (no CDN scripts, no build step). Styling comes from the shared
  * design layer in ./ui/theme; only the chart-specific CSS lives here.
  */
 
-import { sql } from "drizzle-orm";
-import { getDb } from "./database";
+import { isClickHouseConfigured } from "./clickhouse/client";
+import { fetchUsageData, type Row } from "./clickhouse/usage-queries";
 import { renderPage } from "./ui/theme";
-
-interface Row {
-	label: string;
-	count: number;
-}
 
 /** Categorical ramp for donut segments and bars, cycled in order. */
 function color(i: number): string {
@@ -81,7 +76,13 @@ function areaChart(title: string, ariaLabel: string, rows: Row[]): string {
 	const X = (i: number) => pl + i * step;
 	const Y = (v: number) => pt + ih - (v / max) * ih;
 
-	const line = rows.map((r, i) => `${X(i).toFixed(1)},${Y(r.count).toFixed(1)}`).join(" ");
+	// A single day has no span to draw across, and joining one point to the two
+	// bottom corners would render a triangle sloping down to zero. Extend it to
+	// both edges instead so one day reads as a flat series at its value.
+	const line =
+		n > 1
+			? rows.map((r, i) => `${X(i).toFixed(1)},${Y(r.count).toFixed(1)}`).join(" ")
+			: `${pl},${Y(rows[0].count).toFixed(1)} ${(pl + iw).toFixed(1)},${Y(rows[0].count).toFixed(1)}`;
 	const area = `${pl},${pt + ih} ${line} ${(pl + iw).toFixed(1)},${pt + ih}`;
 
 	const gridY = [0, 0.5, 1]
@@ -255,6 +256,8 @@ main { padding: 2.5rem 0 1rem; }
 
 .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.75rem; }
 
+.empty-card { padding: 2.5rem 1.25rem; text-align: center; color: var(--text-faint); }
+
 .tooltip {
 	position: fixed;
 	pointer-events: none;
@@ -321,40 +324,52 @@ const TAIL = `<div class="tooltip" id="tip"></div>
 })();
 </script>`;
 
+/** Full-page message for the states where there is no dashboard to draw. */
+function renderNotice(title: string, detail: string): string {
+	return renderPage({
+		title: "Usage - Duyet MCP Server",
+		description: "Public usage telemetry for the Duyet MCP server.",
+		current: "usage",
+		wide: true,
+		css: CSS,
+		body: `
+<main>
+	<div class="wrap wrap-wide">
+		<div class="page-head">
+			<h1>Usage</h1>
+			<p>${esc(detail)}</p>
+		</div>
+		<div class="card empty-card">${esc(title)}</div>
+	</div>
+</main>`,
+	});
+}
+
 export async function renderUsagePage(env: Env): Promise<string> {
-	const db = getDb(env.DB);
-
-	const query = async (labelExpr: string, where = "1=1", limit = 10): Promise<Row[]> => {
-		const result = await db.all<{ label: string; count: number }>(
-			sql.raw(
-				`SELECT ${labelExpr} AS label, SUM(count) AS count FROM usage_stats WHERE ${where} GROUP BY label ORDER BY count DESC LIMIT ${limit}`,
-			),
+	if (!isClickHouseConfigured(env)) {
+		return renderNotice(
+			"Usage analytics are not configured",
+			"This deployment has no ClickHouse connection set, so no telemetry is being recorded.",
 		);
-		return result.map((r) => ({ label: String(r.label ?? ""), count: Number(r.count) }));
-	};
+	}
 
-	const [total, byDay, byClient, byVersion, byMethod, byTool, byResource, byCountry] =
-		await Promise.all([
-			db.all<{ c: number }>(sql.raw("SELECT SUM(count) AS c FROM usage_stats")),
-			query("date", "1=1", 30).then((rows) =>
-				rows.sort((a, b) => a.label.localeCompare(b.label)),
-			),
-			query("client"),
-			query("client_version", "client_version != ''"),
-			query("method"),
-			query("tool", "tool != ''"),
-			query("resource", "resource != ''"),
-			query("country", "country != ''"),
-		]);
-
-	const totalCount = Number(total[0]?.c ?? 0);
+	const {
+		total: totalCount,
+		byDay,
+		byMethod,
+		byCountry,
+		byClient,
+		byVersion,
+		byTool,
+		byResource,
+	} = await fetchUsageData(env);
 
 	const body = `
 <main>
 	<div class="wrap wrap-wide">
 		<div class="page-head">
 			<h1>Usage</h1>
-			<p>Daily rollups from D1, updated in real time and cached for 5 minutes.</p>
+			<p>Aggregated from raw request events in ClickHouse, cached for 5 minutes.</p>
 		</div>
 
 		<div class="card total">

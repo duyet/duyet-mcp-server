@@ -1,20 +1,17 @@
 /**
  * MCP client usage tracking.
  *
- * Two sinks, both fire-and-forget:
- * - Workers Analytics Engine: rich per-request events (client, method, tool,
- *   user agent, country, colo, hashed IP for approximate uniques). Retained ~90 days.
- * - D1 `usage_stats`: daily rollup rows (date/client/method/tool/country + count),
- *   kept forever for long-term trends. One upsert per request.
+ * A single sink: raw per-request events inserted into ClickHouse over its HTTP
+ * interface. ClickHouse replaced both earlier sinks, the Workers Analytics
+ * Engine dataset and the D1 `usage_stats` daily rollups, so the dashboard now
+ * aggregates raw events at query time instead of maintaining a rollup table.
  *
- * Query AE with the SQL API, e.g.:
- *   SELECT blob2 AS client, COUNT() AS requests, COUNT(DISTINCT blob7) AS approx_users
- *   FROM contact_analytics WHERE timestamp > NOW() - INTERVAL '7' DAY GROUP BY client
+ * The write is fire-and-forget and never throws: the instance is self-hosted,
+ * and it being unreachable must not affect the MCP endpoint.
  */
 
-import { sql } from "drizzle-orm";
-import { getDb } from "../database";
-import { usageStats } from "../database/schema";
+import { insertQuietly, isClickHouseConfigured } from "../clickhouse/client";
+import { safeTableName } from "../clickhouse/usage-queries";
 import { logger } from "./logger";
 
 interface JsonRpcBody {
@@ -77,72 +74,35 @@ function extract(request: Request, body: unknown): TrackedRequest {
 	};
 }
 
-/** Synchronous, non-blocking Analytics Engine write. */
-function trackToAnalyticsEngine(env: Env, t: TrackedRequest): void {
-	env.ANALYTICS?.writeDataPoint({
-		blobs: [
-			t.method, // blob1
-			t.clientName, // blob2
-			t.clientVersion, // blob3
-			t.toolName, // blob4
-			t.userAgent, // blob5
-			t.country, // blob6
-			t.ipHash, // blob7: approximate unique users
-			t.colo, // blob8
-			t.resourceUri, // blob9
-			t.protocolVersion, // blob10
-			t.city, // blob11
-			t.asn, // blob12
-		],
-		doubles: [1],
-		indexes: [t.clientName || t.userAgent.slice(0, 32) || "unknown"],
-	});
-}
-
-/** Upsert the daily rollup row in D1 (long-term storage). */
-async function trackToD1(env: Env, t: TrackedRequest): Promise<void> {
-	const db = getDb(env.DB);
-	const date = new Date().toISOString().slice(0, 10);
-
-	await db
-		.insert(usageStats)
-		.values({
-			date,
-			client: t.clientName,
-			clientVersion: t.clientVersion,
-			method: t.method,
-			tool: t.toolName,
-			resource: t.resourceUri,
-			country: t.country,
-			count: 1,
-		})
-		.onConflictDoUpdate({
-			target: [
-				usageStats.date,
-				usageStats.client,
-				usageStats.clientVersion,
-				usageStats.method,
-				usageStats.tool,
-				usageStats.resource,
-				usageStats.country,
-			],
-			set: { count: sql`${usageStats.count} + 1` },
-		});
+/** Map the extracted request onto the ClickHouse column names. */
+function toRow(t: TrackedRequest): Record<string, unknown> {
+	return {
+		// ClickHouse parses this DateTime64(3) format directly.
+		timestamp: new Date().toISOString().replace("T", " ").replace("Z", ""),
+		method: t.method,
+		client_name: t.clientName,
+		client_version: t.clientVersion,
+		protocol_version: t.protocolVersion,
+		tool_name: t.toolName,
+		resource_uri: t.resourceUri,
+		user_agent: t.userAgent,
+		country: t.country,
+		city: t.city,
+		asn: t.asn,
+		colo: t.colo,
+		ip_hash: t.ipHash,
+	};
 }
 
 /**
- * Track an MCP request. AE write is synchronous; the D1 upsert is returned as a
- * promise for ctx.waitUntil so it never blocks the response. Never throws.
+ * Track an MCP request. Returns a promise for ctx.waitUntil so the insert never
+ * blocks the response, and never throws.
  */
 export function trackMcpRequest(env: Env, request: Request, body: unknown): Promise<void> {
 	try {
-		const t = extract(request, body);
-		trackToAnalyticsEngine(env, t);
-		return trackToD1(env, t).catch((error) => {
-			logger.warn("database", "Usage rollup upsert failed", {
-				error: error instanceof Error ? error.message : String(error),
-			});
-		});
+		if (!isClickHouseConfigured(env)) return Promise.resolve();
+		const row = toRow(extract(request, body));
+		return insertQuietly(env, safeTableName(env.CLICKHOUSE_TABLE), [row]);
 	} catch (error) {
 		logger.warn("request", "Analytics tracking failed", {
 			error: error instanceof Error ? error.message : String(error),
