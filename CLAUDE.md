@@ -96,7 +96,7 @@ This project uses **Bun** as the JavaScript runtime and test runner.
 
 - **No Durable Objects**: The server is stateless; each `/mcp` POST is a self-contained JSON-RPC exchange (zero DO billing)
 - **D1 Database**: SQLite database for contact storage (`duyet-mcp-contacts`)
-- **Analytics Engine**: Contact analytics tracking (`contact_analytics` dataset)
+- **ClickHouse**: MCP usage analytics, self-hosted and reached over its HTTP interface through a Cloudflare Tunnel fronted by Access. Replaced the Analytics Engine dataset and the D1 `usage_stats` rollups. Hyperdrive is not usable for this: it supports only PostgreSQL and MySQL engines. See `src/clickhouse/`.
 - **Smart Placement**: Enabled for optimal geographic distribution
 - **Observability**: Built-in monitoring enabled
 - **Migrations**: DO class history recorded in wrangler.jsonc (MyMCP → DuyetMCP → deleted in v3)
@@ -144,7 +144,7 @@ return cacheOrFetch(cacheKey, CACHE_CONFIGS.CV, () => fetchCVData(format, cvUrl)
 
 ## Configuration Files
 
-- **wrangler.jsonc**: Cloudflare Workers configuration with Durable Objects, D1, and Analytics Engine setup
+- **wrangler.jsonc**: Cloudflare Workers configuration with D1 bindings and ClickHouse analytics vars (connection secrets are set with `wrangler secret put`, not committed)
 - **biome.json**: Code formatting and linting configuration (4-space indentation, 100 char line width)
 - **tsconfig.json**: TypeScript configuration for ES2021 target with bundler module resolution
 - **jest.config**: ESM-compatible Jest configuration for testing

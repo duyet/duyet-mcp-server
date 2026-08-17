@@ -44,16 +44,29 @@
 	],
 
 	/**
-	 * Analytics Engine Datasets
-	 * https://developers.cloudflare.com/analytics/analytics-engine/
-	 * Note: Temporarily commented out until Analytics Engine is enabled in dashboard
+	 * ClickHouse usage analytics.
+	 *
+	 * Replaces the previous Analytics Engine dataset. The instance is self-hosted
+	 * and reached over its HTTP interface through a Cloudflare Tunnel fronted by
+	 * Access, so it needs no binding, only configuration.
+	 *
+	 * Hyperdrive is not usable here: it supports only PostgreSQL and MySQL
+	 * engines, and ClickHouse's Postgres port does not fully implement the
+	 * extended query protocol those drivers require.
+	 *
+	 * CLICKHOUSE_URL is a secret rather than a var on purpose: this repository is
+	 * public, and the tunnel hostname points at a home network.
+	 *
+	 *   wrangler secret put CLICKHOUSE_URL            # https://clickhouse.example.net
+	 *   wrangler secret put CLICKHOUSE_USER
+	 *   wrangler secret put CLICKHOUSE_PASSWORD
+	 *   wrangler secret put CF_ACCESS_CLIENT_ID
+	 *   wrangler secret put CF_ACCESS_CLIENT_SECRET
 	 */
-	"analytics_engine_datasets": [
-		{
-			"binding": "ANALYTICS",
-			"dataset": "contact_analytics"
-		}
-	],
+	"vars": {
+		"CLICKHOUSE_DATABASE": "mcp",
+		"CLICKHOUSE_TABLE": "mcp_requests"
+	},
 
 	/**
 	 * Smart Placement

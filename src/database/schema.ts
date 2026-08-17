@@ -24,9 +24,12 @@ export const contacts = sqliteTable("contacts", {
 });
 
 /**
- * Long-term MCP usage aggregates (one row per day/client/method/tool/country).
- * Analytics Engine keeps raw events only ~90 days; this table keeps daily
- * rollups forever with a single upsert per request.
+ * Legacy MCP usage rollups (one row per day/client/method/tool/country).
+ *
+ * No longer written to or read from: usage analytics moved to ClickHouse, which
+ * stores raw events and aggregates at query time. The definition is kept while
+ * the historical rows still exist in D1, so they can be exported and backfilled
+ * with scripts/backfill-d1-to-clickhouse.ts. Safe to drop once that is done.
  */
 export const usageStats = sqliteTable(
 	"usage_stats",
