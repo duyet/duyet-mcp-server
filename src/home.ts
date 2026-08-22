@@ -50,6 +50,7 @@ section > h2 { margin-bottom: 1.25rem; }
 .chat-act { color: var(--text-faint); font-family: var(--mono); font-size: 0.8125rem; }
 
 .links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-size: 0.875rem; }
+.agent-note { font-size: 0.875rem; color: var(--text-muted); max-width: 60ch; }
 
 @media (max-width: 720px) {
 	.split { grid-template-columns: 1fr; gap: 2rem; }
@@ -154,6 +155,15 @@ const BODY = `
 					Sent. Duyet will receive the description with a reference ID.
 				</div>
 			</div>
+		</section>
+
+		<section>
+			<h2>For agents</h2>
+			<p class="agent-note">
+				Machine-readable metadata for OAuth-aware MCP clients:
+				<a href="/.well-known/oauth-protected-resource">/.well-known/oauth-protected-resource</a>.
+				Developer docs: <a href="https://duyet.net/developers">duyet.net/developers</a>.
+			</p>
 		</section>
 
 		<section>
