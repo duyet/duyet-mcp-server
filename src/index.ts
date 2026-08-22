@@ -142,11 +142,42 @@ llms.txt: https://blog.duyet.net/llms.txt
 - X/Twitter: https://x.com/_duyet
 - LinkedIn: https://linkedin.com/in/duyet
 - Website: https://duyet.net
+
+## When to use
+
+- Researching Duyet for hiring, contracting or collaboration
+- Fetching his blog article content and publication index
+- Looking up recent GitHub activity (commits, PRs, issues, releases)
+- Contacting Duyet programmatically via the send_message tool
+
+## Scopes & auth
+
+Scopes: read:profile, chat. Resource metadata:
+https://mcp.duyet.net/.well-known/oauth-protected-resource
+Developer docs: https://duyet.net/developers
   `;
 
 app.get("/", (c) => c.html(renderHomePage(), 200, { "Cache-Control": "public, max-age=3600" }));
 app.get("/llms.txt", (c) => c.text(LLMS_TXT, 200, { "Cache-Control": "public, max-age=3600" }));
 app.get("/favicon.ico", (c) => c.redirect("https://blog.duyet.net/icon.svg"));
+
+// RFC 9728: lets OAuth-aware MCP clients discover how this resource is protected.
+// The resource identifier is this server; the authorization server and scopes
+// mirror the metadata duyet.net already publishes for its APIs.
+const OAUTH_PROTECTED_RESOURCE = {
+	resource: "https://mcp.duyet.net",
+	authorization_servers: ["https://duyet.net"],
+	scopes_supported: ["read:profile", "chat"],
+	bearer_methods_supported: ["header"],
+	resource_documentation: "https://duyet.net/developers",
+};
+
+app.get("/.well-known/oauth-protected-resource", (c) =>
+	c.json(OAUTH_PROTECTED_RESOURCE, 200, {
+		"Cache-Control": "public, max-age=300",
+		"Access-Control-Allow-Origin": "*",
+	}),
+);
 
 app.get("/usage", async (c) => {
 	try {
