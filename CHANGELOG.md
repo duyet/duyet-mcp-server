@@ -4,6 +4,20 @@ All notable changes to this project are documented here. From v0.2.0 onward,
 entries are generated automatically by [release-please](https://github.com/googleapis/release-please)
 from conventional commits.
 
+## [0.2.2](https://github.com/duyet/duyet-mcp-server/compare/v0.2.1...v0.2.2) (2026-08-23)
+
+
+### Features
+
+* **discovery:** RFC 9728 resource metadata and agent pointers ([df68115](https://github.com/duyet/duyet-mcp-server/commit/df68115effc711a53c70dcb2ed831101aac10d38))
+* **discovery:** RFC 9728 resource metadata and agent pointers ([123144c](https://github.com/duyet/duyet-mcp-server/commit/123144cd5d38f4a52e04ccbd3b90a8b493605067))
+
+
+### Bug Fixes
+
+* **config:** point D1 binding at recreated duyet-mcp-contacts database ([30dd783](https://github.com/duyet/duyet-mcp-server/commit/30dd783bac322b629e42a708cbe40232c39b115a))
+* **config:** point D1 binding at recreated duyet-mcp-contacts database ([9203c74](https://github.com/duyet/duyet-mcp-server/commit/9203c742fab0b89bc3eccd103fc125d91872ee87))
+
 ## [0.2.1](https://github.com/duyet/duyet-mcp-server/compare/v0.2.0...v0.2.1) (2026-08-13)
 
 
