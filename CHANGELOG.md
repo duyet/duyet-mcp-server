@@ -4,6 +4,14 @@ All notable changes to this project are documented here. From v0.2.0 onward,
 entries are generated automatically by [release-please](https://github.com/googleapis/release-please)
 from conventional commits.
 
+## [0.2.3](https://github.com/duyet/duyet-mcp-server/compare/v0.2.2...v0.2.3) (2026-10-19)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @modelcontextprotocol/sdk to v1.32.0 ([#79](https://github.com/duyet/duyet-mcp-server/issues/79)) ([fb66e15](https://github.com/duyet/duyet-mcp-server/commit/fb66e15539d007ad596801ead57732a886d3dc5e))
+* **deps:** update dependency @modelcontextprotocol/sdk to v1.32.1 ([#81](https://github.com/duyet/duyet-mcp-server/issues/81)) ([b08cc76](https://github.com/duyet/duyet-mcp-server/commit/b08cc76286fae83273948d234eca5d6e3512cc0f))
+
 ## [0.2.2](https://github.com/duyet/duyet-mcp-server/compare/v0.2.1...v0.2.2) (2026-08-23)
 
 
